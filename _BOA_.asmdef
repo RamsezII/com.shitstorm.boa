@@ -1,0 +1,17 @@
+{
+    "name": "_BOA_",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ec96f6dc48fee4244bcebc247464e471",
+        "GUID:02bff2b282f91b84680849955c7860bc"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
