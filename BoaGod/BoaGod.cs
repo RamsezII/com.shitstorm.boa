@@ -6,14 +6,16 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    internal class CmdBoa : IShell
+    public class BoaGod : MonoBehaviour, IShell
     {
         public enum Commands : byte
         {
             WriteScript,
-            ReadScript,
+            ExecuteScript,
             _last_,
         }
+
+        public static BoaGod instance;
 
         IEnumerable<string> IShell.ECommands => Enum.GetNames(typeof(Commands));
 
@@ -22,7 +24,16 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Shell.AddUser(new CmdBoa());
+            Util.InstantiateOrCreate<BoaGod>();
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        private void Awake()
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            Shell.AddUser(instance);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -36,19 +47,19 @@ namespace _BOA_
                         OnCmdWriteScript(line);
                         break;
 
-                    case Commands.ReadScript:
+                    case Commands.ExecuteScript:
                         OnCmdReadScript(line);
                         break;
 
                     default:
-                        Debug.LogWarning($"{typeof(CmdBoa).FullName}.OnCmdLine: \"{code}\" not implemented");
+                        Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{code}\" not implemented");
                         break;
                 }
             else
-                Debug.LogWarning($"{typeof(CmdBoa).FullName}.OnCmdLine: \"{arg0}\" not found");
+                Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{arg0}\" not found");
         }
 
-        static void OnCmdWriteScript(in LineParser line)
+        void OnCmdWriteScript(in LineParser line)
         {
             string path = line.ReadAsPath();
             if (line.IsExec)
@@ -69,7 +80,7 @@ namespace _BOA_
                 }
         }
 
-        static void OnCmdReadScript(in LineParser line)
+        void OnCmdReadScript(in LineParser line)
         {
             string path = line.ReadAsPath();
             if (line.IsCplThis)
@@ -79,7 +90,7 @@ namespace _BOA_
                 {
                     FileInfo file = new(path);
                     if (file.Exists)
-                        BoaParser.Execute(file.FullName);
+                        StartCoroutine(new BoaParser().EReadAndExecute(file.FullName, null));
                     else
                         Debug.LogWarning($"File not found: \"{file.FullName}\"");
                 }
@@ -87,6 +98,15 @@ namespace _BOA_
                 {
                     Debug.LogWarning(e.Message);
                 }
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        private void OnDestroy()
+        {
+            Shell.RemoveUser(instance);
+            if (this == instance)
+                instance = null;
         }
     }
 }
