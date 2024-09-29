@@ -22,7 +22,7 @@ namespace _BOA_
             Debug.Log($"{typeof(BoaParser).FullName}.{nameof(EReadAndExecute)}: \"{path}\"");
             using StreamReader file = new(path, Encoding.UTF8);
             while (!file.EndOfStream)
-                if (file.ReadLine().TryReadWord(out string arg0, out string newline, true))
+                if (file.ReadLine().TryReadWord(out string arg0, out string newline))
                     if (Enum.TryParse(arg0, true, out Commands code) && code < Commands._last_)
                         switch (code)
                         {

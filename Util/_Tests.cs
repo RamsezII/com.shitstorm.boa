@@ -10,7 +10,7 @@ namespace _BOA_
         static void TestBoaParserExecute()
         {
             string line = "  123 456 789";
-            line.TryReadWord(out string newline, out string word, true);
+            line.TryReadWord(out string newline, out string word);
             Debug.Log($"\"{word}\"");
             Debug.Log($"\"{newline}\"");
         }
