@@ -6,20 +6,54 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public class BoaParser
+    public partial class BoaParser
     {
         public enum Commands : byte
         {
             Log,
             Wait,
+            var,
             _last_,
+        }
+
+        static int _id;
+        readonly int id;
+        readonly string path;
+        readonly Action onDone;
+        readonly string[] args;
+
+        public override string ToString() => $"{GetType().FullName}[{id}]";
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnAfterSceneLoad()
+        {
+            _id = 0;
         }
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public IEnumerator EReadAndExecute(string path, Action onDone)
+        public BoaParser(in string path, in Action onDone, params string[] args)
         {
-            Debug.Log($"{typeof(BoaParser).FullName}.{nameof(EReadAndExecute)}: \"{path}\"");
+            id = ++_id;
+            this.path = path;
+            this.onDone = onDone;
+            this.args = args;
+            Debug.Log($"{this} created ({path})".ToSubLog());
+            BoaGod.instance.StartCoroutine(EReadAndExecute(args));
+        }
+
+        ~BoaParser()
+        {
+            Debug.Log($"{this} destroyed ({path})".ToSubLog());
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        public IEnumerator EReadAndExecute(params string[] args)
+        {
+            Debug.Log($"{this}.{nameof(EReadAndExecute)}: \"{path}\"".ToSubLog());
             using StreamReader file = new(path, Encoding.UTF8);
             while (!file.EndOfStream)
                 if (file.ReadLine().TryReadWord(out string arg0, out string newline))
@@ -27,19 +61,24 @@ namespace _BOA_
                         switch (code)
                         {
                             case Commands.Log:
-                                Debug.Log(newline);
+                                if (TryReadToken(newline, out string token, out newline))
+                                    Debug.Log(token);
                                 break;
 
                             case Commands.Wait:
                                 yield return OnCmdWait(newline);
                                 break;
 
+                            case Commands.var:
+                                TryDeclareVariable(newline, out _);
+                                break;
+
                             default:
-                                Debug.LogWarning($"{typeof(BoaParser).FullName} does not implement command: \"{arg0}\"");
+                                Debug.LogWarning($"{this} does not implement command: \"{arg0}\"");
                                 break;
                         }
                     else
-                        Debug.LogWarning($"{typeof(BoaParser).FullName} does not recognize command: \"{arg0}\"");
+                        Debug.LogWarning($"{this} does not recognize command: \"{arg0}\"");
             onDone?.Invoke();
             yield break;
         }
@@ -48,12 +87,12 @@ namespace _BOA_
         {
             if (float.TryParse(line, out float seconds))
             {
-                Debug.Log($"{typeof(BoaParser).FullName}.{nameof(EReadAndExecute)}: will wait {seconds} seconds");
+                Debug.Log($"{this}.{nameof(EReadAndExecute)}: starts waiting {seconds} seconds".ToSubLog());
                 yield return new WaitForSeconds(seconds);
-                Debug.Log($"{typeof(BoaParser).FullName}.{nameof(EReadAndExecute)}: waited {seconds} seconds");
+                Debug.Log($"{this}.{nameof(EReadAndExecute)}: ends waiting {seconds} seconds".ToSubLog());
             }
             else
-                Debug.LogWarning($"{typeof(BoaParser).FullName}.{nameof(EReadAndExecute)}: \"{line}\" is not a valid float");
+                Debug.LogWarning($"{this}.{nameof(EReadAndExecute)}: \"{line}\" is not a valid float");
         }
     }
 }

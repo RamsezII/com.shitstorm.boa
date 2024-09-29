@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public class BoaGod : MonoBehaviour, IShell
+    internal class BoaGod : MonoBehaviour, IShell
     {
         public enum Commands : byte
         {
@@ -90,7 +90,7 @@ namespace _BOA_
                 {
                     FileInfo file = new(path);
                     if (file.Exists)
-                        StartCoroutine(new BoaParser().EReadAndExecute(file.FullName, null));
+                        new BoaParser(file.FullName, null, line.ReadAll());
                     else
                         Debug.LogWarning($"File not found: \"{file.FullName}\"");
                 }

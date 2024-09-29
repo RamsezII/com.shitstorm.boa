@@ -9,10 +9,16 @@ namespace _BOA_
         [MenuItem("Assets/" + nameof(_BOA_) + "/" + nameof(TestBoaParserExecute))]
         static void TestBoaParserExecute()
         {
-            string line = "  123 456 789";
-            line.TryReadWord(out string newline, out string word);
-            Debug.Log($"\"{word}\"");
-            Debug.Log($"\"{newline}\"");
+            void Waw(in string value, out string output)
+            {
+                Debug.Log("in1: " + value);
+                output = "zzup Vega";
+                Debug.Log("in2: " + value);
+            }
+
+            string value = "Hello Kong";
+            Waw(value, out value);
+            Debug.Log("out: " + value);
         }
     }
 }
