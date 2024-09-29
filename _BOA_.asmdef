@@ -1,6 +1,6 @@
 {
     "name": "_BOA_",
-    "rootNamespace": "",
+    "rootNamespace": "_BOA_",
     "references": [
         "GUID:ec96f6dc48fee4244bcebc247464e471",
         "GUID:02bff2b282f91b84680849955c7860bc"
