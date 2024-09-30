@@ -6,12 +6,12 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    internal class BoaGod : MonoBehaviour, IShell
+    internal partial class BoaGod : MonoBehaviour, IShell
     {
         public enum Commands : byte
         {
-            WriteScript,
             ExecuteScript,
+            TestPython,
             _last_,
         }
 
@@ -43,12 +43,12 @@ namespace _BOA_
             if (Enum.TryParse(arg0, true, out Commands code) && code < Commands._last_)
                 switch (code)
                 {
-                    case Commands.WriteScript:
-                        OnCmdWriteScript(line);
-                        break;
-
                     case Commands.ExecuteScript:
                         OnCmdReadScript(line);
+                        break;
+
+                    case Commands.TestPython:
+                        OnCmdTestPython(line);
                         break;
 
                     default:
@@ -57,50 +57,6 @@ namespace _BOA_
                 }
             else
                 Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{arg0}\" not found");
-        }
-
-        void OnCmdWriteScript(in LineParser line)
-        {
-            string path = line.ReadAsPath();
-            if (line.IsExec)
-                try
-                {
-                    FileInfo file = new(path);
-                    if (!File.Exists(file.FullName))
-                    {
-                        string folderPath = Path.GetDirectoryName(file.FullName);
-                        if (!Directory.Exists(folderPath))
-                            Directory.CreateDirectory(folderPath);
-                        Debug.Log($"Creating file: \"{file.FullName}\"".ToSubLog());
-                        File.WriteAllText(file.FullName, string.Empty);
-                    }
-                    Debug.Log($"Opening file: \"{file.FullName}\"".ToSubLog());
-                    Application.OpenURL(file.FullName);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning(e.Message);
-                }
-        }
-
-        void OnCmdReadScript(in LineParser line)
-        {
-            string path = line.ReadAsPath();
-            if (line.IsCplThis)
-                line.CplPath(line, path, out _);
-            else if (line.IsExec)
-                try
-                {
-                    FileInfo file = new(path);
-                    if (file.Exists)
-                        new BoaParser(null, file.FullName, line.ReadAll(), null);
-                    else
-                        Debug.LogWarning($"File not found: \"{file.FullName}\"");
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                }
         }
 
         //--------------------------------------------------------------------------------------------------------------
