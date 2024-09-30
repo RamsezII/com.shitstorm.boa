@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -11,12 +12,16 @@ namespace _BOA_
         public enum Commands : byte
         {
             Log,
-            Wait,
-            var,
+            Sleep,
+            Var,
+            Int,
+            Float,
+            Exec,
             _last_,
         }
 
         static int _id;
+        const bool logGarbageCollection = true;
         readonly int id;
         readonly string path;
         readonly Action onDone;
@@ -34,51 +39,88 @@ namespace _BOA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public BoaParser(in string path, in Action onDone, params string[] args)
+        public BoaParser(in BoaParser parser, in string path, string args, in Action onDone)
         {
             id = ++_id;
             this.path = path;
             this.onDone = onDone;
-            this.args = args;
-            Debug.Log($"{this} created ({path})".ToSubLog());
-            BoaGod.instance.StartCoroutine(EReadAndExecute(args));
+
+            List<string> list = new();
+            while ((parser ?? this).TryReadToken(args, out string token, out args))
+                list.Add(token);
+            this.args = list.ToArray();
+
+            Debug.Log($"{this} created ({nameof(path)}: {path}) (args: {this.args.ToLog()})".ToSubLog());
+            BoaGod.instance.StartCoroutine(EReadAndExecute());
         }
 
         ~BoaParser()
         {
-            Debug.Log($"{this} destroyed ({path})".ToSubLog());
+            if (logGarbageCollection)
+                Debug.Log($"{this} destroyed ({path})".ToSubLog());
         }
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public IEnumerator EReadAndExecute(params string[] args)
+        public IEnumerator EReadAndExecute()
         {
             Debug.Log($"{this}.{nameof(EReadAndExecute)}: \"{path}\"".ToSubLog());
+            bool error = false;
             using StreamReader file = new(path, Encoding.UTF8);
-            while (!file.EndOfStream)
-                if (file.ReadLine().TryReadWord(out string arg0, out string newline))
-                    if (Enum.TryParse(arg0, true, out Commands code) && code < Commands._last_)
-                        switch (code)
+            while (!error && !file.EndOfStream)
+            {
+                string line = file.ReadLine();
+                if (!line.StartsWith("#", StringComparison.OrdinalIgnoreCase) && !line.StartsWith("//", StringComparison.OrdinalIgnoreCase))
+                {
+                    string token;
+
+                    if (line.TryReadWord(out string arg0, out string newline))
+                        if (Enum.TryParse(arg0, true, out Commands code) && code < Commands._last_)
+                            switch (code)
+                            {
+                                case Commands.Log:
+                                    if (TryReadToken(newline, out token, out newline))
+                                        Debug.Log(token);
+                                    break;
+
+                                case Commands.Sleep:
+                                    yield return OnCmdWait(newline);
+                                    break;
+
+                                case Commands.Var:
+                                    TryDeclareVariable(newline, out _);
+                                    break;
+
+                                case Commands.Int:
+                                    if (TryReadToken(newline, out token, out newline))
+                                        if (TryComputeInt(token, out int _int))
+                                            Debug.Log($"{this} computed int: {_int}");
+                                    break;
+
+                                case Commands.Float:
+                                    if (TryReadToken(newline, out token, out newline))
+                                        if (TryComputeFloat(token, out float _float))
+                                            Debug.Log($"{this} computed float: {_float}");
+                                    break;
+
+                                case Commands.Exec:
+                                    if (TryReadToken(newline, out token, out newline))
+                                        new BoaParser(this, token, newline, null);
+                                    break;
+
+                                default:
+                                    Debug.LogWarning($"{this} does not implement command: \"{arg0}\"");
+                                    error = true;
+                                    break;
+                            }
+                        else
                         {
-                            case Commands.Log:
-                                if (TryReadToken(newline, out string token, out newline))
-                                    Debug.Log(token);
-                                break;
-
-                            case Commands.Wait:
-                                yield return OnCmdWait(newline);
-                                break;
-
-                            case Commands.var:
-                                TryDeclareVariable(newline, out _);
-                                break;
-
-                            default:
-                                Debug.LogWarning($"{this} does not implement command: \"{arg0}\"");
-                                break;
+                            error = true;
+                            Debug.LogWarning($"{this} does not recognize command: \"{arg0}\"");
                         }
-                    else
-                        Debug.LogWarning($"{this} does not recognize command: \"{arg0}\"");
+                }
+            }
+
             onDone?.Invoke();
             yield break;
         }

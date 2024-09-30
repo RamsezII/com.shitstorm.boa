@@ -68,10 +68,13 @@ namespace _BOA_
                     FileInfo file = new(path);
                     if (!File.Exists(file.FullName))
                     {
-                        Debug.Log($"Creating file: \"{file.FullName}\"");
+                        string folderPath = Path.GetDirectoryName(file.FullName);
+                        if (!Directory.Exists(folderPath))
+                            Directory.CreateDirectory(folderPath);
+                        Debug.Log($"Creating file: \"{file.FullName}\"".ToSubLog());
                         File.WriteAllText(file.FullName, string.Empty);
                     }
-                    Debug.Log($"Opening file: \"{file.FullName}\"");
+                    Debug.Log($"Opening file: \"{file.FullName}\"".ToSubLog());
                     Application.OpenURL(file.FullName);
                 }
                 catch (Exception e)
@@ -90,13 +93,13 @@ namespace _BOA_
                 {
                     FileInfo file = new(path);
                     if (file.Exists)
-                        new BoaParser(file.FullName, null, line.ReadAll());
+                        new BoaParser(null, file.FullName, line.ReadAll(), null);
                     else
                         Debug.LogWarning($"File not found: \"{file.FullName}\"");
                 }
                 catch (Exception e)
                 {
-                    Debug.LogWarning(e.Message);
+                    Debug.LogException(e);
                 }
         }
 
