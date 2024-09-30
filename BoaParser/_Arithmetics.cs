@@ -49,21 +49,21 @@ namespace _BOA_
                     return true;
                 }
             }
+            else if ((index = token.LastIndexOf("/")) > 0)
+            {
+                string[] tokens = new string[2] { token[..index], token[++index..] };
+                if (TryComputeFloat(tokens[0], out float a) && TryComputeFloat(tokens[1], out float b))
+                {
+                    value = a / b;
+                    return true;
+                }
+            }
             else if ((index = token.IndexOf("*")) > 0)
             {
                 string[] tokens = new string[2] { token[..index], token[++index..] };
                 if (TryComputeFloat(tokens[0], out float a) && TryComputeFloat(tokens[1], out float b))
                 {
                     value = a * b;
-                    return true;
-                }
-            }
-            else if ((index = token.IndexOf("/")) > 0)
-            {
-                string[] tokens = new string[2] { token[..index], token[++index..] };
-                if (TryComputeFloat(tokens[0], out float a) && TryComputeFloat(tokens[1], out float b))
-                {
-                    value = a / b;
                     return true;
                 }
             }
