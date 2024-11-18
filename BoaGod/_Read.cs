@@ -19,7 +19,7 @@ namespace _BOA_
                     if (file.Exists)
                         new BoaParser(null, file.FullName, line.ReadAll(), null);
                     else
-                        Debug.LogWarning($"File not found: \"{file.FullName}\"");
+                        Debug.LogWarning($"File not found: \"{file.FullName}\"", this);
                 }
                 catch (Exception e)
                 {

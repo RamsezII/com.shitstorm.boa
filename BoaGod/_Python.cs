@@ -1,4 +1,5 @@
 ﻿using _TERMINAL_;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -30,7 +31,7 @@ namespace _BOA_
 
                 // Lire les outputs
                 string result = pythonProcess.StandardOutput.ReadLine();
-                print("Résultat : " + result);
+                Debug.Log("Résultat : " + result, this);
 
                 pythonProcess.WaitForExit();
             }

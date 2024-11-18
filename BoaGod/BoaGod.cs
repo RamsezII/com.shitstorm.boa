@@ -52,11 +52,11 @@ namespace _BOA_
                         break;
 
                     default:
-                        Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{code}\" not implemented");
+                        Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{code}\" not implemented", this);
                         break;
                 }
             else
-                Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{arg0}\" not found");
+                Debug.LogWarning($"{GetType().FullName}.OnCmdLine: \"{arg0}\" not found", this);
         }
 
         //--------------------------------------------------------------------------------------------------------------
