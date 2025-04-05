@@ -67,6 +67,7 @@ namespace _BOA_
             Debug.Log($"{this}.{nameof(EReadAndExecute)}: \"{path}\"".ToSubLog());
             bool error = false;
             using StreamReader file = new(path, Encoding.UTF8);
+
             while (!error && !file.EndOfStream)
             {
                 string line = file.ReadLine();

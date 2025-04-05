@@ -12,9 +12,9 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand(instance, "boa");
+            Command.cmd_root_shell.AddCommand("boa", instance);
 
-            instance.AddCommand(new(
+            instance.AddCommand("execute-script", new(
                 manual: new("execute script at path <path>"),
                 args: exe =>
                 {
@@ -25,8 +25,7 @@ namespace _BOA_
                 {
                     exe.Stdout("Executing script at path: " + exe.args[0]);
                 }),
-                "execute-script", "execute"
-                );
+                "execute");
         }
     }
 }
