@@ -1,20 +1,20 @@
 ﻿using _COBRA_;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _BOA_
 {
     static internal class CmdBoa
     {
-        static readonly Command instance = new("boa", manual: new("write your own shitstorm scripts :)"));
-
-        //--------------------------------------------------------------------------------------------------------------
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command.cmd_root_shell.AddCommand(instance);
+            Command cmd_boa = Shell.static_domain.AddDomain(
+                "boa",
+                manual: new("write your own shitstorm scripts :)")
+                );
 
-            instance.AddCommand(new(
+            cmd_boa.AddRoutine(
                 "execute-script",
                 manual: new("execute script at path <path>"),
                 args: exe =>
@@ -22,11 +22,12 @@ namespace _BOA_
                     if (exe.line.TryReadArgument(out string arg))
                         exe.args.Add(arg);
                 },
-                action: exe =>
-                {
-                    exe.Stdout("Executing script at path: " + exe.args[0]);
-                }),
-                "execute");
+                routine: ERoutine);
+
+            static IEnumerator<CMD_STATUS> ERoutine(Command.Executor exe)
+            {
+                yield break;
+            }
         }
     }
 }
