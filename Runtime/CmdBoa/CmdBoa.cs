@@ -17,6 +17,7 @@ namespace _BOA_
             cmd_boa.AddRoutine(
                 "execute-script",
                 manual: new("execute script at path <path>"),
+                min_args: 1,
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string arg))
