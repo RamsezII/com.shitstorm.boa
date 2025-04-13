@@ -9,12 +9,12 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Command cmd_boa = Shell.static_domain.AddDomain(
+            Command domain_boa = Command.static_domain.AddDomain(
                 "boa",
                 manual: new("write your own shitstorm scripts :)")
                 );
 
-            cmd_boa.AddRoutine(
+            domain_boa.AddRoutine(
                 "execute-script",
                 manual: new("execute script at path <path>"),
                 min_args: 1,
