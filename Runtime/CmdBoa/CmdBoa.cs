@@ -20,7 +20,7 @@ namespace _BOA_
                 min_args: 1,
                 args: exe =>
                 {
-                    if (exe.line.TryReadArgument(out string arg))
+                    if (exe.line.TryReadArgument(out string arg, out _))
                         exe.args.Add(arg);
                 },
                 routine: ERoutine);
