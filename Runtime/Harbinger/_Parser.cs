@@ -1,62 +1,74 @@
-﻿using System.Collections.Generic;
-
-namespace _BOA_
+﻿namespace _BOA_
 {
     partial class Harbinger
     {
-        class Parser
+        static string TryParse(in string text, out MegaContractor stack)
         {
-            List<Token> tokens; int pos = 0;
+            stack = new();
+            int read_i = 0;
+            string error;
+            while (ParseContractor(text, ref read_i, out AbstractContractor contractor, out error))
+                stack.stack.Add(contractor);
+            return error;
+        }
 
-            Token Peek() => tokens[pos];
-            Token Next() => tokens[pos++];
+        static bool ParseContractor(in string text, ref int read_i, out AbstractContractor contractor, out string error)
+        {
+            error = null;
 
-            public List<Node> Parse(List<Token> toks)
-            {
-                tokens = toks; pos = 0;
-                var nodes = new List<Node>();
-                while (Peek().Type != TokenType.EOF)
+            if (Util_cobra.HasNext(text, ref read_i))
+                switch (text[read_i])
                 {
-                    if (Peek().Type == TokenType.If) nodes.Add(ParseIf());
-                    else if (Peek().Type == TokenType.Print) nodes.Add(ParsePrint());
-                    else if (Peek().Type == TokenType.Identifier) nodes.Add(ParseAssign());
-                    else { Next(); } // skip
-                }
-                return nodes;
-            }
+                    case '{':
+                        ++read_i;
+                        if (Util_cobra.HasNext(text, ref read_i))
+                        {
+                            MegaContractor body = new();
 
-            Node ParseAssign()
-            {
-                var id = Next();
-                Next(); // =
-                var val = Next();
-                Next(); // ;
-                return new AssignNode(id.Value, val.Value);
-            }
-            Node ParsePrint()
-            {
-                Next(); // print
-                var str = Next();
-                Next(); // ;
-                return new PrintNode(str.Value);
-            }
-            Node ParseIf()
-            {
-                Next(); // if
-                Next(); // (
-                var left = Next(); var op = Next(); var right = Next();
-                Next(); // )
-                Next(); // {
-                var body = new List<Node>();
-                while (Peek().Type != TokenType.RBrace)
-                {
-                    if (Peek().Type == TokenType.Print) body.Add(ParsePrint());
-                    else if (Peek().Type == TokenType.Identifier) body.Add(ParseAssign());
-                    else Next();
+                            while (ParseContractor(text, ref read_i, out AbstractContractor subcontractor, out error))
+                                body.stack.Add(subcontractor);
+
+                            if (error != null)
+                            {
+                                contractor = null;
+                                return false;
+                            }
+
+                            contractor = body;
+
+                            if (text[read_i] == '}')
+                            {
+                                ++read_i;
+                                return true;
+                            }
+                            else
+                                error = $"did not find closing bracket '}}'";
+                        }
+                        break;
+
+                    default:
+                        {
+                            while (text[read_i] switch
+                            {
+                                ' ' or ';' or '\n' or '\r' or '\t' => true,
+                                _ => false,
+                            })
+                                ++read_i;
+
+                            if (Util_boa.TryReadArgument(text, out int start_i, ref read_i, out string arg))
+                            {
+                                if (global_contracts.TryGetValue(arg, out Contract contract))
+                                {
+                                    contractor = new Contractor(contract, text, ref read_i);
+                                    return true;
+                                }
+                            }
+                        }
+                        break;
                 }
-                Next(); // }
-                return new IfNode(new ConditionNode(left.Value, op.Type.ToString(), right.Value), body);
-            }
+
+            contractor = null;
+            return false;
         }
     }
 }

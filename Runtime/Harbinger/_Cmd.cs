@@ -2,32 +2,13 @@
 using _UTIL_;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
+        static void InitCmd_Run()
         {
-            Command.static_domain.AddAction(
-                "harbinger-test",
-                action: static exe =>
-                {
-                    string code = @"
-                        x = 5;
-                        if (x > 2) {
-                            print ""hello!"";
-                        }
-                        ";
-
-                    List<Token> tokens = Tokenize(code);
-                    Parser parser = new();
-                    List<Node> nodes = parser.Parse(tokens);
-                    // Tu peux afficher les nodes pour debug, ou écrire un interpréteur qui exécute ça !
-                });
-
             Command.static_domain.AddRoutine(
                 "run-boa-script",
                 min_args: 1,
@@ -40,6 +21,9 @@ namespace _BOA_
 
             static IEnumerator<CMD_STATUS> ERunScript(Command.Executor exe)
             {
+                while (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                    yield return default;
+
                 string script_path = (string)exe.args[0];
                 script_path = exe.shell.PathCheck(script_path, PathModes.ForceFull);
 
@@ -51,7 +35,26 @@ namespace _BOA_
 
                 string script_text = File.ReadAllText(script_path);
 
-                var instructions = ParseInstructions(script_text);
+                string error = TryParse(script_text, out var contractor);
+                if (error != null)
+                {
+                    exe.error = error;
+                    yield break;
+                }
+
+                var execution = contractor.EExecute();
+
+                while (true)
+                    if (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
+                        yield return default;
+                    else if (execution.MoveNext())
+                    {
+                        if (execution.Current.data != null)
+                            exe.Stdout(execution.Current.data);
+                        yield return new CMD_STATUS(progress: execution.Current.progress);
+                    }
+                    else
+                        yield break;
             }
         }
     }

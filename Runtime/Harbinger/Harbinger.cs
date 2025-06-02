@@ -1,19 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 
 namespace _BOA_
 {
-    internal static partial class Harbinger
+    public static partial class Harbinger
     {
-        public static List<Instruction> ParseInstructions(in string text)
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void OnBeforeSceneLoad()
         {
-            List<Instruction> instructions = new();
-            ParseInstructions(text, 0, instructions);
-            return instructions;
+            global_contracts.Clear();
         }
 
-        static void ParseInstructions(in string text, in int read_i, in List<Instruction> instructions)
-        {
+        //----------------------------------------------------------------------------------------------------------
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnAfterSceneLoad()
+        {
+            InitCmd_Run();
         }
     }
 }
