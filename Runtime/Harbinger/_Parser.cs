@@ -1,31 +1,42 @@
-﻿namespace _BOA_
+﻿using System;
+
+namespace _BOA_
 {
     partial class Harbinger
     {
-        static string TryParse(in string text, out MegaContractor stack)
+        static string TryParseInstructions(in BoaReader reader, in Action<object> stdout, out MegaContractor stack)
         {
             stack = new();
-            int read_i = 0;
             string error;
-            while (ParseContractor(text, ref read_i, out AbstractContractor contractor, out error))
+            while (ParseInstruction(reader, stdout, out AbstractContractor contractor, out error))
                 stack.stack.Add(contractor);
             return error;
         }
 
-        static bool ParseContractor(in string text, ref int read_i, out AbstractContractor contractor, out string error)
+        static bool ParseInstruction(in BoaReader reader, in Action<object> stdout, out AbstractContractor contractor, out string error)
         {
+            contractor = null;
             error = null;
 
-            if (Util_cobra.HasNext(text, ref read_i))
-                switch (text[read_i])
+            while (reader.TryPeek(out char c) && c switch
+            {
+                ' ' or ';' or '\n' or '\r' or '\t' => true,
+                _ => false,
+            })
+                ++reader.read_i;
+
+            if (reader.HasNext())
+            {
+                char c = reader.Peek();
+                switch (c)
                 {
                     case '{':
-                        ++read_i;
-                        if (Util_cobra.HasNext(text, ref read_i))
+                        ++reader.read_i;
+                        if (reader.HasNext())
                         {
                             MegaContractor body = new();
 
-                            while (ParseContractor(text, ref read_i, out AbstractContractor subcontractor, out error))
+                            while (ParseInstruction(reader, stdout, out AbstractContractor subcontractor, out error))
                                 body.stack.Add(subcontractor);
 
                             if (error != null)
@@ -36,11 +47,8 @@
 
                             contractor = body;
 
-                            if (text[read_i] == '}')
-                            {
-                                ++read_i;
+                            if (reader.TryReadChar('}'))
                                 return true;
-                            }
                             else
                                 error = $"did not find closing bracket '}}'";
                         }
@@ -48,24 +56,85 @@
 
                     default:
                         {
-                            while (text[read_i] switch
-                            {
-                                ' ' or ';' or '\n' or '\r' or '\t' => true,
-                                _ => false,
-                            })
-                                ++read_i;
-
-                            if (Util_boa.TryReadArgument(text, out int start_i, ref read_i, out string arg))
-                            {
-                                if (global_contracts.TryGetValue(arg, out Contract contract))
+                            if (reader.TryReadArgument(out string arg))
+                                switch (arg.ToLower())
                                 {
-                                    contractor = new Contractor(contract, text, ref read_i);
-                                    return true;
+                                    case "if":
+                                        if (ParseGetter(reader, stdout, out var cond_contractor, out error))
+                                        {
+                                            contractor = cond_contractor;
+                                            return true;
+                                        }
+                                        contractor = null;
+                                        return false;
+
+                                    case "var":
+                                        {
+                                            if (reader.TryReadArgument(out string varname))
+                                                if (reader.TryReadArgument(out string varval))
+                                                    global_values[varname] = varval;
+                                        }
+                                        break;
+
+                                    default:
+                                        {
+                                            if (global_values.TryGetValue(arg, out _))
+                                            {
+                                                if (reader.HasNext())
+                                                    if (reader.TryReadChar('='))
+                                                        if (reader.TryReadArgument(out string varval))
+                                                        {
+                                                            global_values[arg] = varval;
+                                                            return true;
+                                                        }
+                                                return false;
+                                            }
+
+                                            if (global_contracts.TryGetValue(arg, out var contract))
+                                            {
+                                                contractor = new Contractor(contract, reader, stdout);
+                                                return true;
+                                            }
+                                        }
+                                        break;
                                 }
-                            }
                         }
                         break;
                 }
+            }
+
+            return false;
+        }
+
+        static bool ParseGetter(BoaReader reader, Action<object> stdout, out Contractor contractor, out string error)
+        {
+            error = null;
+
+            if (reader.HasNext())
+            {
+                Contractor _cont = null;
+                string _error = null;
+
+                if (reader.TryReadBetween('(', ')', true, () =>
+                {
+                    if (reader.TryReadArgument(out string arg))
+                        if (global_contracts.TryGetValue(arg, out Contract contract))
+                            if (contract.type == typeof(bool))
+                                _cont = new Contractor(contract, reader, stdout);
+                            else
+                                _error = $"'if' statement expects boolean contract (while '{contract.name}' is of type {contract.type.GetType()})";
+                        else
+                            _error = $"no {nameof(contract)} named '{arg}'";
+                    else
+                        _error = $"could not parse condition";
+                }))
+                {
+                    contractor = _cont;
+                    return true;
+                }
+
+                error = _error;
+            }
 
             contractor = null;
             return false;

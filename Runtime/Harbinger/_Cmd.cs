@@ -34,8 +34,8 @@ namespace _BOA_
                 }
 
                 string script_text = File.ReadAllText(script_path);
-
-                string error = TryParse(script_text, out var contractor);
+                BoaReader reader = new(script_text);
+                string error = TryParseInstructions(reader, stdout => exe.Stdout(stdout), out var contractor);
                 if (error != null)
                 {
                     exe.error = error;
@@ -48,11 +48,7 @@ namespace _BOA_
                     if (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
                         yield return default;
                     else if (execution.MoveNext())
-                    {
-                        if (execution.Current.data != null)
-                            exe.Stdout(execution.Current.data);
                         yield return new CMD_STATUS(progress: execution.Current.progress);
-                    }
                     else
                         yield break;
             }

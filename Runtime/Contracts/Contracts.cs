@@ -10,15 +10,16 @@ namespace _BOA_
         {
             Harbinger.AddContract(new(
                 "print",
+                typeof(object),
                 min_args: 1,
                 args: static cont =>
                 {
-                    if (cont.TryReadArgument(out string arg))
+                    if (cont.reader.TryReadArgument(out string arg))
                         cont.args.Add(arg);
                 },
                 action: static cont =>
                 {
-                    return new() { data = cont.args[0], };
+                    cont.stdout(cont.args[0]);
                 })
                 );
 
@@ -27,12 +28,13 @@ namespace _BOA_
                 min_args: 1,
                 args: static cont =>
                 {
-
+                    if (cont.reader.TryReadArgument(out string arg))
+                        cont.args.Add(arg);
                 },
                 routine: EWait)
                 );
 
-            static IEnumerator<Harbinger.Contract.Status> EWait(Harbinger.Contractor contractor)
+            static IEnumerator<Contract.Status> EWait(Contractor contractor)
             {
                 float timer = 0;
 
