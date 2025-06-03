@@ -3,12 +3,14 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    static internal partial class Contracts
+    partial class Harbinger
     {
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
+        static void InitContracts()
         {
-            Harbinger.AddContract(new(
+            Init_Vars();
+            Init_If();
+
+            AddContract(new(
                 "print",
                 typeof(object),
                 min_args: 1,
@@ -20,10 +22,9 @@ namespace _BOA_
                 action: static cont =>
                 {
                     cont.stdout(cont.args[0]);
-                })
-                );
+                }));
 
-            Harbinger.AddContract(new(
+            AddContract(new(
                 "wait",
                 min_args: 1,
                 args: static cont =>

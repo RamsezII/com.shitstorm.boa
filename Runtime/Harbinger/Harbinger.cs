@@ -22,6 +22,7 @@ namespace _BOA_
         static void OnAfterSceneLoad()
         {
             InitCmd_Run();
+            InitContracts();
         }
 
         //----------------------------------------------------------------------------------------------------------

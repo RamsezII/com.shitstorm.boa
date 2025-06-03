@@ -4,10 +4,25 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public abstract class AbstractContractor
+    public abstract class AbstractContractor : IDisposable
     {
+        public bool disposed;
         public object result;
         internal abstract IEnumerator<Contract.Status> EExecute();
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+            disposed = true;
+            OnDispose();
+        }
+
+        protected virtual void OnDispose()
+        {
+        }
     }
 
     public sealed class Contractor : AbstractContractor
@@ -16,11 +31,12 @@ namespace _BOA_
         public readonly ushort id;
 
         public readonly Contract contract;
+        public readonly BoaReader reader;
         public readonly Action<object> stdout;
-        public readonly List<object> args;
+        public readonly List<object> args = new();
         public readonly IEnumerator<Contract.Status> routine;
 
-        public readonly BoaReader reader;
+        public string error;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -41,10 +57,7 @@ namespace _BOA_
             this.stdout = stdout;
 
             if (contract.args != null)
-            {
-                args = new();
                 contract.args(this);
-            }
 
             if (contract.routine != null)
                 routine = contract.routine(this);
@@ -61,7 +74,7 @@ namespace _BOA_
         }
     }
 
-    public sealed class MegaContractor : AbstractContractor
+    public sealed class BodyContractor : AbstractContractor
     {
         internal readonly List<AbstractContractor> stack = new();
 
@@ -69,13 +82,23 @@ namespace _BOA_
 
         internal override IEnumerator<Contract.Status> EExecute()
         {
-            int stack_i = 0;
-            while (stack_i < stack.Count)
+            for (int i = 0; i < stack.Count; i++)
             {
-                var execution = stack[stack_i++].EExecute();
-                while (execution.MoveNext())
+                var contractor = stack[i];
+                var execution = contractor.EExecute();
+                while (!contractor.disposed && execution.MoveNext())
                     yield return execution.Current;
             }
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        protected override void OnDispose()
+        {
+            base.OnDispose();
+            for (int i = 0; i < stack.Count; i++)
+                stack[i].Dispose();
+            stack.Clear();
         }
     }
 }

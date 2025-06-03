@@ -56,5 +56,18 @@ namespace _BOA_
             }
             return false;
         }
+
+        public bool TryReadArgument(in string match, in bool ignore_case)
+        {
+            if (TryReadArgument(text, out start_i, ref read_i, out string argument))
+                if (match.Equals(argument, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                {
+                    last_arg = argument;
+                    return true;
+                }
+                else
+                    read_i = start_i;
+            return false;
+        }
     }
 }
