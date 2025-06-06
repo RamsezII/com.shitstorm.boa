@@ -25,6 +25,18 @@ namespace _BOA_
         }
     }
 
+    //public sealed class Contractor_bool : AbstractContractor
+    //{
+
+
+    //    //----------------------------------------------------------------------------------------------------------
+
+    //    internal override IEnumerator<Contract.Status> EExecute()
+    //    {
+
+    //    }
+    //}
+
     public sealed class Contractor : AbstractContractor
     {
         static ushort _id;
@@ -34,7 +46,6 @@ namespace _BOA_
         public readonly BoaReader reader;
         public readonly Action<object> stdout;
         public readonly List<object> args = new();
-        public readonly IEnumerator<Contract.Status> routine;
 
         public string error;
 
@@ -56,11 +67,7 @@ namespace _BOA_
             this.reader = reader;
             this.stdout = stdout;
 
-            if (contract.args != null)
-                contract.args(this);
-
-            if (contract.routine != null)
-                routine = contract.routine(this);
+            contract.args?.Invoke(this);
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -68,9 +75,12 @@ namespace _BOA_
         internal override IEnumerator<Contract.Status> EExecute()
         {
             contract.action?.Invoke(this);
-            if (routine != null)
+            if (contract.routine != null)
+            {
+                var routine = contract.routine(this);
                 while (routine.MoveNext())
                     yield return routine.Current;
+            }
         }
     }
 

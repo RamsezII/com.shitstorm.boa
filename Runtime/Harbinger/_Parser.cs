@@ -84,7 +84,12 @@ namespace _BOA_
             error = null;
 
             if (reader.HasNext())
-                if (reader.TryReadArgument(out string arg))
+                if (reader.TryReadChar(';'))
+                {
+                    contractor = null;
+                    return force_type == null;
+                }
+                else if (reader.TryReadArgument(out string arg))
                 {
                     if (global_contracts.TryGetValue(arg, out Contract contract) && (force_type == null || force_type.IsAssignableFrom(contract.type)))
                     {

@@ -9,6 +9,7 @@ namespace _BOA_
         {
             Init_Vars();
             Init_If();
+            Init_For();
 
             AddContract(new(
                 "print",
