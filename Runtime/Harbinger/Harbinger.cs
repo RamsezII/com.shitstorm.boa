@@ -9,6 +9,8 @@ namespace _BOA_
         static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
         static readonly Dictionary<string, Variable<object>> global_values = new(StringComparer.Ordinal);
 
+        //----------------------------------------------------------------------------------------------------------
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad()
         {

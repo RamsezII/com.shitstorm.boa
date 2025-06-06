@@ -4,18 +4,18 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        public static string TryParseInstructions(in BoaReader reader, in Action<object> stdout, out BodyContractor stack)
+        public static string TryParseProgram(in BoaReader reader, in Action<object> stdout, out BodyContractor body)
         {
-            stack = new();
+            body = new();
             string error;
-            while (ParseBodyOrInstruction(reader, stdout, out AbstractContractor contractor, out error))
-                stack.stack.Add(contractor);
+            while (TryParseBlock(reader, stdout, out AbstractContractor contractor, out error))
+                body.stack.Add(contractor);
             return error;
         }
 
-        public static bool ParseBodyOrInstruction(in BoaReader reader, in Action<object> stdout, out AbstractContractor contractor, out string error)
+        public static bool TryParseBlock(in BoaReader reader, in Action<object> stdout, out AbstractContractor block, out string error)
         {
-            contractor = null;
+            block = null;
             error = null;
 
             if (reader.HasNext())
@@ -25,16 +25,16 @@ namespace _BOA_
                     {
                         BodyContractor body = new();
 
-                        while (ParseBodyOrInstruction(reader, stdout, out AbstractContractor subcontractor, out error))
-                            body.stack.Add(subcontractor);
+                        while (TryParseBlock(reader, stdout, out AbstractContractor sub_block, out error))
+                            body.stack.Add(sub_block);
 
                         if (error != null)
                         {
-                            contractor = null;
+                            block = null;
                             return false;
                         }
 
-                        contractor = body;
+                        block = body;
 
                         if (reader.TryReadChar('}'))
                             return true;
@@ -42,71 +42,80 @@ namespace _BOA_
                             error = $"did not find closing bracket '}}'";
                     }
                 }
-                else if (ParseInstruction(reader, stdout, out contractor, out error))
+                else if (TryParseExpression(reader, stdout, out block, out error))
                     return true;
 
             return false;
         }
 
-        public static bool ParseInstruction(in BoaReader reader, in Action<object> stdout, out AbstractContractor contractor, out string error)
-        {
-            contractor = null;
-            error = null;
-
-            if (reader.TryReadArgument(out string arg))
-            {
-                if (global_values.ContainsKey(arg))
-                {
-                    if (reader.TryPeek(out char c))
-                        switch (c)
-                        {
-                            case '=':
-                                return ParseStatement(reader, data => global_values[arg] = new Variable<object>(arg, data), out contractor, out error, typeof(object));
-                        }
-                    return false;
-                }
-
-                reader.read_i = reader.start_i;
-
-                if (ParseStatement(reader, stdout, out contractor, out error, null))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public static bool ParseStatement(BoaReader reader, Action<object> stdout, out AbstractContractor contractor, out string error, in Type force_type)
+        public static bool TryParseExpression(BoaReader reader, Action<object> stdout, out AbstractContractor expression, out string error, in Type force_type = null)
         {
             error = null;
 
             if (reader.HasNext())
                 if (reader.TryReadChar(';'))
                 {
-                    contractor = null;
-                    return force_type == null;
+                    expression = null;
+                    return true;
                 }
-                else if (reader.TryReadArgument(out string arg))
+                else if (reader.TryReadArgument(out string arg0))
                 {
-                    if (global_contracts.TryGetValue(arg, out Contract contract) && (force_type == null || force_type.IsAssignableFrom(contract.type)))
+                    if (global_contracts.TryGetValue(arg0, out Contract contract) && (force_type == null || force_type.IsAssignableFrom(contract.type)))
                     {
-                        contractor = new Contractor(contract, reader, stdout);
+                        expression = new Contractor(contract, reader, stdout);
                         return true;
                     }
 
                     reader.read_i = reader.start_i;
 
-                    if (ParseData(reader, stdout, out Literal<object> literal, out error, force_type))
-                    {
-                        contractor = new Contractor_value<object>(literal);
-                        return true;
-                    }
+                    if (ParseValue(reader, stdout, out Literal<object> literal, out error, force_type))
+                        if (reader.TryReadArgument(out string arg1))
+                        {
+                            Contract cmd = arg1 switch
+                            {
+                                "=" => cmd_assign,
+                                "+=" => cmd_increment,
+                                "==" => cmd_equals,
+                                "!=" => cmd_nequals,
+                                ">" => cmd_greater,
+                                "<" => cmd_lesser,
+                                ">=" => cmd_egreater,
+                                "<=" => cmd_elesser,
+                                _ => null,
+                            };
+
+                            if (cmd == cmd_increment)
+                            {
+                                if (global_values.TryGetValue(arg0, out var variable))
+                                {
+                                    var contractor = new Contractor(cmd, reader, stdout, parse_arguments: false);
+                                    contractor.args.Add(variable);
+                                    contractor.args.Add(literal);
+                                    expression = contractor;
+                                    return true;
+                                }
+                            }
+                            else if (ParseValue(reader, stdout, out Literal<object> literal2, out error, force_type))
+                            {
+                                var contractor = new Contractor(cmd, reader, stdout, parse_arguments: false);
+                                contractor.args.Add(literal);
+                                contractor.args.Add(literal2);
+                                expression = contractor;
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            expression = new Contractor_value<object>(literal);
+                            return true;
+                        }
                 }
 
-            contractor = null;
+            expression = null;
             return false;
         }
 
-        public static bool ParseData(BoaReader reader, Action<object> stdout, out Literal<object> literal, out string error, in Type force_type)
+        public static bool ParseValue(BoaReader reader, Action<object> stdout, out Literal<object> literal, out string error, in Type force_type)
         {
             error = null;
 

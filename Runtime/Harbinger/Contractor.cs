@@ -56,7 +56,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Contractor(in Contract contract, in BoaReader reader, in Action<object> stdout)
+        public Contractor(in Contract contract, in BoaReader reader, in Action<object> stdout, in bool parse_arguments = true)
         {
             id = _id.LoopID();
 
@@ -64,7 +64,8 @@ namespace _BOA_
             this.reader = reader;
             this.stdout = stdout;
 
-            contract.args?.Invoke(this);
+            if (parse_arguments)
+                contract.args?.Invoke(this);
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -97,8 +98,7 @@ namespace _BOA_
         internal override IEnumerator<Contract.Status> EExecute()
         {
             result = literal.Value;
-            if (false)
-                yield break;
+            yield break;
         }
     }
 

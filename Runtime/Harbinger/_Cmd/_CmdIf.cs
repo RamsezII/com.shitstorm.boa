@@ -22,16 +22,16 @@ namespace _BOA_
                                     body_if.Dispose();
                         }
 
-                        if (ParseStatement(cont.reader, OnCond, out var condition, out cont.error, typeof(object)))
+                        if (TryParseExpression(cont.reader, OnCond, out var condition, out cont.error, typeof(object)))
                             if (cont.reader.TryReadChar(')'))
-                                if (ParseBodyOrInstruction(cont.reader, cont.stdout, out body_if, out cont.error))
+                                if (TryParseBlock(cont.reader, cont.stdout, out body_if, out cont.error))
                                 {
                                     cont.args.Add(condition);
                                     cont.args.Add(body_if);
 
                                     if (cont.reader.HasNext())
                                         if (cont.reader.TryReadArgument("else", true))
-                                            if (ParseBodyOrInstruction(cont.reader, cont.stdout, out body_else, out cont.error))
+                                            if (TryParseBlock(cont.reader, cont.stdout, out body_else, out cont.error))
                                                 cont.args.Add(body_else);
                                 }
                     }

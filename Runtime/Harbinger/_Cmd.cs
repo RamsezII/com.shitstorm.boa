@@ -35,7 +35,7 @@ namespace _BOA_
 
                 string script_text = File.ReadAllText(script_path);
                 BoaReader reader = new(script_text);
-                string error = TryParseInstructions(reader, stdout => exe.Stdout(stdout), out var contractor);
+                string error = TryParseProgram(reader, stdout => exe.Stdout(stdout), out var contractor);
                 if (error != null)
                 {
                     exe.error = error;

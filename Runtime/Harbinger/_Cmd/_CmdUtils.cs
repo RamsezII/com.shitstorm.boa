@@ -17,7 +17,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static cont =>
                 {
-                    if (ParseStatement(cont.reader, null, out var statement, out cont.error, null))
+                    if (TryParseExpression(cont.reader, null, out var statement, out cont.error, null))
                         cont.args.Add(statement);
                 },
                 routine: static cont =>
