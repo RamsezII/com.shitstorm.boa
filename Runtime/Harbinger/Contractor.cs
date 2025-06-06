@@ -25,18 +25,6 @@ namespace _BOA_
         }
     }
 
-    //public sealed class Contractor_bool : AbstractContractor
-    //{
-
-
-    //    //----------------------------------------------------------------------------------------------------------
-
-    //    internal override IEnumerator<Contract.Status> EExecute()
-    //    {
-
-    //    }
-    //}
-
     public sealed class Contractor : AbstractContractor
     {
         static ushort _id;

@@ -12,10 +12,6 @@
                             if (cont.reader.TryReadChar('='))
                                 if (!ParseStatement(cont.reader, data => global_values[varname] = data, out Contractor getter, out cont.error, null))
                                     cont.args.Add(varname);
-                },
-                action: static cont =>
-                {
-
                 }));
         }
     }

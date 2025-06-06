@@ -118,23 +118,36 @@ namespace _BOA_
                 switch (lower)
                 {
                     case "true":
+                        contractor = new Contractor(null, reader, stdout)
                         {
-                            Contractor cont = new(literal, reader, stdout);
-                            cont.args.Add(true);
-                            contractor = cont;
-                        }
+                            result = true,
+                        };
                         return true;
 
                     case "false":
+                        contractor = new Contractor(null, reader, stdout)
                         {
-                            Contractor cont = new(literal, reader, stdout);
-                            cont.args.Add(false);
-                            contractor = cont;
-                        }
+                            result = false,
+                        };
                         return true;
 
                     default:
-                        break;
+                        if (int.TryParse(arg, out int _int))
+                            contractor = new Contractor(null, reader, stdout)
+                            {
+                                result = _int,
+                            };
+                        else if (Util.TryParseFloat(arg, out float _float))
+                            contractor = new Contractor(null, reader, stdout)
+                            {
+                                result = _float,
+                            };
+                        else
+                            contractor = new Contractor(null, reader, stdout)
+                            {
+                                result = arg,
+                            };
+                        return true;
                 }
             }
 
