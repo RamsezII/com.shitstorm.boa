@@ -10,13 +10,13 @@ namespace _BOA_
                 args: static cont =>
                 {
                     if (cont.reader.TryReadChar('('))
-                        if (ParseStatement(cont.reader, null, out Contractor instr_1, out cont.error, null))
+                        if (ParseStatement(cont.reader, null, out var instr_1, out cont.error, null))
                             if (cont.reader.TryReadChar(';'))
-                                if (ParseStatement(cont.reader, null, out Contractor instr_2, out cont.error, typeof(bool)))
+                                if (ParseStatement(cont.reader, null, out var instr_2, out cont.error, typeof(bool)))
                                     if (cont.reader.TryReadChar(';'))
-                                        if (ParseStatement(cont.reader, null, out Contractor instr_3, out cont.error, null))
+                                        if (ParseStatement(cont.reader, null, out var instr_3, out cont.error, null))
                                             if (cont.reader.TryReadChar(')'))
-                                                if (ParseBodyOrInstruction(cont.reader, null, out AbstractContractor body, out cont.error))
+                                                if (ParseBodyOrInstruction(cont.reader, null, out var body, out cont.error))
                                                 {
                                                     cont.args.Add(instr_1);
                                                     cont.args.Add(instr_2);

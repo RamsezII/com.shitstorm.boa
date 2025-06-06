@@ -11,6 +11,15 @@ namespace _BOA_
         internal abstract IEnumerator<Contract.Status> EExecute();
 
         //----------------------------------------------------------------------------------------------------------
+        public IEnumerator<Contract.Status> ERoutinize(Action action)
+        {
+            var routine = EExecute();
+            while (routine.MoveNext())
+                yield return routine.Current;
+            action?.Invoke();
+        }
+
+        //----------------------------------------------------------------------------------------------------------
 
         public void Dispose()
         {
@@ -69,6 +78,27 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
             }
+        }
+    }
+
+    internal sealed class Contractor_value<T> : AbstractContractor
+    {
+        internal readonly Literal<T> literal;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public Contractor_value(in Literal<T> literal)
+        {
+            this.literal = literal;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override IEnumerator<Contract.Status> EExecute()
+        {
+            result = literal.Value;
+            if (false)
+                yield break;
         }
     }
 

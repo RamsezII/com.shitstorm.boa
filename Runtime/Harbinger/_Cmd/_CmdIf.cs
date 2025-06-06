@@ -22,7 +22,7 @@ namespace _BOA_
                                     body_if.Dispose();
                         }
 
-                        if (ParseStatement(cont.reader, OnCond, out Contractor condition, out cont.error, typeof(object)))
+                        if (ParseStatement(cont.reader, OnCond, out var condition, out cont.error, typeof(object)))
                             if (cont.reader.TryReadChar(')'))
                                 if (ParseBodyOrInstruction(cont.reader, cont.stdout, out body_if, out cont.error))
                                 {

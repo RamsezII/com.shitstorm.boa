@@ -12,21 +12,22 @@ namespace _BOA_
             Init_For();
 
             AddContract(new(
-                "print",
+                "echo",
                 typeof(object),
                 min_args: 1,
                 args: static cont =>
                 {
-                    if (cont.reader.TryReadArgument(out string arg))
-                        cont.args.Add(arg);
+                    if (ParseStatement(cont.reader, null, out var statement, out cont.error, null))
+                        cont.args.Add(statement);
                 },
-                action: static cont =>
+                routine: static cont =>
                 {
-                    cont.stdout(cont.args[0]);
+                    AbstractContractor statement = (AbstractContractor)cont.args[0];
+                    return statement.ERoutinize(() => cont.stdout(statement.result));
                 }));
 
             AddContract(new(
-                "wait",
+                "sleep",
                 min_args: 1,
                 args: static cont =>
                 {

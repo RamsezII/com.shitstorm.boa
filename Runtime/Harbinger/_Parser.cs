@@ -42,16 +42,13 @@ namespace _BOA_
                             error = $"did not find closing bracket '}}'";
                     }
                 }
-                else if (ParseInstruction(reader, stdout, out Contractor cont, out error))
-                {
-                    contractor = cont;
+                else if (ParseInstruction(reader, stdout, out contractor, out error))
                     return true;
-                }
 
             return false;
         }
 
-        public static bool ParseInstruction(in BoaReader reader, in Action<object> stdout, out Contractor contractor, out string error)
+        public static bool ParseInstruction(in BoaReader reader, in Action<object> stdout, out AbstractContractor contractor, out string error)
         {
             contractor = null;
             error = null;
@@ -60,13 +57,12 @@ namespace _BOA_
             {
                 if (global_values.ContainsKey(arg))
                 {
-                    if (reader.HasNext())
-                        if (reader.TryReadChar('='))
-                            if (ParseStatement(reader, data => global_values[arg] = data, out Contractor cont, out error, typeof(object)))
-                            {
-                                contractor = cont;
-                                return true;
-                            }
+                    if (reader.TryPeek(out char c))
+                        switch (c)
+                        {
+                            case '=':
+                                return ParseStatement(reader, data => global_values[arg] = new Variable<object>(arg, data), out contractor, out error, typeof(object));
+                        }
                     return false;
                 }
 
@@ -79,7 +75,7 @@ namespace _BOA_
             return false;
         }
 
-        public static bool ParseStatement(BoaReader reader, Action<object> stdout, out Contractor contractor, out string error, in Type force_type)
+        public static bool ParseStatement(BoaReader reader, Action<object> stdout, out AbstractContractor contractor, out string error, in Type force_type)
         {
             error = null;
 
@@ -99,58 +95,52 @@ namespace _BOA_
 
                     reader.read_i = reader.start_i;
 
-                    if (ParseLiteral(reader, stdout, out contractor, out error, force_type))
+                    if (ParseData(reader, stdout, out Literal<object> literal, out error, force_type))
+                    {
+                        contractor = new Contractor_value<object>(literal);
                         return true;
+                    }
                 }
 
             contractor = null;
             return false;
         }
 
-        public static bool ParseLiteral(BoaReader reader, Action<object> stdout, out Contractor contractor, out string error, in Type force_type)
+        public static bool ParseData(BoaReader reader, Action<object> stdout, out Literal<object> literal, out string error, in Type force_type)
         {
-            contractor = null;
             error = null;
 
             if (reader.TryReadArgument(out string arg))
-            {
-                string lower = arg.ToLower();
-                switch (lower)
+                if (global_values.TryGetValue(arg, out var variable))
                 {
-                    case "true":
-                        contractor = new Contractor(null, reader, stdout)
-                        {
-                            result = true,
-                        };
-                        return true;
-
-                    case "false":
-                        contractor = new Contractor(null, reader, stdout)
-                        {
-                            result = false,
-                        };
-                        return true;
-
-                    default:
-                        if (int.TryParse(arg, out int _int))
-                            contractor = new Contractor(null, reader, stdout)
-                            {
-                                result = _int,
-                            };
-                        else if (Util.TryParseFloat(arg, out float _float))
-                            contractor = new Contractor(null, reader, stdout)
-                            {
-                                result = _float,
-                            };
-                        else
-                            contractor = new Contractor(null, reader, stdout)
-                            {
-                                result = arg,
-                            };
-                        return true;
+                    literal = new Literal<object>(variable);
+                    return true;
                 }
-            }
+                else
+                {
+                    string lower = arg.ToLower();
+                    switch (lower)
+                    {
+                        case "true":
+                            literal = new(true);
+                            return true;
 
+                        case "false":
+                            literal = new(false);
+                            return true;
+
+                        default:
+                            if (int.TryParse(arg, out int _int))
+                                literal = new(_int);
+                            else if (Util.TryParseFloat(arg, out float _float))
+                                literal = new(_float);
+                            else
+                                literal = new(arg);
+                            return true;
+                    }
+                }
+
+            literal = null;
             return false;
         }
     }
