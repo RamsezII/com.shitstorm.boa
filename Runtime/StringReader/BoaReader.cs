@@ -26,34 +26,46 @@ namespace _BOA_
         public void Peek(out char c) => c = text[read_i];
         public bool HasNext() => text.HasNext(ref read_i);
 
-        public bool TryPeek(out char c)
+        public bool TryPeek(out char c, in bool skip_empties = true)
         {
-            if (read_i >= text.Length)
+            if (skip_empties)
+                HasNext();
+
+            if (read_i < text.Length)
             {
-                c = '\0';
-                return false;
+                c = text[read_i];
+                return true;
             }
-            c = text[read_i];
-            return true;
+
+            c = '\0';
+            return false;
         }
 
-        public bool TryReadChar(in char expected_value)
+        public bool TryReadChar(in char expected_value, in bool skip_empties = true)
         {
+            if (skip_empties)
+                HasNext();
+
             if (TryPeek(out char c) && c == expected_value)
             {
                 ++read_i;
                 return true;
             }
+
             return false;
         }
 
-        public bool TryReadChar(out char value, in string expected_values, in bool ignore_case = false)
+        public bool TryReadChar(out char value, in string expected_values, in bool ignore_case = false, in bool skip_empties = true)
         {
+            if (skip_empties)
+                HasNext();
+
             if (TryPeek(out value) && expected_values.Contains(value, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
             {
                 ++read_i;
                 return true;
             }
+
             value = default;
             return false;
         }

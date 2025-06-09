@@ -20,6 +20,20 @@ namespace _BOA_
 
         internal abstract IEnumerator<Contract.Status> EExecute(Action<object> on_done = null);
 
+        public static IEnumerator<Contract.Status> EExecute(Func<object> on_all_done, params (Executor executor, Action<object> on_done)[] stack)
+        {
+            if (stack != null && stack.Length > 0)
+                for (int i = 0; i < stack.Length; i++)
+                    if (stack[i].executor != null)
+                    {
+                        var (executor, on_done) = stack[i];
+                        var routine = executor.EExecute(on_done);
+                        while (routine.MoveNext())
+                            yield return routine.Current;
+                    }
+            yield return new() { data = on_all_done?.Invoke(), };
+        }
+
         //----------------------------------------------------------------------------------------------------------
 
         public void Dispose()

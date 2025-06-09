@@ -41,6 +41,7 @@
             symbol = string.Empty;
             cmd = null;
 
+            int read_i = reader.read_i;
             if (reader.TryReadChar(out char c_oper, "=+-*/%<>&|", true))
             {
                 symbol = c_oper.ToString();
@@ -149,7 +150,10 @@
             }
 
             if (cmd == null)
+            {
                 symbol = string.Empty;
+                reader.read_i = read_i;
+            }
 
             return cmd != null;
         }
@@ -175,6 +179,35 @@
                     Variable<object> variable = (Variable<object>)exe.args[0];
                     Executor expression = (Executor)exe.args[1];
                     return expression.EExecute(data => variable.value = data);
+                }));
+
+            cmd_add_ = AddContract(new("add",
+                args: static exe =>
+                {
+                    if (exe.harbinger.TryParseExpression(exe.reader, out var expr1, out exe.error))
+                        if (exe.harbinger.TryParseExpression(exe.reader, out var expr2, out exe.error))
+                        {
+                            exe.args.Add(expr1);
+                            exe.args.Add(expr2);
+                        }
+                },
+                routine: static exe =>
+                {
+                    Executor expr1 = (Executor)exe.args[0];
+                    Executor expr2 = (Executor)exe.args[1];
+
+                    object data1 = null, data2 = null;
+
+                    return Executor.EExecute(
+                        () =>
+                        {
+                            if (data1 is int i1 && data2 is int i2)
+                                return i1 + i2;
+                            return 0;
+                        },
+                        (expr1, data => data1 = data),
+                        (expr2, data => data2 = data)
+                        );
                 }));
         }
     }
