@@ -4,20 +4,21 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public abstract class AbstractContractor : IDisposable
+    public abstract class Executor : IDisposable
     {
+        public readonly Harbinger harbinger;
         public bool disposed;
-        public object result;
-        internal abstract IEnumerator<Contract.Status> EExecute();
 
         //----------------------------------------------------------------------------------------------------------
-        public IEnumerator<Contract.Status> ERoutinize(Action action)
+
+        public Executor(in Harbinger harbinger)
         {
-            var routine = EExecute();
-            while (routine.MoveNext())
-                yield return routine.Current;
-            action?.Invoke();
+            this.harbinger = harbinger;
         }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal abstract IEnumerator<Contract.Status> EExecute(Action<object> on_done = null);
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -34,14 +35,13 @@ namespace _BOA_
         }
     }
 
-    public sealed class Contractor : AbstractContractor
+    public sealed class ContractExecutor : Executor
     {
         static ushort _id;
         public readonly ushort id;
 
         public readonly Contract contract;
         public readonly BoaReader reader;
-        public readonly Action<object> stdout;
         public readonly List<object> args = new();
 
         public string error;
@@ -56,67 +56,62 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Contractor(in Contract contract, in BoaReader reader, in Action<object> stdout, in bool parse_arguments = true)
+        public ContractExecutor(in Harbinger harbinger, in Contract contract, in BoaReader reader, in bool parse_arguments = true) : base(harbinger)
         {
             id = _id.LoopID();
 
             this.contract = contract;
             this.reader = reader;
-            this.stdout = stdout;
 
             if (parse_arguments)
-                contract.args?.Invoke(this);
+                contract?.args?.Invoke(this);
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done = null)
         {
-            contract.action?.Invoke(this);
-            if (contract.routine != null)
-            {
-                var routine = contract.routine(this);
-                while (routine.MoveNext())
-                    yield return routine.Current;
-            }
-        }
-    }
-
-    internal sealed class Contractor_value<T> : AbstractContractor
-    {
-        internal readonly Literal<T> literal;
-
-        //----------------------------------------------------------------------------------------------------------
-
-        public Contractor_value(in Literal<T> literal)
-        {
-            this.literal = literal;
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        internal override IEnumerator<Contract.Status> EExecute()
-        {
-            result = literal.Value;
-            yield break;
+            object result = null;
+            if (contract != null)
+                if (contract.action != null)
+                    result = contract.action(this);
+                else if (contract.routine != null)
+                {
+                    var routine = contract.routine(this);
+                    while (routine.MoveNext())
+                    {
+                        result = routine.Current.data;
+                        yield return routine.Current;
+                    }
+                }
+            on_done?.Invoke(result);
         }
     }
 
-    public sealed class BodyContractor : AbstractContractor
+    public sealed class BlockExecutor : Executor
     {
-        internal readonly List<AbstractContractor> stack = new();
+        internal readonly List<Executor> stack = new();
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        internal BlockExecutor(in Harbinger harbinger) : base(harbinger)
         {
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done = null)
+        {
+            object result = null;
             for (int i = 0; i < stack.Count; i++)
             {
-                var contractor = stack[i];
-                var execution = contractor.EExecute();
-                while (!contractor.disposed && execution.MoveNext())
-                    yield return execution.Current;
+                var exe = stack[i];
+                var routine = exe.EExecute(null);
+                while (!exe.disposed && routine.MoveNext())
+                    yield return routine.Current;
+                result = routine.Current.data;
             }
+            on_done?.Invoke(result);
         }
 
         //----------------------------------------------------------------------------------------------------------

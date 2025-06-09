@@ -47,6 +47,31 @@ namespace _BOA_
             return false;
         }
 
+        public bool TryReadChar(out char value, in string expected_values, in bool ignore_case = false)
+        {
+            if (TryPeek(out value) && expected_values.Contains(value, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+            {
+                ++read_i;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        public bool SkipUntil(in char expected_value)
+        {
+            while (read_i < text.Length)
+            {
+                if (TryPeek(out char c) && c == expected_value)
+                {
+                    ++read_i;
+                    return true;
+                }
+                ++read_i;
+            }
+            return false;
+        }
+
         public bool TryReadArgument(out string argument)
         {
             if (TryReadArgument(text, out start_i, ref read_i, out argument))
@@ -57,7 +82,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadArgument(in string match, in bool ignore_case)
+        public bool TryReadMatch(in string match, in bool ignore_case)
         {
             if (TryReadArgument(text, out start_i, ref read_i, out string argument))
                 if (match.Equals(argument, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))

@@ -4,10 +4,12 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public static partial class Harbinger
+    public partial class Harbinger
     {
         static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
-        static readonly Dictionary<string, Variable<object>> global_values = new(StringComparer.Ordinal);
+        readonly Dictionary<string, Variable<object>> global_variables = new(StringComparer.Ordinal);
+
+        public readonly Action<object> stdout;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -15,7 +17,6 @@ namespace _BOA_
         static void OnBeforeSceneLoad()
         {
             global_contracts.Clear();
-            global_values.Clear();
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -23,8 +24,8 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            InitCmd_Run();
             InitContracts();
+            InitCmd_Run();
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -33,6 +34,13 @@ namespace _BOA_
         {
             global_contracts.Add(contract.name, contract);
             return contract;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public Harbinger(in Action<object> stdout)
+        {
+            this.stdout = stdout;
         }
     }
 }

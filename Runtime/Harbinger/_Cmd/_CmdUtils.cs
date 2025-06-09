@@ -8,22 +8,20 @@ namespace _BOA_
         static void InitContracts()
         {
             Init_Vars();
-            Init_If();
-            Init_For();
 
             AddContract(new(
                 "echo",
                 typeof(object),
                 min_args: 1,
-                args: static cont =>
+                args: static exe =>
                 {
-                    if (TryParseExpression(cont.reader, null, out var statement, out cont.error, null))
-                        cont.args.Add(statement);
+                    if (exe.harbinger.TryParseExpression(exe.reader, out var statement, out exe.error))
+                        exe.args.Add(statement);
                 },
-                routine: static cont =>
+                routine: static exe =>
                 {
-                    AbstractContractor statement = (AbstractContractor)cont.args[0];
-                    return statement.ERoutinize(() => cont.stdout(statement.result));
+                    Executor statement = (Executor)exe.args[0];
+                    return statement.EExecute(exe.harbinger.stdout);
                 }));
 
             AddContract(new(
@@ -37,7 +35,7 @@ namespace _BOA_
                 routine: EWait)
                 );
 
-            static IEnumerator<Contract.Status> EWait(Contractor contractor)
+            static IEnumerator<Contract.Status> EWait(ContractExecutor contractor)
             {
                 float timer = 0;
 

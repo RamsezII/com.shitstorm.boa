@@ -1,21 +1,42 @@
-﻿using System;
-
-namespace _BOA_
+﻿namespace _BOA_
 {
     partial class Harbinger
     {
-        public static string TryParseProgram(in BoaReader reader, in Action<object> stdout, out BodyContractor body)
+        /*
+
+            Instruction
+            │
+            ├── Assignation (ex: x = ...)
+            │     └── Expression
+            │           └── ...
+            │
+            └── Expression
+                  └── Or/And/Comparison
+                        └── Addition
+                            └── Multiplication
+                                └── Facteur
+                                      ├── Littéral (nombre)
+                                      ├── Variable
+                                      ├── Parenthèse
+                                      └── Appel de fonction
+
+        */
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public Executor ParseProgram(in BoaReader reader, out string error)
         {
-            body = new();
-            string error;
-            while (TryParseBlock(reader, stdout, out AbstractContractor contractor, out error))
-                body.stack.Add(contractor);
-            return error;
+            BlockExecutor program = new(this);
+
+            while (TryParseBlock(reader, out Executor block, out error))
+                program.stack.Add(block);
+
+            return program;
         }
 
-        public static bool TryParseBlock(in BoaReader reader, in Action<object> stdout, out AbstractContractor block, out string error)
+        internal bool TryParseBlock(in BoaReader reader, out Executor executor, out string error)
         {
-            block = null;
+            executor = null;
             error = null;
 
             if (reader.HasNext())
@@ -23,18 +44,18 @@ namespace _BOA_
                 {
                     if (reader.HasNext())
                     {
-                        BodyContractor body = new();
+                        BlockExecutor block = new(this);
 
-                        while (TryParseBlock(reader, stdout, out AbstractContractor sub_block, out error))
-                            body.stack.Add(sub_block);
+                        while (TryParseBlock(reader, out Executor exe, out error))
+                            block.stack.Add(exe);
 
                         if (error != null)
                         {
-                            block = null;
+                            executor = null;
                             return false;
                         }
 
-                        block = body;
+                        executor = block;
 
                         if (reader.TryReadChar('}'))
                             return true;
@@ -42,114 +63,170 @@ namespace _BOA_
                             error = $"did not find closing bracket '}}'";
                     }
                 }
-                else if (TryParseExpression(reader, stdout, out block, out error))
+                else if (TryParseInstruction(reader, out var instruction, out error))
+                {
+                    executor = instruction;
                     return true;
+                }
 
             return false;
         }
 
-        public static bool TryParseExpression(BoaReader reader, Action<object> stdout, out AbstractContractor expression, out string error, in Type force_type = null)
+        internal bool TryParseInstruction(in BoaReader reader, out ContractExecutor instruction, out string error)
         {
+            instruction = null;
             error = null;
 
             if (reader.HasNext())
                 if (reader.TryReadChar(';'))
                 {
-                    expression = null;
+                    instruction = new(this, null, reader);
                     return true;
                 }
-                else if (reader.TryReadArgument(out string arg0))
+                else if (reader.TryReadMatch("//", true))
                 {
-                    if (global_contracts.TryGetValue(arg0, out Contract contract) && (force_type == null || force_type.IsAssignableFrom(contract.type)))
-                    {
-                        expression = new Contractor(contract, reader, stdout);
-                        return true;
-                    }
-
-                    reader.read_i = reader.start_i;
-
-                    if (ParseValue(reader, stdout, out Literal<object> literal, out error, force_type))
-                        if (reader.TryReadArgument(out string arg1))
-                        {
-                            Contract cmd = arg1 switch
-                            {
-                                "=" => cmd_assign,
-                                "+=" => cmd_increment,
-                                "==" => cmd_equals,
-                                "!=" => cmd_nequals,
-                                ">" => cmd_greater,
-                                "<" => cmd_lesser,
-                                ">=" => cmd_egreater,
-                                "<=" => cmd_elesser,
-                                _ => null,
-                            };
-
-                            if (cmd == cmd_increment)
-                            {
-                                if (global_values.TryGetValue(arg0, out var variable))
-                                {
-                                    var contractor = new Contractor(cmd, reader, stdout, parse_arguments: false);
-                                    contractor.args.Add(variable);
-                                    contractor.args.Add(literal);
-                                    expression = contractor;
-                                    return true;
-                                }
-                            }
-                            else if (ParseValue(reader, stdout, out Literal<object> literal2, out error, force_type))
-                            {
-                                var contractor = new Contractor(cmd, reader, stdout, parse_arguments: false);
-                                contractor.args.Add(literal);
-                                contractor.args.Add(literal2);
-                                expression = contractor;
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            expression = new Contractor_value<object>(literal);
-                            return true;
-                        }
+                    reader.SkipUntil('\n');
+                    instruction = new(this, null, reader);
+                    return true;
                 }
+                else if (TryParseExpression(reader, out instruction, out error))
+                    return true;
 
-            expression = null;
             return false;
         }
 
-        public static bool ParseValue(BoaReader reader, Action<object> stdout, out Literal<object> literal, out string error, in Type force_type)
+        internal bool TryParseExpression(BoaReader reader, out ContractExecutor expression, out string error)
         {
-            error = null;
+            expression = null;
 
-            if (reader.TryReadArgument(out string arg))
-                if (global_values.TryGetValue(arg, out var variable))
+            // assignation
+            int read_i = reader.read_i;
+            if (reader.TryReadArgument(out string varname))
+                if (global_variables.TryGetValue(varname, out var variable))
+                    if (TryGetOperator(reader, out string assign_op, out Contract assign_cmd, op_assign: true))
+                        if (TryParseExpression(reader, out var expr, out error))
+                        {
+                            expression = new ContractExecutor(this, assign_cmd, reader, parse_arguments: false);
+                            expression.args.Add(variable);
+                            expression.args.Add(expr);
+                            return true;
+                        }
+                        else
+                        {
+                            error ??= $"expected expression after '{assign_op}' operator";
+                            return false;
+                        }
+            reader.read_i = read_i;
+
+            // expression
+            if (TryParseTerm(reader, out var term1, out error))
+                if (TryGetOperator(reader, out string assign_op, out Contract assign_cmd, op_expr: true))
                 {
-                    literal = new Literal<object>(variable);
+                    if (TryParseExpression(reader, out var term2, out error))
+                    {
+                        expression = new ContractExecutor(this, assign_cmd, reader, parse_arguments: false);
+                        expression.args.Add(term1);
+                        expression.args.Add(term2);
+                        return true;
+                    }
+                    else
+                    {
+                        error ??= $"expected expression after '{assign_op}' operator";
+                        return false;
+                    }
+                }
+                else
+                {
+                    expression = term1;
+                    return true;
+                }
+
+            return false;
+        }
+
+        internal bool TryParseTerm(in BoaReader reader, out ContractExecutor term, out string error)
+        {
+            term = null;
+
+            if (!TryParseFactor(reader, out var factor1, out error))
+                return false;
+
+            if (TryGetOperator(reader, out string op_term, out Contract term_cmd, op_terms: true))
+            {
+                if (TryParseExpression(reader, out var factor2, out error))
+                {
+                    term = new ContractExecutor(this, term_cmd, reader, parse_arguments: false);
+                    term.args.Add(factor1);
+                    term.args.Add(factor2);
                     return true;
                 }
                 else
                 {
+                    error ??= $"expected term after '{op_term}' operator";
+                    return false;
+                }
+            }
+            else
+            {
+                term = factor1;
+                return true;
+            }
+        }
+
+        internal bool TryParseFactor(in BoaReader reader, out ContractExecutor factor, out string error)
+        {
+            error = null;
+            factor = null;
+
+            if (reader.TryReadChar('('))
+                if (!TryParseExpression(reader, out factor, out error))
+                {
+                    error ??= "expected expression inside parentheses";
+                    return false;
+                }
+                else if (!reader.TryReadChar(')'))
+                {
+                    error ??= $"expected closing parenthesis ')'";
+                    return false;
+                }
+
+            if (reader.TryReadArgument(out string arg))
+                if (global_contracts.TryGetValue(arg, out var contract))
+                {
+                    factor = new ContractExecutor(this, contract, reader);
+                    return true;
+                }
+                else if (global_variables.TryGetValue(arg, out var variable))
+                {
+                    factor = new(this, cmd_variable, reader, parse_arguments: false);
+                    factor.args.Add(variable);
+                    return true;
+                }
+                else
+                {
+                    factor = new(this, cmd_literal, reader, parse_arguments: false);
                     string lower = arg.ToLower();
                     switch (lower)
                     {
                         case "true":
-                            literal = new(true);
+                            factor.args.Add(true);
                             return true;
 
                         case "false":
-                            literal = new(false);
+                            factor.args.Add(false);
                             return true;
 
                         default:
                             if (int.TryParse(arg, out int _int))
-                                literal = new(_int);
+                                factor.args.Add(_int);
                             else if (Util.TryParseFloat(arg, out float _float))
-                                literal = new(_float);
+                                factor.args.Add(_float);
                             else
-                                literal = new(arg);
+                                factor.args.Add(arg);
                             return true;
                     }
                 }
 
-            literal = null;
             return false;
         }
     }

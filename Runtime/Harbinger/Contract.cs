@@ -19,13 +19,15 @@ namespace _BOA_
 
             public States state;
             [Range(0, 1)] public float progress;
+            public object data;
         }
 
         public readonly string name;
-        public readonly Type type;
-        public readonly int min_args, max_args;
-        public readonly Action<Contractor> args, action;
-        public readonly Func<Contractor, IEnumerator<Status>> routine;
+        internal readonly Type type;
+        internal readonly int min_args, max_args;
+        public readonly Action<ContractExecutor> args;
+        internal readonly Func<ContractExecutor, object> action;
+        internal readonly Func<ContractExecutor, IEnumerator<Status>> routine;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -33,9 +35,9 @@ namespace _BOA_
             in Type type = null,
             in int min_args = 0,
             in int max_args = 0,
-            in Action<Contractor> args = null,
-            in Action<Contractor> action = null,
-            in Func<Contractor, IEnumerator<Status>> routine = null
+            in Action<ContractExecutor> args = null,
+            in Func<ContractExecutor, object> action = null,
+            in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
         {
             this.name = name;

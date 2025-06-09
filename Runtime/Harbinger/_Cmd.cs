@@ -34,15 +34,17 @@ namespace _BOA_
                 }
 
                 string script_text = File.ReadAllText(script_path);
+                Harbinger harbinger = new(data => exe.Stdout(data));
                 BoaReader reader = new(script_text);
-                string error = TryParseProgram(reader, stdout => exe.Stdout(stdout), out var contractor);
+                using Executor executor = harbinger.ParseProgram(reader, out string error);
+
                 if (error != null)
                 {
                     exe.error = error;
                     yield break;
                 }
 
-                var execution = contractor.EExecute();
+                var execution = executor.EExecute();
 
                 while (true)
                     if (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
