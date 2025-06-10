@@ -6,6 +6,28 @@ namespace _BOA_
 {
     public partial class Harbinger
     {
+        /*
+
+            Instruction
+            │
+            ├── Assignation (ex: x = ...)
+            │     └── Expression
+            │           └── ...
+            │
+            └── Expression
+                └── Or
+                    └── And
+                        └── Comparison
+                            └── Addition (addition, subtraction)
+                                └── Term (multiplication, division, modulo)
+                                    └── Facteur
+                                        ├── Littéral (nombre)
+                                        ├── Variable
+                                        ├── Parenthèse
+                                        └── Appel de fonction
+
+        */
+
         static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
         readonly Dictionary<string, Variable<object>> global_variables = new(StringComparer.Ordinal);
 
@@ -41,6 +63,18 @@ namespace _BOA_
         public Harbinger(in Action<object> stdout)
         {
             this.stdout = stdout;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public Executor ParseProgram(in BoaReader reader, out string error)
+        {
+            BlockExecutor program = new(this);
+
+            while (TryParseBlock(reader, out Executor block, out error))
+                program.stack.Add(block);
+
+            return program;
         }
     }
 }
