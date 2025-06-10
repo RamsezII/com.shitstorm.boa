@@ -7,6 +7,30 @@
             error = null;
             factor = null;
 
+            if (reader.TryReadChar(out char c, "+-!"))
+            {
+                if (TryParseFactor(reader, out var sub_factor, out error))
+                {
+                    OperatorsM code = c switch
+                    {
+                        '+' => OperatorsM.add,
+                        '-' => OperatorsM.sub,
+                        '!' => OperatorsM.not,
+                        _ => 0,
+                    };
+
+                    factor = new(this, cmd_unary_, reader, parse_arguments: false);
+                    factor.args.Add(code);
+                    factor.args.Add(sub_factor);
+                    return true;
+                }
+                else
+                {
+                    error ??= $"expected factor after '{c}'";
+                    return false;
+                }
+            }
+
             if (reader.TryReadChar('('))
                 if (!TryParseExpression(reader, out factor, out error))
                 {

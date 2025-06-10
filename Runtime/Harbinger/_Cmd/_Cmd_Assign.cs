@@ -5,6 +5,11 @@ namespace _BOA_
 {
     partial class Harbinger
     {
+
+        static Contract cmd_assign_;
+
+        //----------------------------------------------------------------------------------------------------------
+
         static void Init_Assign()
         {
             cmd_assign_ = AddContract(new("assign",

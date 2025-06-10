@@ -8,6 +8,7 @@ namespace _BOA_
         static void InitContracts()
         {
             Init_Assign();
+            Init_Unary();
             Init_Vars();
             Init_If();
             Init_For();

@@ -8,9 +8,10 @@ namespace _BOA_
         enum OperatorsE : byte
         {
             assign,
+            not,
             add, sub,
             mul, div, div_int, mod,
-            eq, neq, gt, lt,
+            eq, gt, lt,
             and, or, xor,
         }
 
@@ -19,6 +20,7 @@ namespace _BOA_
         {
             unknown,
             assign = 1 << OperatorsE.assign,
+            not = 1 << OperatorsE.not,
             add = 1 << OperatorsE.add,
             sub = 1 << OperatorsE.sub,
             mul = 1 << OperatorsE.mul,
@@ -26,7 +28,7 @@ namespace _BOA_
             div_int = 1 << OperatorsE.div_int,
             mod = 1 << OperatorsE.mod,
             eq = 1 << OperatorsE.eq,
-            neq = 1 << OperatorsE.neq,
+            neq = not | eq,
             gt = 1 << OperatorsE.gt,
             lt = 1 << OperatorsE.lt,
             ge = gt | eq,
@@ -40,7 +42,6 @@ namespace _BOA_
             cmd_literal = new("literal", typeof(object), action: static exe => exe.args[0]),
             cmd_variable = new("variable", typeof(object), action: static exe => ((Variable<object>)exe.args[0]).value),
             cmd_declare_,
-            cmd_assign_,
             cmd_math_,
             cmd_not_;
 
