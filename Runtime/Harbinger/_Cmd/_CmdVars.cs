@@ -71,7 +71,8 @@ namespace _BOA_
             cmd_assign_ = AddContract(new("assign",
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string varname)) if (exe.reader.TryReadArgument(out string operator_name))
+                    if (exe.reader.TryReadArgument(out string varname)) 
+                        if (exe.reader.TryReadArgument(out string operator_name))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                                 exe.error = $"unknown operator '{operator_name}'";
                             else if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))

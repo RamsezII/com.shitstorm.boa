@@ -9,6 +9,7 @@ namespace _BOA_
         {
             Init_Vars();
             Init_If();
+            Init_Cmd();
             Init_Stdin();
 
             AddContract(new(
@@ -29,22 +30,27 @@ namespace _BOA_
             AddContract(new(
                 "sleep",
                 min_args: 1,
-                args: static cont =>
+                args: static exe =>
                 {
-                    if (cont.reader.TryReadArgument(out string arg))
-                        cont.args.Add(arg);
+                    if (exe.reader.TryReadArgument(out string arg))
+                        if (Util.TryParseFloat(arg, out float time))
+                            exe.args.Add(time);
                 },
                 routine: EWait)
                 );
 
-            static IEnumerator<Contract.Status> EWait(ContractExecutor contractor)
+            static IEnumerator<Contract.Status> EWait(ContractExecutor exe)
             {
+                float time = (float)exe.args[0];
                 float timer = 0;
 
-                while (timer < 1)
+                while (timer < time)
                 {
                     timer += Time.unscaledDeltaTime;
-                    yield return new() { progress = timer, };
+                    if (timer < time)
+                        yield return new() { progress = timer / time, };
+                    else
+                        yield return new() { progress = 1, };
                 }
             }
         }
