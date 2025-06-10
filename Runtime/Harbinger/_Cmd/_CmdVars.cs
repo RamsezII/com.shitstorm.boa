@@ -1,166 +1,53 @@
-﻿namespace _BOA_
+﻿using System;
+
+namespace _BOA_
 {
     partial class Harbinger
     {
+        enum OperatorsE : byte
+        {
+            assign,
+            add, sub,
+            mul, div, div_int, mod,
+            eq, neq, gt, lt, ge, le,
+            and, or, xor,
+        }
+
+        [Flags]
+        public enum OperatorsM : ushort
+        {
+            unknown,
+            assign = 1 << OperatorsE.assign,
+            add = 1 << OperatorsE.add,
+            sub = 1 << OperatorsE.sub,
+            mul = 1 << OperatorsE.mul,
+            div = 1 << OperatorsE.div,
+            div_int = 1 << OperatorsE.div_int,
+            mod = 1 << OperatorsE.mod,
+            eq = 1 << OperatorsE.eq,
+            neq = 1 << OperatorsE.neq,
+            gt = 1 << OperatorsE.gt,
+            lt = 1 << OperatorsE.lt,
+            ge = 1 << OperatorsE.ge,
+            le = 1 << OperatorsE.le,
+            and = 1 << OperatorsE.and,
+            or = 1 << OperatorsE.or,
+            xor = 1 << OperatorsE.xor,
+        }
+
         static Contract
             cmd_literal = new("literal", typeof(object), action: static exe => exe.args[0]),
             cmd_variable = new("variable", typeof(object), action: static exe => ((Variable<object>)exe.args[0]).value),
-            cmd_ass_,
-            cmd_ass_add_,
-            cmd_ass_sub_,
-            cmd_ass_and_,
-            cmd_ass_or_,
-            cmd_eq_,
-            cmd_neq_,
-            cmd_grt_,
-            cmd_eq_grt_,
-            cmd_less_,
-            cmd_eq_less_,
-            cmd_add_,
-            cmd_sub_,
-            cmd_mult_,
-            cmd_div_,
-            cmd_div_int,
-            cmd_mod_,
-            cmd_and_,
-            cmd_not_,
-            cmd_or_,
-            cmd_xor_;
+            cmd_declare_,
+            cmd_assign_,
+            cmd_math_,
+            cmd_not_;
 
         //----------------------------------------------------------------------------------------------------------
 
-        static bool TryGetOperator(
-            in BoaReader reader, out string symbol, out Contract cmd,
-            in bool op_assign = false,
-            in bool op_or = false,
-            in bool op_and = false,
-            in bool op_compare = false,
-            in bool op_expr = false,
-            in bool op_terms = false)
-        {
-            symbol = string.Empty;
-            cmd = null;
-
-            int read_i = reader.read_i;
-            if (reader.TryReadChar(out char c_oper, "=+-*/%<>&|", true))
-            {
-                symbol = c_oper.ToString();
-                switch (c_oper)
-                {
-                    case '=':
-                        if (reader.TryReadChar('='))
-                        {
-                            symbol += "=";
-                            if (op_compare)
-                                cmd = cmd_eq_;
-                        }
-                        else if (op_assign)
-                            cmd = cmd_ass_;
-                        break;
-
-                    case '>':
-                    case '<':
-                        if (op_compare)
-                            if (reader.TryReadChar('='))
-                            {
-                                symbol += "=";
-                                cmd = c_oper switch
-                                {
-                                    '>' => cmd_eq_grt_,
-                                    '<' => cmd_eq_less_,
-                                    _ => null,
-                                };
-                            }
-                            else
-                                cmd = c_oper switch
-                                {
-                                    '>' => cmd_grt_,
-                                    '<' => cmd_less_,
-                                    _ => null,
-                                };
-                        break;
-
-                    case '+':
-                    case '-':
-                    case '*':
-                    case '/':
-                    case '%':
-                        if (c_oper switch
-                        {
-                            '+' or '-' => op_expr,
-                            '*' or '/' or '%' => op_terms,
-                            _ => false,
-                        })
-                            if (reader.TryReadChar('='))
-                            {
-                                symbol += "=";
-                                cmd = c_oper switch
-                                {
-                                    '+' => cmd_ass_add_,
-                                    '-' => cmd_ass_sub_,
-                                    '*' => null,
-                                    '/' => null,
-                                    '%' => null,
-                                    _ => null,
-                                };
-                            }
-                            else
-                                cmd = c_oper switch
-                                {
-                                    '+' => cmd_add_,
-                                    '-' => cmd_sub_,
-                                    '*' => cmd_mult_,
-                                    '/' => cmd_div_,
-                                    '%' => cmd_mod_,
-                                    _ => null,
-                                };
-                        break;
-
-                    case '&':
-                    case '|':
-                        if (reader.TryReadChar(c_oper))
-                            if (reader.TryReadChar('='))
-                            {
-                                symbol = $"{c_oper}{c_oper}=";
-                                if (op_assign)
-                                    cmd = c_oper switch
-                                    {
-                                        '&' => cmd_ass_and_,
-                                        '|' => cmd_ass_or_,
-                                        _ => null,
-                                    };
-                            }
-                            else if (c_oper switch
-                            {
-                                '&' => op_and,
-                                '|' => op_or,
-                                _ => false,
-                            })
-                            {
-                                symbol = $"{c_oper}{c_oper}";
-                                cmd = c_oper switch
-                                {
-                                    '&' => cmd_and_,
-                                    '|' => cmd_or_,
-                                    _ => null,
-                                };
-                            }
-                        break;
-                }
-            }
-
-            if (cmd == null)
-            {
-                symbol = string.Empty;
-                reader.read_i = read_i;
-            }
-
-            return cmd != null;
-        }
-
         static void Init_Vars()
         {
-            cmd_ass_ = AddContract(new("var",
+            cmd_declare_ = AddContract(new("var",
                 args: static exe =>
                 {
                     if (exe.reader.TryReadArgument(out string varname))
@@ -181,20 +68,58 @@
                     return expression.EExecute(data => variable.value = data);
                 }));
 
-            cmd_add_ = AddContract(new("add",
+            cmd_assign_ = AddContract(new("assign",
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, out var expr1, out exe.error))
-                        if (exe.harbinger.TryParseExpression(exe.reader, out var expr2, out exe.error))
-                        {
-                            exe.args.Add(expr1);
-                            exe.args.Add(expr2);
-                        }
+                    if (exe.reader.TryReadArgument(out string varname)) if (exe.reader.TryReadArgument(out string operator_name))
+                            if (!Enum.TryParse(operator_name, true, out OperatorsM code))
+                                exe.error = $"unknown operator '{operator_name}'";
+                            else if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))
+                            {
+                                Variable<object> variable = new(varname, null);
+                                exe.harbinger.global_variables[varname] = variable;
+                                exe.args.Add(code);
+                                exe.args.Add(variable);
+                                exe.args.Add(expression);
+                            }
                 },
                 routine: static exe =>
                 {
-                    Executor expr1 = (Executor)exe.args[0];
-                    Executor expr2 = (Executor)exe.args[1];
+                    OperatorsM code = (OperatorsM)exe.args[0];
+                    Variable<object> variable = (Variable<object>)exe.args[1];
+                    Executor expression = (Executor)exe.args[2];
+                    return expression.EExecute(data => variable.value = (code & ~OperatorsM.assign) switch
+                    {
+                        OperatorsM.add => (int)variable.value + (int)data,
+                        OperatorsM.sub => (int)variable.value - (int)data,
+                        OperatorsM.mul => (int)variable.value * (int)data,
+                        OperatorsM.div => (int)variable.value / (int)data,
+                        OperatorsM.div_int => (int)variable.value / (int)data,
+                        OperatorsM.mod => (int)variable.value % (int)data,
+                        OperatorsM.neq => (int)variable.value != (int)data,
+                        _ => data,
+                    });
+                }));
+
+            cmd_math_ = AddContract(new("math",
+                args: static exe =>
+                {
+                    if (exe.reader.TryReadArgument(out string operator_name))
+                        if (!Enum.TryParse(operator_name, true, out OperatorsM code))
+                            exe.error = $"unknown operator '{operator_name}'";
+                        else if (exe.harbinger.TryParseExpression(exe.reader, out var expr1, out exe.error))
+                            if (exe.harbinger.TryParseExpression(exe.reader, out var expr2, out exe.error))
+                            {
+                                exe.args.Add(code);
+                                exe.args.Add(expr1);
+                                exe.args.Add(expr2);
+                            }
+                },
+                routine: static exe =>
+                {
+                    OperatorsM code = (OperatorsM)exe.args[0];
+                    Executor expr1 = (Executor)exe.args[1];
+                    Executor expr2 = (Executor)exe.args[2];
 
                     object data1 = null, data2 = null;
 
@@ -202,7 +127,25 @@
                         () =>
                         {
                             if (data1 is int i1 && data2 is int i2)
-                                return i1 + i2;
+                                return code switch
+                                {
+                                    OperatorsM.add => i1 + i2,
+                                    OperatorsM.sub => i1 - i2,
+                                    OperatorsM.mul => i1 * i2,
+                                    OperatorsM.div => i1 / i2,
+                                    OperatorsM.div_int => i1 / i2,
+                                    OperatorsM.mod => i1 % i2,
+                                    OperatorsM.eq => i1 == i2,
+                                    OperatorsM.neq => i1 != i2,
+                                    OperatorsM.gt => i1 > i2,
+                                    OperatorsM.lt => i1 < i2,
+                                    OperatorsM.ge => i1 >= i2,
+                                    OperatorsM.le => i1 <= i2,
+                                    OperatorsM.and => i1 & i2,
+                                    OperatorsM.or => i1 | i2,
+                                    OperatorsM.xor => i1 ^ i2,
+                                    _ => 0,
+                                };
                             return 0;
                         },
                         (expr1, data => data1 = data),

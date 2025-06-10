@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace _BOA_
 {
@@ -104,6 +105,23 @@ namespace _BOA_
                 }
                 else
                     read_i = start_i;
+            return false;
+        }
+
+        public bool TryReadMatch(out string match, in bool ignore_case, in bool skip_empties = true, params string[] matches)
+        {
+            if (skip_empties)
+                HasNext();
+
+            if (TryReadArgument(text, out start_i, ref read_i, out match))
+                if (matches.Contains(match, ignore_case ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal))
+                {
+                    last_arg = match;
+                    return true;
+                }
+                else
+                    read_i = start_i;
+
             return false;
         }
     }
