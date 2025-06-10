@@ -75,7 +75,7 @@ namespace _BOA_
             this.contract = contract;
             this.reader = reader;
 
-            if (parse_arguments)
+            if (parse_arguments )
                 contract?.args?.Invoke(this);
         }
 
