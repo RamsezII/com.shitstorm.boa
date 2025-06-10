@@ -8,19 +8,18 @@
             factor = null;
 
             if (reader.TryReadChar('('))
-                if (TryParseExpression(reader, out factor, out error))
-                    if (reader.TryReadChar(')'))
-                        return true;
-                    else
-                    {
-                        error ??= "expected expression inside parentheses";
-                        return false;
-                    }
-                else
+                if (!TryParseExpression(reader, out factor, out error))
+                {
+                    error ??= "expected expression inside parentheses";
+                    return false;
+                }
+                else if (!reader.TryReadChar(')'))
                 {
                     error ??= $"expected closing parenthesis ')'";
                     return false;
                 }
+                else
+                    return true;
 
             if (reader.TryReadArgument(out string arg))
                 if (global_contracts.TryGetValue(arg, out var contract))
