@@ -75,7 +75,7 @@ namespace _BOA_
         {
             while (read_i < text.Length)
             {
-                if (TryPeek(out char c) && c == expected_value)
+                if (TryPeek(out char c, false) && c == expected_value)
                 {
                     ++read_i;
                     return true;

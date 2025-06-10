@@ -8,6 +8,7 @@ namespace _BOA_
         static void InitContracts()
         {
             Init_Vars();
+            Init_If();
 
             AddContract(new(
                 "echo",

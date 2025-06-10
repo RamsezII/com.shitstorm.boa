@@ -72,7 +72,7 @@
             return false;
         }
 
-        internal bool TryParseInstruction(in BoaReader reader, out ContractExecutor instruction, out string error)
+        internal bool TryParseInstruction(in BoaReader reader, out Executor instruction, out string error)
         {
             instruction = null;
             error = null;
@@ -80,17 +80,20 @@
             if (reader.HasNext())
                 if (reader.TryReadChar(';'))
                 {
-                    instruction = new(this, null, reader);
+                    instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
                 else if (reader.TryReadMatch("//", true))
                 {
                     reader.SkipUntil('\n');
-                    instruction = new(this, null, reader);
+                    instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (TryParseExpression(reader, out instruction, out error))
+                else if (TryParseExpression(reader, out var expr, out error))
+                {
+                    instruction = expr;
                     return true;
+                }
 
             return false;
         }
@@ -230,6 +233,11 @@
                 if (global_contracts.TryGetValue(arg, out var contract))
                 {
                     factor = new ContractExecutor(this, contract, reader);
+                    if (factor.error != null)
+                    {
+                        error = factor.error;
+                        return false;
+                    }
                     return true;
                 }
                 else if (global_variables.TryGetValue(arg, out var variable))
