@@ -44,15 +44,16 @@ namespace _BOA_
                     yield break;
                 }
 
-                var execution = executor.EExecute();
+                var routine = executor.EExecute();
 
                 while (true)
                     if (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
                         yield return default;
-                    else if (execution.MoveNext())
-                        yield return new CMD_STATUS(progress: execution.Current.progress);
-                    else
-                        yield break;
+                    else if (!routine.MoveNext())
+                        if (routine.Current.state == Contract.Status.States.WAIT_FOR_STDIN)
+                            yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                        else
+                            yield return new CMD_STATUS(progress: routine.Current.progress);
             }
         }
     }

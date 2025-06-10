@@ -18,6 +18,7 @@ namespace _BOA_
             }
 
             public States state;
+            public string prefixe;
             [Range(0, 1)] public float progress;
             public object data;
         }

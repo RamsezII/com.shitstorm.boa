@@ -40,8 +40,8 @@ namespace _BOA_
                 var routine = cond.EExecute(data => cond_result = data switch
                 {
                     bool b => b,
-                    int i => i != 0,
-                    float f => f != 0f,
+                    int i => i > 0,
+                    float f => f > 0,
                     _ => data != default,
                 });
 

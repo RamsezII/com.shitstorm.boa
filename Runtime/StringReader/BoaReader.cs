@@ -11,7 +11,7 @@ namespace _BOA_
         public string last_arg;
 
         public const string
-            blacklist_boa = " \n\r{}():;'\"";
+            blacklist_boa = " \n\r{}();'\"";
 
         //----------------------------------------------------------------------------------------------------------
 
