@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_If()
         {
-            AddContract(new("if", typeof(object),
+            AddContract(new("if",
                 min_args: 1,
                 args: static exe =>
                 {

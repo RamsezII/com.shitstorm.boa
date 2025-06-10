@@ -7,9 +7,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Echo()
         {
-            AddContract(new(
-                "echo",
-                typeof(object),
+            AddContract(new("echo",
                 min_args: 1,
                 args: static exe =>
                 {

@@ -7,8 +7,8 @@ namespace _BOA_
     partial class Harbinger
     {
         static readonly Contract
-            cmd_literal = new("literal", typeof(object), action: static exe => exe.args[0]),
-            cmd_variable = new("variable", typeof(object), action: static exe => ((Variable<object>)exe.args[0]).value);
+            cmd_literal = new("literal", action: static exe => exe.args[0]),
+            cmd_variable = new("variable", action: static exe => ((Variable<object>)exe.args[0]).value);
 
         static Contract cmd_math_;
 

@@ -24,28 +24,28 @@ namespace _BOA_
         }
 
         public readonly string name;
-        internal readonly Type type;
         internal readonly int min_args, max_args;
         public readonly Action<ContractExecutor> args;
+        internal readonly Action<ContractExecutor> pipe;
         internal readonly Func<ContractExecutor, object> action;
         internal readonly Func<ContractExecutor, IEnumerator<Status>> routine;
 
         //----------------------------------------------------------------------------------------------------------
 
         public Contract(in string name, 
-            in Type type = null,
             in int min_args = 0,
             in int max_args = 0,
             in Action<ContractExecutor> args = null,
+            in Action<ContractExecutor> pipe = null,
             in Func<ContractExecutor, object> action = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
         {
             this.name = name;
-            this.type = type;
             this.min_args = min_args;
             this.max_args = Mathf.Max(min_args, max_args);
             this.args = args;
+            this.pipe = pipe;
             this.action = action;
             this.routine = routine;
         }
