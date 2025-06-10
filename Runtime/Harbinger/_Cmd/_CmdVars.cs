@@ -8,7 +8,7 @@ namespace _BOA_
     {
         static readonly Contract
             cmd_literal = new("literal", action: static exe => exe.args[0]),
-            cmd_variable = new("variable", action: static exe => ((Variable<object>)exe.args[0]).value);
+            cmd_variable = new("variable", action: static exe => ((BoaVar)exe.args[0]).value);
 
         static Contract cmd_math_;
 
@@ -25,7 +25,7 @@ namespace _BOA_
                             if (exe.reader.TryReadChar('='))
                                 if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))
                                 {
-                                    Variable<object> variable = new(varname, null);
+                                    BoaVar variable = new(varname, null);
                                     exe.harbinger.global_variables[varname] = variable;
                                     exe.args.Add(variable);
                                     exe.args.Add(expression);
@@ -33,7 +33,7 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    Variable<object> variable = (Variable<object>)exe.args[0];
+                    BoaVar variable = (BoaVar)exe.args[0];
                     Executor expression = (Executor)exe.args[1];
                     return expression.EExecute(data => variable.value = data);
                 }));

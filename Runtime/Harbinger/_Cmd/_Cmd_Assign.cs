@@ -23,7 +23,7 @@ namespace _BOA_
                                 exe.error = $"unknown operator '{operator_name}'";
                             else if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))
                             {
-                                Variable<object> variable = new(varname, null);
+                                BoaVar variable = new(varname, null);
                                 exe.harbinger.global_variables[varname] = variable;
                                 exe.args.Add(code);
                                 exe.args.Add(variable);
@@ -35,7 +35,7 @@ namespace _BOA_
             static IEnumerator<Contract.Status> EAssign(ContractExecutor exe)
             {
                 OperatorsM code = (OperatorsM)exe.args[0];
-                Variable<object> variable = (Variable<object>)exe.args[1];
+                BoaVar variable = (BoaVar)exe.args[1];
                 Executor expression = (Executor)exe.args[2];
 
                 var routine = expression.EExecute();
