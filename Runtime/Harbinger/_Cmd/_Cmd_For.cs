@@ -4,7 +4,7 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        static void Init_Cmd()
+        static void Init_For()
         {
             AddContract(new("for",
                 min_args: 1,
@@ -51,12 +51,14 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
 
-                bool loop = true;
-                while (loop)
+                while (true)
                 {
-                    routine = cond.EExecute(data => loop = data.ToBool());
+                    routine = cond.EExecute();
                     while (routine.MoveNext())
                         yield return routine.Current;
+
+                    if (!routine.Current.data.ToBool())
+                        break;
 
                     routine = block.EExecute();
                     while (routine.MoveNext())

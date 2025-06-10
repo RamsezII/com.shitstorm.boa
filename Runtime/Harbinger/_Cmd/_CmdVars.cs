@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -68,39 +69,6 @@ namespace _BOA_
                     return expression.EExecute(data => variable.value = data);
                 }));
 
-            cmd_assign_ = AddContract(new("assign",
-                args: static exe =>
-                {
-                    if (exe.reader.TryReadArgument(out string varname))
-                        if (exe.reader.TryReadArgument(out string operator_name))
-                            if (!Enum.TryParse(operator_name, true, out OperatorsM code))
-                                exe.error = $"unknown operator '{operator_name}'";
-                            else if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))
-                            {
-                                Variable<object> variable = new(varname, null);
-                                exe.harbinger.global_variables[varname] = variable;
-                                exe.args.Add(code);
-                                exe.args.Add(variable);
-                                exe.args.Add(expression);
-                            }
-                },
-                routine: static exe =>
-                {
-                    OperatorsM code = (OperatorsM)exe.args[0];
-                    Variable<object> variable = (Variable<object>)exe.args[1];
-                    Executor expression = (Executor)exe.args[2];
-                    return expression.EExecute(data => variable.value = (code & ~OperatorsM.assign) switch
-                    {
-                        OperatorsM.add => (int)variable.value + (int)data,
-                        OperatorsM.sub => (int)variable.value - (int)data,
-                        OperatorsM.mul => (int)variable.value * (int)data,
-                        OperatorsM.div => (int)variable.value / (int)data,
-                        OperatorsM.div_int => (int)variable.value / (int)data,
-                        OperatorsM.mod => (int)variable.value % (int)data,
-                        _ => data,
-                    });
-                }));
-
             cmd_math_ = AddContract(new("math",
                 args: static exe =>
                 {
@@ -115,51 +83,61 @@ namespace _BOA_
                                 exe.args.Add(expr2);
                             }
                 },
-                routine: static exe =>
-                {
-                    OperatorsM code = (OperatorsM)exe.args[0];
-                    Executor expr1 = (Executor)exe.args[1];
-                    Executor expr2 = (Executor)exe.args[2];
+                routine: EMath));
 
-                    object data1 = null, data2 = null;
+            static IEnumerator<Contract.Status> EMath(ContractExecutor exe)
+            {
+                OperatorsM code = (OperatorsM)exe.args[0];
+                Executor expr1 = (Executor)exe.args[1];
+                Executor expr2 = (Executor)exe.args[2];
 
-                    return Executor.EExecute(
-                        () =>
+                var routine1 = expr1.EExecute();
+                while (routine1.MoveNext())
+                    yield return routine1.Current;
+                object data1 = routine1.Current.data;
+
+                var routine2 = expr2.EExecute();
+                while (routine2.MoveNext())
+                    yield return routine2.Current;
+                object data2 = routine2.Current.data;
+
+                if (data1 is int i1 && data2 is int i2)
+                    yield return new Contract.Status()
+                    {
+                        data = code switch
                         {
-                            if (data1 is int i1 && data2 is int i2)
-                                return code switch
-                                {
-                                    OperatorsM.add => i1 + i2,
-                                    OperatorsM.sub => i1 - i2,
-                                    OperatorsM.mul => i1 * i2,
-                                    OperatorsM.div => i1 / i2,
-                                    OperatorsM.div_int => i1 / i2,
-                                    OperatorsM.mod => i1 % i2,
-                                    OperatorsM.eq => i1 == i2,
-                                    OperatorsM.neq => i1 != i2,
-                                    OperatorsM.gt => i1 > i2,
-                                    OperatorsM.lt => i1 < i2,
-                                    OperatorsM.ge => i1 >= i2,
-                                    OperatorsM.le => i1 <= i2,
-                                    OperatorsM.and => i1 & i2,
-                                    OperatorsM.or => i1 | i2,
-                                    OperatorsM.xor => i1 ^ i2,
-                                    _ => 0,
-                                };
-                            if (data1 is bool b1 && data2 is bool b2)
-                                return code switch
-                                {
-                                    OperatorsM.and => b1 & b2,
-                                    OperatorsM.or => b1 | b2,
-                                    OperatorsM.xor => b1 ^ b2,
-                                    _ => false,
-                                };
-                            return 0;
+                            OperatorsM.add => i1 + i2,
+                            OperatorsM.sub => i1 - i2,
+                            OperatorsM.mul => i1 * i2,
+                            OperatorsM.div => i1 / i2,
+                            OperatorsM.div_int => i1 / i2,
+                            OperatorsM.mod => i1 % i2,
+                            OperatorsM.eq => i1 == i2,
+                            OperatorsM.neq => i1 != i2,
+                            OperatorsM.gt => i1 > i2,
+                            OperatorsM.lt => i1 < i2,
+                            OperatorsM.ge => i1 >= i2,
+                            OperatorsM.le => i1 <= i2,
+                            OperatorsM.and => i1 & i2,
+                            OperatorsM.or => i1 | i2,
+                            OperatorsM.xor => i1 ^ i2,
+                            _ => 0,
                         },
-                        (expr1, data => data1 = data),
-                        (expr2, data => data2 = data)
-                        );
-                }));
+                    };
+                else if (data1 is bool b1 && data2 is bool b2)
+                    yield return new Contract.Status()
+                    {
+                        data = code switch
+                        {
+                            OperatorsM.and => b1 & b2,
+                            OperatorsM.or => b1 | b2,
+                            OperatorsM.xor => b1 ^ b2,
+                            _ => false,
+                        },
+                    };
+                else
+                    yield return default;
+            }
         }
     }
 }

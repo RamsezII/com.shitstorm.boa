@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace _BOA_
+{
+    partial class Harbinger
+    {
+        static void Init_Assign()
+        {
+            cmd_assign_ = AddContract(new("assign",
+                args: static exe =>
+                {
+                    if (exe.reader.TryReadArgument(out string varname))
+                        if (exe.reader.TryReadArgument(out string operator_name))
+                            if (!Enum.TryParse(operator_name, true, out OperatorsM code))
+                                exe.error = $"unknown operator '{operator_name}'";
+                            else if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))
+                            {
+                                Variable<object> variable = new(varname, null);
+                                exe.harbinger.global_variables[varname] = variable;
+                                exe.args.Add(code);
+                                exe.args.Add(variable);
+                                exe.args.Add(expression);
+                            }
+                },
+                routine: EAssign));
+
+            static IEnumerator<Contract.Status> EAssign(ContractExecutor exe)
+            {
+                OperatorsM code = (OperatorsM)exe.args[0];
+                Variable<object> variable = (Variable<object>)exe.args[1];
+                Executor expression = (Executor)exe.args[2];
+
+                var routine = expression.EExecute();
+                while (routine.MoveNext())
+                    yield return routine.Current;
+                object data = routine.Current.data;
+
+                yield return new Contract.Status()
+                {
+                    data = variable.value = (code & ~OperatorsM.assign) switch
+                    {
+                        OperatorsM.add => (int)variable.value + (int)data,
+                        OperatorsM.sub => (int)variable.value - (int)data,
+                        OperatorsM.mul => (int)variable.value * (int)data,
+                        OperatorsM.div => (int)variable.value / (int)data,
+                        OperatorsM.div_int => (int)variable.value / (int)data,
+                        OperatorsM.mod => (int)variable.value % (int)data,
+                        _ => data,
+                    },
+                };
+            }
+        }
+    }
+}

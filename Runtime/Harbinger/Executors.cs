@@ -20,18 +20,16 @@ namespace _BOA_
 
         internal abstract IEnumerator<Contract.Status> EExecute(Action<object> on_done = null);
 
-        public static IEnumerator<Contract.Status> EExecute(Func<object> on_all_done, params (Executor executor, Action<object> on_done)[] stack)
+        public static IEnumerator<Contract.Status> EExecute(params IEnumerator<Contract.Status>[] stack)
         {
             if (stack != null && stack.Length > 0)
                 for (int i = 0; i < stack.Length; i++)
-                    if (stack[i].executor != null)
+                    if (stack[i] != null)
                     {
-                        var (executor, on_done) = stack[i];
-                        var routine = executor.EExecute(on_done);
+                        var routine = stack[i];
                         while (routine.MoveNext())
                             yield return routine.Current;
                     }
-            yield return new() { data = on_all_done?.Invoke(), };
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -83,22 +81,22 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done = null)
+        internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done)
         {
-            object result = null;
             if (contract != null)
                 if (contract.action != null)
-                    result = contract.action(this);
+                {
+                    object data = contract.action(this);
+                    yield return new Contract.Status() { data = data, };
+                    on_done?.Invoke(data);
+                }
                 else if (contract.routine != null)
                 {
                     var routine = contract.routine(this);
                     while (routine.MoveNext())
-                    {
-                        result = routine.Current.data;
                         yield return routine.Current;
-                    }
+                    on_done?.Invoke(routine.Current.data);
                 }
-            on_done?.Invoke(result);
         }
     }
 
@@ -116,16 +114,15 @@ namespace _BOA_
 
         internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done = null)
         {
-            object result = null;
+            IEnumerator<Contract.Status> routine = null;
             for (int i = 0; i < stack.Count; i++)
             {
                 var exe = stack[i];
-                var routine = exe.EExecute(null);
+                routine = exe.EExecute();
                 while (!exe.disposed && routine.MoveNext())
                     yield return routine.Current;
-                result = routine.Current.data;
             }
-            on_done?.Invoke(result);
+            on_done?.Invoke(routine?.Current.data);
         }
 
         //----------------------------------------------------------------------------------------------------------

@@ -7,9 +7,11 @@ namespace _BOA_
     {
         static void InitContracts()
         {
+            Init_Assign();
             Init_Vars();
             Init_If();
-            Init_Cmd();
+            Init_For();
+            Init_While();
             Init_Stdin();
 
             AddContract(new(

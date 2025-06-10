@@ -85,7 +85,7 @@
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (reader.TryReadMatch(out _, true, true, "#", "//"))
+                else if (reader.TryReadChar('#'))
                 {
                     reader.SkipUntil('\n');
                     instruction = new ContractExecutor(this, null, reader);
