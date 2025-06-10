@@ -36,10 +36,10 @@ namespace _BOA_
                         if (Util.TryParseFloat(arg, out float time))
                             exe.args.Add(time);
                 },
-                routine: EWait)
+                routine: ESleep)
                 );
 
-            static IEnumerator<Contract.Status> EWait(ContractExecutor exe)
+            static IEnumerator<Contract.Status> ESleep(ContractExecutor exe)
             {
                 float time = (float)exe.args[0];
                 float timer = 0;

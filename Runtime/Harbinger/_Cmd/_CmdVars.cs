@@ -9,7 +9,7 @@ namespace _BOA_
             assign,
             add, sub,
             mul, div, div_int, mod,
-            eq, neq, gt, lt, ge, le,
+            eq, neq, gt, lt,
             and, or, xor,
         }
 
@@ -28,8 +28,8 @@ namespace _BOA_
             neq = 1 << OperatorsE.neq,
             gt = 1 << OperatorsE.gt,
             lt = 1 << OperatorsE.lt,
-            ge = 1 << OperatorsE.ge,
-            le = 1 << OperatorsE.le,
+            ge = gt | eq,
+            le = lt | eq,
             and = 1 << OperatorsE.and,
             or = 1 << OperatorsE.or,
             xor = 1 << OperatorsE.xor,
@@ -71,7 +71,7 @@ namespace _BOA_
             cmd_assign_ = AddContract(new("assign",
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string varname)) 
+                    if (exe.reader.TryReadArgument(out string varname))
                         if (exe.reader.TryReadArgument(out string operator_name))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                                 exe.error = $"unknown operator '{operator_name}'";
@@ -97,7 +97,6 @@ namespace _BOA_
                         OperatorsM.div => (int)variable.value / (int)data,
                         OperatorsM.div_int => (int)variable.value / (int)data,
                         OperatorsM.mod => (int)variable.value % (int)data,
-                        OperatorsM.neq => (int)variable.value != (int)data,
                         _ => data,
                     });
                 }));
@@ -146,6 +145,14 @@ namespace _BOA_
                                     OperatorsM.or => i1 | i2,
                                     OperatorsM.xor => i1 ^ i2,
                                     _ => 0,
+                                };
+                            if (data1 is bool b1 && data2 is bool b2)
+                                return code switch
+                                {
+                                    OperatorsM.and => b1 & b2,
+                                    OperatorsM.or => b1 | b2,
+                                    OperatorsM.xor => b1 ^ b2,
+                                    _ => false,
                                 };
                             return 0;
                         },

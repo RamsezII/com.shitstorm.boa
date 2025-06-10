@@ -11,14 +11,16 @@
             │           └── ...
             │
             └── Expression
-                  └── Or/And/Comparison
-                        └── Addition
-                            └── Multiplication
-                                └── Facteur
-                                      ├── Littéral (nombre)
-                                      ├── Variable
-                                      ├── Parenthèse
-                                      └── Appel de fonction
+                └── Or
+                    └── And
+                        └── Comparison
+                            └── Addition (addition, subtraction)
+                                └── Term (multiplication, division, modulo)
+                                    └── Facteur
+                                        ├── Littéral (nombre)
+                                        ├── Variable
+                                        ├── Parenthèse
+                                        └── Appel de fonction
 
         */
 
@@ -83,7 +85,7 @@
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (reader.TryReadMatch("//", true))
+                else if (reader.TryReadMatch(out _, true, true, "#", "//"))
                 {
                     reader.SkipUntil('\n');
                     instruction = new ContractExecutor(this, null, reader);
@@ -100,10 +102,19 @@
 
         internal bool TryParseExpression(BoaReader reader, out ContractExecutor expression, out string error)
         {
-            expression = null;
+            if (TryParseAssignation(reader, out expression, out error))
+                return true;
+            else if (TryParseOr(reader, out expression, out error))
+                return true;
+            return false;
+        }
 
-            // assignation
+        internal bool TryParseAssignation(in BoaReader reader, out ContractExecutor assignation, out string error)
+        {
+            assignation = null;
+            error = null;
             int read_i = reader.read_i;
+
             if (reader.TryReadArgument(out string varname))
                 if (global_variables.TryGetValue(varname, out var variable))
                     if (reader.TryReadMatch(out string op_name, true, true, "=", "+=", "-=", "*=", "/="))
@@ -122,10 +133,10 @@
 
                         if (TryParseExpression(reader, out var expr, out error))
                         {
-                            expression = new ContractExecutor(this, cmd_assign_, reader, parse_arguments: false);
-                            expression.args.Add(code);
-                            expression.args.Add(variable);
-                            expression.args.Add(expr);
+                            assignation = new ContractExecutor(this, cmd_assign_, reader, parse_arguments: false);
+                            assignation.args.Add(code);
+                            assignation.args.Add(variable);
+                            assignation.args.Add(expr);
                             return true;
                         }
                         else
@@ -136,9 +147,113 @@
                     }
 
             reader.read_i = read_i;
+            return false;
+        }
 
-            // expression
+        internal bool TryParseOr(in BoaReader reader, out ContractExecutor expression, out string error)
+        {
+            expression = null;
+            if (TryParseAnd(reader, out var or1, out error))
+            {
+                if (reader.TryReadMatch(out string op_name, true, true, "or", "||"))
+                {
+                    if (TryParseAnd(reader, out var or2, out error))
+                    {
+                        expression = new ContractExecutor(this, cmd_math_, reader, parse_arguments: false);
+                        expression.args.Add(OperatorsM.or);
+                        expression.args.Add(or1);
+                        expression.args.Add(or2);
+                        return true;
+                    }
+                    else
+                    {
+                        error ??= $"expected right operand for '{op_name}' operator";
+                        return false;
+                    }
+                }
+                else
+                {
+                    expression = or1;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal bool TryParseAnd(in BoaReader reader, out ContractExecutor expression, out string error)
+        {
+            expression = null;
+            if (TryParseComparison(reader, out var and1, out error))
+                if (reader.TryReadMatch(out string op_name, true, true, "and", "&&"))
+                {
+                    if (TryParseComparison(reader, out var and2, out error))
+                    {
+                        expression = new ContractExecutor(this, cmd_math_, reader, parse_arguments: false);
+                        expression.args.Add(OperatorsM.and);
+                        expression.args.Add(and1);
+                        expression.args.Add(and2);
+                        return true;
+                    }
+                    else
+                    {
+                        error ??= $"expected expression after '{op_name}' operator";
+                        return false;
+                    }
+                }
+                else
+                {
+                    expression = and1;
+                    return true;
+                }
+            return false;
+        }
+
+        internal bool TryParseComparison(in BoaReader reader, out ContractExecutor expression, out string error)
+        {
+            expression = null;
+            if (TryParseAddSub(reader, out var addsub1, out error))
+            {
+                if (reader.TryReadChar(out char op_char, "<>=", ignore_case: true, skip_empties: true))
+                {
+                    OperatorsM code = op_char switch
+                    {
+                        '<' => OperatorsM.lt,
+                        '>' => OperatorsM.gt,
+                        '=' => OperatorsM.eq,
+                        _ => 0,
+                    };
+
+                    if (reader.TryReadChar('=') && code != 0)
+                        code |= OperatorsM.eq;
+
+                    if (TryParseAddSub(reader, out var addsub2, out error))
+                    {
+                        expression = new ContractExecutor(this, cmd_math_, reader, parse_arguments: false);
+                        expression.args.Add(code);
+                        expression.args.Add(addsub1);
+                        expression.args.Add(addsub2);
+                        return true;
+                    }
+                    else
+                    {
+                        error ??= $"expected comparison after '{op_char}' operator";
+                        return false;
+                    }
+                }
+                else
+                {
+                    expression = addsub1;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal bool TryParseAddSub(in BoaReader reader, out ContractExecutor expression, out string error)
+        {
+            expression = null;
             if (TryParseTerm(reader, out var term1, out error))
+            {
                 if (reader.TryReadChar(out char op_char, "+-", ignore_case: true, skip_empties: true))
                 {
                     OperatorsM code = op_char switch
@@ -148,7 +263,7 @@
                         _ => 0,
                     };
 
-                    if (TryParseExpression(reader, out var term2, out error))
+                    if (TryParseTerm(reader, out var term2, out error))
                     {
                         expression = new ContractExecutor(this, cmd_math_, reader, parse_arguments: false);
                         expression.args.Add(code);
@@ -158,7 +273,7 @@
                     }
                     else
                     {
-                        error ??= $"expected expression after '{op_char}' operator";
+                        error ??= $"expected term after '{op_char}' operator";
                         return false;
                     }
                 }
@@ -167,7 +282,7 @@
                     expression = term1;
                     return true;
                 }
-
+            }
             return false;
         }
 
@@ -188,7 +303,7 @@
                     _ => 0,
                 };
 
-                if (TryParseExpression(reader, out var factor2, out error))
+                if (TryParseFactor(reader, out var factor2, out error))
                 {
                     term = new ContractExecutor(this, cmd_math_, reader, parse_arguments: false);
                     term.args.Add(code);
