@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_For()
         {
             AddContract(new("for",

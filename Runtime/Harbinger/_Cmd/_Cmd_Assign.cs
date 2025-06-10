@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -10,6 +11,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Assign()
         {
             cmd_assign_ = AddContract(new("assign",

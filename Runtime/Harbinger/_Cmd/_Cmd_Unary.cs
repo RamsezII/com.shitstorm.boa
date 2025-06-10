@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
         static Contract cmd_unary_;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Unary()
         {
             cmd_unary_ = AddContract(new("unary",

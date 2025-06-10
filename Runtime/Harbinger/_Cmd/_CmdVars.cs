@@ -1,55 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
-        enum OperatorsE : byte
-        {
-            assign,
-            not,
-            add, sub,
-            mul, div, div_int, mod,
-            eq, gt, lt,
-            and, or, xor,
-        }
-
-        [Flags]
-        public enum OperatorsM : ushort
-        {
-            unknown,
-            assign = 1 << OperatorsE.assign,
-            not = 1 << OperatorsE.not,
-            add = 1 << OperatorsE.add,
-            sub = 1 << OperatorsE.sub,
-            mul = 1 << OperatorsE.mul,
-            div = 1 << OperatorsE.div,
-            div_int = 1 << OperatorsE.div_int,
-            mod = 1 << OperatorsE.mod,
-            eq = 1 << OperatorsE.eq,
-            neq = not | eq,
-            gt = 1 << OperatorsE.gt,
-            lt = 1 << OperatorsE.lt,
-            ge = gt | eq,
-            le = lt | eq,
-            and = 1 << OperatorsE.and,
-            or = 1 << OperatorsE.or,
-            xor = 1 << OperatorsE.xor,
-        }
-
-        static Contract
+        static readonly Contract
             cmd_literal = new("literal", typeof(object), action: static exe => exe.args[0]),
-            cmd_variable = new("variable", typeof(object), action: static exe => ((Variable<object>)exe.args[0]).value),
-            cmd_declare_,
-            cmd_math_,
-            cmd_not_;
+            cmd_variable = new("variable", typeof(object), action: static exe => ((Variable<object>)exe.args[0]).value);
+
+        static Contract cmd_math_;
 
         //----------------------------------------------------------------------------------------------------------
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Vars()
         {
-            cmd_declare_ = AddContract(new("var",
+            AddContract(new("var",
                 args: static exe =>
                 {
                     if (exe.reader.TryReadArgument(out string varname))

@@ -5,31 +5,9 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        static void InitContracts()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Init_Sleep()
         {
-            Init_Assign();
-            Init_Unary();
-            Init_Vars();
-            Init_If();
-            Init_For();
-            Init_While();
-            Init_Stdin();
-
-            AddContract(new(
-                "echo",
-                typeof(object),
-                min_args: 1,
-                args: static exe =>
-                {
-                    if (exe.harbinger.TryParseExpression(exe.reader, out var statement, out exe.error))
-                        exe.args.Add(statement);
-                },
-                routine: static exe =>
-                {
-                    Executor statement = (Executor)exe.args[0];
-                    return statement.EExecute(exe.harbinger.stdout);
-                }));
-
             AddContract(new(
                 "sleep",
                 min_args: 1,

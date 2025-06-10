@@ -2,11 +2,13 @@
 using _UTIL_;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Run()
         {
             Command.static_domain.AddRoutine(

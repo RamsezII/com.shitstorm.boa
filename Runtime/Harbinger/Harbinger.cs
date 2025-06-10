@@ -43,15 +43,6 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
-        {
-            InitContracts();
-            InitCmd_Run();
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
         public static Contract AddContract(in Contract contract)
         {
             global_contracts.Add(contract.name, contract);
