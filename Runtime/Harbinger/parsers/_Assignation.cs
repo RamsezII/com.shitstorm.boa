@@ -5,10 +5,9 @@
         internal bool TryParseAssignation(in BoaReader reader, out ContractExecutor assignation, out string error)
         {
             assignation = null;
-            error = null;
             int read_i = reader.read_i;
 
-            if (reader.TryReadArgument(out string varname))
+            if (reader.TryReadArgument(out string varname, out error, check_parenthesis: false))
                 if (global_variables.TryGetValue(varname, out var variable))
                     if (reader.TryReadMatch(out string op_name, true, true, "=", "+=", "-=", "*=", "/="))
                     {

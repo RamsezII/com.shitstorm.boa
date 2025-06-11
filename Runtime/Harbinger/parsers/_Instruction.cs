@@ -21,6 +21,12 @@
                 }
                 else if (TryParseExpression(reader, out var expr, out error))
                 {
+                    if (reader.IsScript && !reader.TryReadChar(';'))
+                    {
+                        error ??= $"missing ';' at the end of instruction ({reader.GetType()}.{nameof(reader.last_arg)}: {reader.last_arg})";
+                        return false;
+                    }
+
                     instruction = expr;
                     return true;
                 }

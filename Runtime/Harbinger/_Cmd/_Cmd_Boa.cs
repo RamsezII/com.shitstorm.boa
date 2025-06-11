@@ -42,9 +42,11 @@ namespace _BOA_
 
                 if (error != null)
                 {
-                    exe.error = error;
+                    exe.error = reader.LocalizeError(error, File.ReadAllLines(script_path));
                     yield break;
                 }
+                else if (false)
+                    Debug.Log(script_text);
 
                 var routine = executor.EExecute();
 

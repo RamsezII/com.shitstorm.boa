@@ -21,10 +21,10 @@ namespace _BOA_
                     min_args: 1,
                     args: static exe =>
                     {
-                        if (!exe.reader.TryReadArgument(out string operation_name))
-                            exe.error = "missing string operation";
+                        if (!exe.reader.TryReadArgument(out string operation_name, out exe.error))
+                            exe.error ??= "missing string operation";
                         else if (!Enum.TryParse(operation_name, true, out Operations op))
-                            exe.error = $"unknown string operation '{operation_name}'";
+                            exe.error ??= $"unknown string operation '{operation_name}'";
                         else
                         {
                             exe.args.Add(op);

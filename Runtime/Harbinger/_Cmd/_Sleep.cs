@@ -12,7 +12,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string arg))
+                    if (exe.reader.TryReadArgument(out string arg, out exe.error))
                         if (Util.TryParseFloat(arg, out float time))
                             exe.args.Add(time);
                 },

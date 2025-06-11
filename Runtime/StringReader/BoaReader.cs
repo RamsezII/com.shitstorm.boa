@@ -19,7 +19,7 @@ namespace _BOA_
         public string last_arg;
 
         public const string
-            blacklist_boa = " \n\r{}();'\"";
+            blacklist_boa = " \n\r{}(),;'\"";
 
         public bool IsScript => mode == Sources.Script;
         public bool IsCommandLine => mode == Sources.CommandLine;
@@ -51,6 +51,17 @@ namespace _BOA_
             }
 
             c = '\0';
+            return false;
+        }
+
+        public bool TryPeekChar(in char expected_value, in bool skip_empties = true)
+        {
+            if (skip_empties)
+                HasNext();
+
+            if (TryPeek(out char c) && c == expected_value)
+                return true;
+
             return false;
         }
 
@@ -97,11 +108,20 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadArgument(out string argument)
+        public bool TryReadArgument(out string argument, out string error, in bool check_parenthesis = true)
         {
+            error = null;
             if (TryReadArgument(text, out start_i, ref read_i, out argument))
             {
                 last_arg = argument;
+                if (check_parenthesis)
+                    if (IsScript && !TryReadChar(','))
+                        if (!TryPeekChar(')'))
+                        {
+                            error = $"expected ',' or ')' after argument '{argument}'";
+                            read_i = start_i;
+                            return false;
+                        }
                 return true;
             }
             return false;

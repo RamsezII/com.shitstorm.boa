@@ -83,18 +83,38 @@ namespace _BOA_
             this.reader = reader;
             this.previous_exe = previous_exe;
 
-            if (parse_arguments)
+            if (parse_arguments && contract != null)
+            {
+                bool expects_parenthesis = reader.IsScript && contract.expects_parenthesis;
+
+                if (expects_parenthesis && !reader.TryReadChar('('))
+                {
+                    error = $"'{contract.name}' expects opening parenthesis '('";
+                    return;
+                }
+
                 contract?.args?.Invoke(this);
+
+                if (error != null)
+                    return;
+
+                if (expects_parenthesis && !reader.TryReadChar(')'))
+                {
+                    error = $"'{contract.name}' expects closing parenthesis ')'";
+                    return;
+                }
+            }
 
             if (reader.IsCommandLine)
                 if (reader.TryReadChar('|'))
-                    if (reader.TryReadArgument(out string arg))
-                        if (Harbinger.global_contracts.TryGetValue(arg, out Contract pipe_cont))
-                        {
-                            next_exe = new ContractExecutor(harbinger, pipe_cont, reader, parse_arguments: parse_arguments, previous_exe: this);
-                            if (next_exe.error != null)
-                                error = next_exe.error;
-                        }
+                    if (!reader.TryReadArgument(out string arg, out error, check_parenthesis: false))
+                        return;
+                    else if (Harbinger.global_contracts.TryGetValue(arg, out Contract pipe_cont))
+                    {
+                        next_exe = new ContractExecutor(harbinger, pipe_cont, reader, parse_arguments: parse_arguments, previous_exe: this);
+                        if (next_exe.error != null)
+                            error = next_exe.error;
+                    }
         }
 
         //----------------------------------------------------------------------------------------------------------

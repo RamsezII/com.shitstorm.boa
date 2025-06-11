@@ -8,9 +8,10 @@ namespace _BOA_
         static void Init_Var()
         {
             AddContract(new("var",
+                expects_parenthesis: false,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string varname))
+                    if (exe.reader.TryReadArgument(out string varname, out exe.error, check_parenthesis: false))
                         if (exe.reader.HasNext())
                             if (exe.reader.TryReadChar('='))
                                 if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))

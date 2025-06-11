@@ -16,8 +16,8 @@ namespace _BOA_
             cmd_unary_ = AddContract(new("unary",
                 args: static exe =>
                 {
-                    if (!exe.reader.TryReadArgument(out string arg))
-                        exe.error = "expected operator or factor";
+                    if (!exe.reader.TryReadArgument(out string arg, out exe.error))
+                        exe.error ??= "expected operator or factor";
                     else if (!Enum.TryParse(arg, true, out OperatorsM code))
                         exe.error = $"unknown operator '{arg}'";
                     else if (exe.harbinger.TryParseFactor(exe.reader, out var factor, out exe.error))

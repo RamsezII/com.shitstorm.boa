@@ -16,7 +16,7 @@ namespace _BOA_
             cmd_math_ = AddContract(new("math",
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string operator_name))
+                    if (exe.reader.TryReadArgument(out string operator_name, out exe.error))
                         if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                             exe.error = $"unknown operator '{operator_name}'";
                         else if (exe.harbinger.TryParseExpression(exe.reader, out var expr1, out exe.error))

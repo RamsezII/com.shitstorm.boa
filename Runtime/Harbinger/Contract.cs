@@ -26,6 +26,7 @@ namespace _BOA_
         public readonly string name;
         internal readonly int min_args, max_args;
         public readonly Action<ContractExecutor> args;
+        public readonly bool expects_parenthesis;
         internal readonly Action<ContractExecutor, object> on_pipe;
         internal readonly Func<ContractExecutor, object> action;
         internal readonly Func<ContractExecutor, IEnumerator<Status>> routine;
@@ -36,6 +37,7 @@ namespace _BOA_
         public Contract(in string name,
             in int min_args = 0,
             in int max_args = 0,
+            in bool expects_parenthesis = true,
             in Action<ContractExecutor> args = null,
             in Action<ContractExecutor, object> on_pipe = null,
             in Func<ContractExecutor, object> action = null,
@@ -44,8 +46,9 @@ namespace _BOA_
             )
         {
             this.name = name;
-            this.min_args = min_args;
+            this.min_args = Mathf.Min(min_args, max_args);
             this.max_args = Mathf.Max(min_args, max_args);
+            this.expects_parenthesis = expects_parenthesis;
             this.args = args;
             this.on_pipe = on_pipe;
             this.action = action;
