@@ -17,10 +17,7 @@ namespace _BOA_
                 routine: static exe =>
                 {
                     Executor expression = (Executor)exe.args[0];
-                    return expression.EExecute(after_execution: data =>
-                    {
-                        exe.harbinger.stdout(data);
-                    });
+                    return expression.EExecute(after_execution: exe.harbinger.stdout);
                 }));
         }
     }

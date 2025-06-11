@@ -6,6 +6,14 @@ namespace _BOA_
     [Serializable]
     public sealed partial class BoaReader
     {
+        public enum Sources : byte
+        {
+            Undefined,
+            CommandLine,
+            Script,
+        }
+
+        public readonly Sources mode;
         public readonly string text;
         public int start_i, read_i;
         public string last_arg;
@@ -13,10 +21,14 @@ namespace _BOA_
         public const string
             blacklist_boa = " \n\r{}();'\"";
 
+        public bool IsScript => mode == Sources.Script;
+        public bool IsCommandLine => mode == Sources.CommandLine;
+
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaReader(in string text, in int read_i = 0)
+        public BoaReader(in Sources mode, in string text, in int read_i = 0)
         {
+            this.mode = mode;
             this.read_i = read_i;
             this.text = text;
         }

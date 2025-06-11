@@ -86,14 +86,15 @@ namespace _BOA_
             if (parse_arguments)
                 contract?.args?.Invoke(this);
 
-            if (reader.TryReadChar('|'))
-                if (reader.TryReadArgument(out string arg))
-                    if (Harbinger.global_contracts.TryGetValue(arg, out Contract pipe_cont))
-                    {
-                        next_exe = new ContractExecutor(harbinger, pipe_cont, reader, parse_arguments: parse_arguments, previous_exe: this);
-                        if (next_exe.error != null)
-                            error = next_exe.error;
-                    }
+            if (reader.IsCommandLine)
+                if (reader.TryReadChar('|'))
+                    if (reader.TryReadArgument(out string arg))
+                        if (Harbinger.global_contracts.TryGetValue(arg, out Contract pipe_cont))
+                        {
+                            next_exe = new ContractExecutor(harbinger, pipe_cont, reader, parse_arguments: parse_arguments, previous_exe: this);
+                            if (next_exe.error != null)
+                                error = next_exe.error;
+                        }
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -101,6 +102,7 @@ namespace _BOA_
         internal override IEnumerator<Contract.Status> EExecute(Action<object> end_action = null)
         {
             object data = null;
+
             if (contract != null)
                 if (contract.action != null)
                 {
@@ -117,13 +119,19 @@ namespace _BOA_
                         yield return routine.Current;
                     }
                 }
-            end_action?.Invoke(data);
-        }
 
-        public IEnumerator<Contract.Status> EStdout(in object data)
-        {
-            next_exe?.contract?.on_pipe?.Invoke(next_exe, data);
-            return next_exe?.contract?.on_pipe_routine(next_exe, data);
+            if (next_exe != null && next_exe.contract != null)
+            {
+                next_exe.contract.on_pipe?.Invoke(next_exe, data);
+                if (next_exe.contract.on_pipe_routine != null)
+                {
+                    var stdout = next_exe.contract.on_pipe_routine(next_exe, data);
+                    while (!disposed && stdout.MoveNext())
+                        yield return stdout.Current;
+                }
+            }
+
+            end_action?.Invoke(data);
         }
     }
 

@@ -37,7 +37,7 @@ namespace _BOA_
 
                 string script_text = File.ReadAllText(script_path);
                 Harbinger harbinger = new(data => exe.Stdout(data));
-                BoaReader reader = new(script_text);
+                BoaReader reader = new(BoaReader.Sources.Script, script_text);
                 using Executor executor = harbinger.ParseProgram(reader, out string error);
 
                 if (error != null)
