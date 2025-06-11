@@ -38,7 +38,7 @@
             }
 
             if (reader.TryReadChar('('))
-                if (!TryParseExpression(reader, out factor, out error))
+                if (!TryParseExpression(reader, false, out factor, out error))
                 {
                     error ??= "expected expression inside parentheses";
                     return false;
@@ -51,7 +51,7 @@
                 else
                     return true;
 
-            if (reader.TryReadArgument(out string arg, out error, check_parenthesis: false))
+            if (reader.TryReadArgument(out string arg, out error, as_function_argument: false))
                 if (global_contracts.TryGetValue(arg, out var contract))
                 {
                     factor = new ContractExecutor(this, contract, reader);

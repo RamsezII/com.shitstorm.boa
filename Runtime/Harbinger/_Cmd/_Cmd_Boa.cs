@@ -11,9 +11,17 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Run()
         {
+            const string
+                as_cmd_line = "--as-command-line";
+
             Command.static_domain.AddRoutine(
                 "run-boa-script",
                 min_args: 1,
+                opts: static exe =>
+                {
+                    if (exe.line.TryRead_one_flag(exe, as_cmd_line))
+                        exe.opts.Add(as_cmd_line, null);
+                },
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string script_path, out _, strict: true, path_mode: FS_TYPES.FILE))
@@ -23,6 +31,8 @@ namespace _BOA_
 
             static IEnumerator<CMD_STATUS> ERunScript(Command.Executor exe)
             {
+                bool asCmdLine_flag = exe.opts.ContainsKey(as_cmd_line);
+
                 while (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
                     yield return default;
 
@@ -37,7 +47,7 @@ namespace _BOA_
 
                 string script_text = File.ReadAllText(script_path);
                 Harbinger harbinger = new(data => exe.Stdout(data));
-                BoaReader reader = new(BoaReader.Sources.Script, script_text);
+                BoaReader reader = new(asCmdLine_flag ? BoaReader.Sources.CommandLine : BoaReader.Sources.Script, script_text);
                 using Executor executor = harbinger.ParseProgram(reader, out string error);
 
                 if (error != null)

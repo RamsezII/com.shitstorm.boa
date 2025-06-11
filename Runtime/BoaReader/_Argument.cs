@@ -5,20 +5,20 @@ namespace _BOA_
     partial class BoaReader
     {
         public const string
-            _stoppers_ = " \n\r{}(),;'\"",
+            _stoppers_ = " \n\r{}(),;'\"+-*/%",
             _empties_ = " \t\n\r";
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryReadArgument(in string text, out int start_i, ref int read_i, out string argument, in string blacklist = _stoppers_)
+        public static bool TryReadArgument(in string text, out int start_i, ref int read_i, out string argument, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
-            text.HasNext(ref read_i);
+            text.HasNext(ref read_i, skippables: skippables);
             start_i = read_i;
 
             for (; read_i < text.Length; read_i++)
             {
                 char c = text[read_i];
-                if (c == ' ' || blacklist != null && blacklist.Contains(c, StringComparison.OrdinalIgnoreCase))
+                if (c == ' ' || stoppers != null && stoppers.Contains(c, StringComparison.OrdinalIgnoreCase))
                     break;
             }
 

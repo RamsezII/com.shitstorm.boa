@@ -7,7 +7,7 @@
             assignation = null;
             int read_i = reader.read_i;
 
-            if (reader.TryReadArgument(out string varname, out error, check_parenthesis: false))
+            if (reader.TryReadArgument(out string varname, out error, as_function_argument: false))
                 if (global_variables.TryGetValue(varname, out var variable))
                     if (reader.TryReadMatch(out string op_name, true, BoaReader._empties_, "=", "+=", "-=", "*=", "/="))
                     {
@@ -23,7 +23,7 @@
 
                         code |= OperatorsM.assign;
 
-                        if (TryParseExpression(reader, out var expr, out error))
+                        if (TryParseExpression(reader, false, out var expr, out error))
                         {
                             assignation = new ContractExecutor(this, cmd_assign_, reader, parse_arguments: false);
                             assignation.args.Add(code);

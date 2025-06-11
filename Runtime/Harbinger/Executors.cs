@@ -60,7 +60,6 @@ namespace _BOA_
         public readonly ushort id;
 
         public readonly Contract contract;
-        internal readonly ContractExecutor previous_exe, next_exe;
         public readonly BoaReader reader;
         public readonly List<object> args = new();
         public string error;
@@ -75,13 +74,12 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ContractExecutor(in Harbinger harbinger, in Contract contract, in BoaReader reader, in bool parse_arguments = true, in ContractExecutor previous_exe = null) : base(harbinger)
+        public ContractExecutor(in Harbinger harbinger, in Contract contract, in BoaReader reader, in bool parse_arguments = true) : base(harbinger)
         {
             id = _id.LoopID();
 
             this.contract = contract;
             this.reader = reader;
-            this.previous_exe = previous_exe;
 
             if (parse_arguments && contract != null)
             {
@@ -89,7 +87,7 @@ namespace _BOA_
 
                 if (expects_parenthesis && !reader.TryReadChar('('))
                 {
-                    error = $"'{contract.name}' expects opening parenthesis '('";
+                    error = $"'{contract.name}' expected opening parenthesis '('";
                     return;
                 }
 
@@ -100,21 +98,10 @@ namespace _BOA_
 
                 if (expects_parenthesis && !reader.TryReadChar(')'))
                 {
-                    error = $"'{contract.name}' expects closing parenthesis ')'";
+                    error = $"'{contract.name}' expected closing parenthesis ')'";
                     return;
                 }
             }
-
-            if (reader.IsCommandLine)
-                if (reader.TryReadChar('|'))
-                    if (!reader.TryReadArgument(out string arg, out error, check_parenthesis: false))
-                        return;
-                    else if (Harbinger.global_contracts.TryGetValue(arg, out Contract pipe_cont))
-                    {
-                        next_exe = new ContractExecutor(harbinger, pipe_cont, reader, parse_arguments: parse_arguments, previous_exe: this);
-                        if (next_exe.error != null)
-                            error = next_exe.error;
-                    }
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -133,23 +120,13 @@ namespace _BOA_
                 {
                     using var routine = contract.routine(this);
                     data = routine.Current.data;
+
                     while (!disposed && routine.MoveNext())
                     {
                         data = routine.Current.data;
                         yield return routine.Current;
                     }
                 }
-
-            if (next_exe != null && next_exe.contract != null)
-            {
-                next_exe.contract.on_pipe?.Invoke(next_exe, data);
-                if (next_exe.contract.on_pipe_routine != null)
-                {
-                    var stdout = next_exe.contract.on_pipe_routine(next_exe, data);
-                    while (!disposed && stdout.MoveNext())
-                        yield return stdout.Current;
-                }
-            }
 
             end_action?.Invoke(data);
         }

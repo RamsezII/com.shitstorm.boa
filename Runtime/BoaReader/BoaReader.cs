@@ -62,14 +62,42 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryPeekChar(in char expected_value, in string skippables = _empties_)
+        public bool TryPeekChar(in char expected_value, in string skippables = _empties_, in bool ignore_case = true)
         {
             int read_old = read_i;
 
-            if (TryPeek(out char c, skippables) && c == expected_value)
-                return true;
+            while (read_i < text.Length)
+            {
+                char c = text[read_i];
+
+                if (c == expected_value)
+                    return true;
+
+                if (skippables.Contains(c, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                    ++read_i;
+                else
+                    break;
+            }
 
             read_i = read_old;
+            return false;
+        }
+
+        public bool SkipUntil(in char expected_value, in string unskippables = null, in bool ignore_case = true)
+        {
+            while (read_i < text.Length)
+            {
+                char c = text[read_i];
+
+                if (c == expected_value)
+                    return true;
+
+                if (unskippables != null && unskippables.Contains(c, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
+                    break;
+                else
+                    ++read_i;
+            }
+
             return false;
         }
 
@@ -97,22 +125,25 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadArgument(out string argument, out string error, in bool check_parenthesis = true)
+        public bool TryReadArgument(out string argument, out string error, in string stoppers = _stoppers_, in bool as_function_argument = true)
         {
             int read_old = read_i;
 
+            argument = null;
             error = null;
-            if (TryReadArgument(text, out start_i, ref read_i, out argument))
-            {
-                last_arg = argument;
-                if (!check_parenthesis || !IsScript)
-                    return true;
 
-                if (TryReadChar(',') || TryPeekChar(')'))
-                    return true;
+            if (HasNext())
+                if (TryReadArgument(text, out start_i, ref read_i, out argument, stoppers: stoppers))
+                {
+                    last_arg = argument;
+                    if (!as_function_argument || !IsScript)
+                        return true;
 
-                error = $"expected ',' or ')' after argument '{argument}'";
-            }
+                    if (TryReadChar(',') || TryPeekChar(')'))
+                        return true;
+
+                    error = $"expected ',' or ')' after argument '{argument}'";
+                }
 
             read_i = read_old;
             return false;

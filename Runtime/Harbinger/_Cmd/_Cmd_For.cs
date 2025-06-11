@@ -19,7 +19,7 @@ namespace _BOA_
                     else
                     {
                         exe.reader.TryReadChar(';');
-                        if (!exe.harbinger.TryParseExpression(exe.reader, out var cond, out exe.error))
+                        if (!exe.harbinger.TryParseExpression(exe.reader, false, out var cond, out exe.error))
                             exe.error = "expected expression after first instruction in 'for' instruction";
                         else
                         {

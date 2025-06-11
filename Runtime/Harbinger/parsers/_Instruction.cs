@@ -13,13 +13,13 @@
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (reader.TryReadChar('#', " \t"))
+                else if (reader.TryReadChar('#'))
                 {
-                    reader.TryReadChar('\n', " \t");
+                    reader.SkipUntil('\n');
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (TryParseExpression(reader, out var expr, out error))
+                else if (TryParseExpression(reader, false, out var expr, out error))
                 {
                     if (reader.IsScript && !reader.TryReadChar(';'))
                     {
