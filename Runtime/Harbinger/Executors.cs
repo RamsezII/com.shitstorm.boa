@@ -18,18 +18,25 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal abstract IEnumerator<Contract.Status> EExecute(Action<object> on_done = null);
+        internal abstract IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null);
 
-        public static IEnumerator<Contract.Status> EExecute(params IEnumerator<Contract.Status>[] stack)
+        public static IEnumerator<Contract.Status> EExecute(Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)
         {
+            object data = null;
             if (stack != null && stack.Length > 0)
                 for (int i = 0; i < stack.Length; i++)
                     if (stack[i] != null)
                     {
-                        var routine = stack[i];
+                        using var routine = stack[i];
+                        data = routine.Current.data;
                         while (routine.MoveNext())
+                        {
+                            data = routine.Current.data;
                             yield return routine.Current;
+                        }
                     }
+            if (modify_output != null)
+                yield return new Contract.Status() { data = modify_output?.Invoke(data), };
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -53,9 +60,9 @@ namespace _BOA_
         public readonly ushort id;
 
         public readonly Contract contract;
+        internal readonly ContractExecutor previous_exe, next_exe;
         public readonly BoaReader reader;
         public readonly List<object> args = new();
-
         public string error;
 
         //----------------------------------------------------------------------------------------------------------
@@ -68,35 +75,55 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ContractExecutor(in Harbinger harbinger, in Contract contract, in BoaReader reader, in bool parse_arguments = true) : base(harbinger)
+        public ContractExecutor(in Harbinger harbinger, in Contract contract, in BoaReader reader, in bool parse_arguments = true, in ContractExecutor previous_exe = null) : base(harbinger)
         {
             id = _id.LoopID();
 
             this.contract = contract;
             this.reader = reader;
+            this.previous_exe = previous_exe;
 
             if (parse_arguments)
                 contract?.args?.Invoke(this);
+
+            if (reader.TryReadChar('|'))
+                if (reader.TryReadArgument(out string arg))
+                    if (Harbinger.global_contracts.TryGetValue(arg, out Contract pipe_cont))
+                    {
+                        next_exe = new ContractExecutor(harbinger, pipe_cont, reader, parse_arguments: parse_arguments, previous_exe: this);
+                        if (next_exe.error != null)
+                            error = next_exe.error;
+                    }
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done)
+        internal override IEnumerator<Contract.Status> EExecute(Action<object> end_action = null)
         {
+            object data = null;
             if (contract != null)
                 if (contract.action != null)
                 {
-                    object data = contract.action(this);
+                    data = contract.action(this);
                     yield return new Contract.Status() { data = data, };
-                    on_done?.Invoke(data);
                 }
                 else if (contract.routine != null)
                 {
-                    var routine = contract.routine(this);
-                    while (routine.MoveNext())
+                    using var routine = contract.routine(this);
+                    data = routine.Current.data;
+                    while (!disposed && routine.MoveNext())
+                    {
+                        data = routine.Current.data;
                         yield return routine.Current;
-                    on_done?.Invoke(routine.Current.data);
+                    }
                 }
+            end_action?.Invoke(data);
+        }
+
+        public IEnumerator<Contract.Status> EStdout(in object data)
+        {
+            next_exe?.contract?.on_pipe?.Invoke(next_exe, data);
+            return next_exe?.contract?.on_pipe_routine(next_exe, data);
         }
     }
 
@@ -112,17 +139,21 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute(Action<object> on_done = null)
+        internal override IEnumerator<Contract.Status> EExecute(Action<object> end_action = null)
         {
-            IEnumerator<Contract.Status> routine = null;
+            object data = null;
             for (int i = 0; i < stack.Count; i++)
             {
                 var exe = stack[i];
-                routine = exe.EExecute();
+                using var routine = exe.EExecute();
+                data = routine.Current.data;
                 while (!exe.disposed && routine.MoveNext())
+                {
+                    data = routine.Current.data;
                     yield return routine.Current;
+                }
             }
-            on_done?.Invoke(routine?.Current.data);
+            end_action?.Invoke(data);
         }
 
         //----------------------------------------------------------------------------------------------------------

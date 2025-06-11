@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,38 +6,13 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        static readonly Contract
-            cmd_literal = new("literal", action: static exe => exe.args[0]),
-            cmd_variable = new("variable", action: static exe => ((BoaVar)exe.args[0]).value);
-
         static Contract cmd_math_;
 
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Init_Vars()
+        static void Init_Math()
         {
-            AddContract(new("var",
-                args: static exe =>
-                {
-                    if (exe.reader.TryReadArgument(out string varname))
-                        if (exe.reader.HasNext())
-                            if (exe.reader.TryReadChar('='))
-                                if (exe.harbinger.TryParseExpression(exe.reader, out var expression, out exe.error))
-                                {
-                                    BoaVar variable = new(varname, null);
-                                    exe.harbinger.global_variables[varname] = variable;
-                                    exe.args.Add(variable);
-                                    exe.args.Add(expression);
-                                }
-                },
-                routine: static exe =>
-                {
-                    BoaVar variable = (BoaVar)exe.args[0];
-                    Executor expression = (Executor)exe.args[1];
-                    return expression.EExecute(data => variable.value = data);
-                }));
-
             cmd_math_ = AddContract(new("math",
                 args: static exe =>
                 {

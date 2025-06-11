@@ -2,6 +2,12 @@
 {
     partial class Harbinger
     {
+        static readonly Contract
+            cmd_literal = new("literal", action: static exe => exe.args[0]),
+            cmd_variable = new("variable", action: static exe => ((BoaVar)exe.args[0]).value);
+
+        //----------------------------------------------------------------------------------------------------------
+
         internal bool TryParseFactor(in BoaReader reader, out ContractExecutor factor, out string error)
         {
             error = null;
