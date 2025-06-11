@@ -13,9 +13,9 @@
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (reader.TryReadChar('#'))
+                else if (reader.TryReadChar('#', " \t"))
                 {
-                    reader.SkipUntil('\n');
+                    reader.TryReadChar('\n', " \t");
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
@@ -23,7 +23,7 @@
                 {
                     if (reader.IsScript && !reader.TryReadChar(';'))
                     {
-                        error ??= $"missing ';' at the end of instruction ({reader.GetType()}.{nameof(reader.last_arg)}: {reader.last_arg})";
+                        error ??= $"missing ';' at the end of instruction";
                         return false;
                     }
 

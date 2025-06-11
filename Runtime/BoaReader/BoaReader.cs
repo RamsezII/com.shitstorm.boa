@@ -18,8 +18,9 @@ namespace _BOA_
         public int start_i, read_i;
         public string last_arg;
 
-        public const string
-            blacklist_boa = " \n\r{}(),;'\"";
+#if UNITY_EDITOR
+        readonly int _text_length;
+#endif
 
         public bool IsScript => mode == Sources.Script;
         public bool IsCommandLine => mode == Sources.CommandLine;
@@ -31,18 +32,23 @@ namespace _BOA_
             this.mode = mode;
             this.read_i = read_i;
             this.text = text;
+#if UNITY_EDITOR
+            _text_length = text.Length;
+#endif
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         public char Peek() => text[read_i];
         public void Peek(out char c) => c = text[read_i];
-        public bool HasNext() => text.HasNext(ref read_i);
+        public bool HasNext(in string skippables = _empties_) => text.HasNext(ref read_i);
 
-        public bool TryPeek(out char c, in bool skip_empties = true)
+        public bool TryPeek(out char c, in string skippables = _empties_)
         {
-            if (skip_empties)
-                HasNext();
+            int read_old = read_i;
+
+            if (skippables != null)
+                HasNext(skippables);
 
             if (read_i < text.Length)
             {
@@ -51,96 +57,83 @@ namespace _BOA_
             }
 
             c = '\0';
+
+            read_i = read_old;
             return false;
         }
 
-        public bool TryPeekChar(in char expected_value, in bool skip_empties = true)
+        public bool TryPeekChar(in char expected_value, in string skippables = _empties_)
         {
-            if (skip_empties)
-                HasNext();
+            int read_old = read_i;
 
-            if (TryPeek(out char c) && c == expected_value)
+            if (TryPeek(out char c, skippables) && c == expected_value)
                 return true;
 
+            read_i = read_old;
             return false;
         }
 
-        public bool TryReadChar(in char expected_value, in bool skip_empties = true)
+        public bool TryReadChar(in char expected_value, in string skippables = _empties_, in bool ignore_case = true)
         {
-            if (skip_empties)
-                HasNext();
+            if (TryPeekChar(expected_value, skippables))
+            {
+                ++read_i;
+                return true;
+            }
+            return false;
+        }
 
-            if (TryPeek(out char c) && c == expected_value)
+        public bool TryReadChar(out char value, in string expected_values, in string skippables = _empties_, in bool ignore_case = false)
+        {
+            int read_old = read_i;
+
+            if (TryPeek(out value, skippables) && expected_values.Contains(value, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
             {
                 ++read_i;
                 return true;
             }
 
-            return false;
-        }
-
-        public bool TryReadChar(out char value, in string expected_values, in bool ignore_case = false, in bool skip_empties = true)
-        {
-            if (skip_empties)
-                HasNext();
-
-            if (TryPeek(out value) && expected_values.Contains(value, ignore_case ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal))
-            {
-                ++read_i;
-                return true;
-            }
-
-            value = default;
-            return false;
-        }
-
-        public bool SkipUntil(in char expected_value)
-        {
-            while (read_i < text.Length)
-            {
-                if (TryPeek(out char c, false) && c == expected_value)
-                {
-                    ++read_i;
-                    return true;
-                }
-                ++read_i;
-            }
+            read_i = read_old;
             return false;
         }
 
         public bool TryReadArgument(out string argument, out string error, in bool check_parenthesis = true)
         {
+            int read_old = read_i;
+
             error = null;
             if (TryReadArgument(text, out start_i, ref read_i, out argument))
             {
                 last_arg = argument;
-                if (check_parenthesis)
-                    if (IsScript && !TryReadChar(','))
-                        if (!TryPeekChar(')'))
-                        {
-                            error = $"expected ',' or ')' after argument '{argument}'";
-                            read_i = start_i;
-                            return false;
-                        }
-                return true;
+                if (!check_parenthesis || !IsScript)
+                    return true;
+
+                if (TryReadChar(',') || TryPeekChar(')'))
+                    return true;
+
+                error = $"expected ',' or ')' after argument '{argument}'";
             }
+
+            read_i = read_old;
             return false;
         }
 
-        public bool TryReadMatch(out string match, in bool ignore_case, in bool skip_empties, params string[] matches)
+        public bool TryReadMatch(out string value, string match) => TryReadMatch(out value, true, _empties_, match);
+        public bool TryReadMatch(out string value, in bool ignore_case, in string skippables = _empties_, params string[] matches)
         {
-            if (skip_empties)
-                HasNext();
+            int read_old = read_i;
 
-            if (TryReadArgument(text, out start_i, ref read_i, out match))
-                if (matches.Contains(match, ignore_case ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal))
+            if (skippables != null)
+                HasNext(skippables);
+
+            if (TryReadArgument(text, out start_i, ref read_i, out value))
+                if (matches.Contains(value, ignore_case ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal))
                 {
-                    last_arg = match;
+                    last_arg = value;
                     return true;
                 }
-                else
-                    read_i = start_i;
 
+            read_i = read_old;
             return false;
         }
     }

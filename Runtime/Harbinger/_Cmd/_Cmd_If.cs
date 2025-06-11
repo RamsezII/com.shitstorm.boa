@@ -24,7 +24,7 @@ namespace _BOA_
                     {
                         exe.args.Add(cond);
                         exe.args.Add(block_if);
-                        if (exe.reader.TryReadMatch(out _, true, true, "else"))
+                        if (exe.reader.TryReadMatch(out _, "else"))
                             if (exe.harbinger.TryParseBlock(exe.reader, out var block_else, out exe.error))
                                 exe.args.Add(block_else);
                     }

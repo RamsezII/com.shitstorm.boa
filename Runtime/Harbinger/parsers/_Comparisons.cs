@@ -7,7 +7,7 @@
             expression = null;
             if (TryParseAddSub(reader, out var addsub1, out error))
             {
-                if (reader.TryReadChar(out char op_char, "<>=", ignore_case: true, skip_empties: true))
+                if (reader.TryReadChar(out char op_char, "<>="))
                 {
                     OperatorsM code = op_char switch
                     {

@@ -7,7 +7,7 @@
             expression = null;
             if (TryParseTerm(reader, out var term1, out error))
             {
-                if (reader.TryReadChar(out char op_char, "+-", ignore_case: true, skip_empties: true))
+                if (reader.TryReadChar(out char op_char, "+-"))
                 {
                     OperatorsM code = op_char switch
                     {

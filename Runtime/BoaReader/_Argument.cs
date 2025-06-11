@@ -4,7 +4,13 @@ namespace _BOA_
 {
     partial class BoaReader
     {
-        public static bool TryReadArgument(in string text, out int start_i, ref int read_i, out string argument, in string blacklist = blacklist_boa)
+        public const string
+            _stoppers_ = " \n\r{}(),;'\"",
+            _empties_ = " \t\n\r";
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public static bool TryReadArgument(in string text, out int start_i, ref int read_i, out string argument, in string blacklist = _stoppers_)
         {
             text.HasNext(ref read_i);
             start_i = read_i;
