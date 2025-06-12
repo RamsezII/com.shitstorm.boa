@@ -15,7 +15,7 @@ namespace _BOA_
                 if (TryReadArgument(text, out start_i, ref read_i, out argument, stoppers: stoppers))
                 {
                     last_arg = argument;
-                    if (!as_function_argument || !IsScript)
+                    if (!as_function_argument || !strict_syntax)
                         return true;
 
                     if (TryReadMatch(',') || TryPeekSpecific(')'))

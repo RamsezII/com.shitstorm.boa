@@ -5,14 +5,7 @@ namespace _BOA_
     [Serializable]
     public sealed partial class BoaReader
     {
-        public enum Sources : byte
-        {
-            Undefined,
-            CommandLine,
-            Script,
-        }
-
-        public readonly Sources source;
+        public bool strict_syntax;
         public readonly string text;
         public int start_i, read_i;
         public string last_arg;
@@ -21,14 +14,11 @@ namespace _BOA_
         readonly int _text_length;
 #endif
 
-        public bool IsScript => source == Sources.Script;
-        public bool IsCommandLine => source == Sources.CommandLine;
-
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaReader(in Sources source, in string text, in int read_i = 0)
+        public BoaReader(in bool strict_syntax, in string text, in int read_i = 0)
         {
-            this.source = source;
+            this.strict_syntax = strict_syntax;
             this.read_i = read_i;
             this.text = text;
 #if UNITY_EDITOR

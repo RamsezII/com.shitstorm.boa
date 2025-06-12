@@ -6,7 +6,7 @@
         {
             if (TryParseAssignation(reader, out expression, out error) || TryParseOr(reader, out expression, out error))
             {
-                if (!as_function_argument || !reader.IsScript)
+                if (!as_function_argument || !reader.strict_syntax)
                     return true;
 
                 if (reader.TryReadMatch(',') || reader.TryPeekSpecific(')'))

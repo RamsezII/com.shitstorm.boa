@@ -88,7 +88,7 @@ namespace _BOA_
 
             if (parse_arguments && contract != null)
             {
-                bool expects_parenthesis = reader.IsScript && contract.function_style_arguments;
+                bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
 
                 if (expects_parenthesis && !reader.TryReadMatch('('))
                 {
