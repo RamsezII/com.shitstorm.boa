@@ -41,7 +41,7 @@ namespace _BOA_
 
                     if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
                         value = value[..err_index];
-                    error ??= $"string error: expected closing quote '{sep}' after {sep}{value}";
+                    error ??= $"uncomplete string: expected closing quote '{sep}' after {{ {sep}{value} }}";
                 }
             }
 
