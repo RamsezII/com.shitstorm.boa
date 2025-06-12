@@ -24,15 +24,20 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public void AddCursor(in int index, in Color color)
+        public void AddLintCursor(in int index, in Color color)
+        {
+            RemoveLintCursorsAboveIndex(index);
+            lint_cursors.Add(new(index, color));
+        }
+
+        public void RemoveLintCursorsAboveIndex(in int index)
         {
             for (int i = lint_cursors.Count - 1; i >= 0; i--)
                 if (lint_cursors[i].index >= index)
                     lint_cursors.RemoveAt(i);
-            lint_cursors.Add(new(index, color));
         }
 
-        public string GetLint(in Color default_color)
+        public string GetLintResult(in Color default_color)
         {
             StringBuilder sb = new();
 
