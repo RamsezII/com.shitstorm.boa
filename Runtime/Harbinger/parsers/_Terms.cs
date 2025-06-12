@@ -9,7 +9,7 @@
             if (!TryParseFactor(reader, out var factor1, out error))
                 return false;
 
-            if (reader.TryReadChar(out char op_char, "*/%"))
+            if (reader.TryReadMatch(out char op_char, true, "*/%"))
             {
                 OperatorsM code = op_char switch
                 {

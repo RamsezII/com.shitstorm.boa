@@ -13,7 +13,7 @@ namespace _BOA_
                 {
                     if (!exe.reader.TryReadArgument(out string varname, out exe.error, as_function_argument: false))
                         exe.error ??= $"Expected variable name after 'var'.";
-                    if (!exe.reader.TryReadChar('='))
+                    if (!exe.reader.TryReadMatch('='))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
                     else if (!exe.harbinger.TryParseExpression(exe.reader, false, out var expression, out exe.error))
                         exe.error ??= $"Failed to parse expression after '=' for variable '{varname}'.";

@@ -10,14 +10,14 @@
 
         internal bool TryParseFactor(in BoaReader reader, out ContractExecutor factor, out string error)
         {
-            error = null;
             factor = null;
+            error = null;
 
-            if (reader.TryReadChar(out char c, "+-!"))
+            if (reader.TryReadMatch(out char unary_operator, true, "+-!"))
             {
                 if (TryParseFactor(reader, out var sub_factor, out error))
                 {
-                    OperatorsM code = c switch
+                    OperatorsM code = unary_operator switch
                     {
                         '+' => OperatorsM.add,
                         '-' => OperatorsM.sub,
@@ -32,66 +32,80 @@
                 }
                 else
                 {
-                    error ??= $"expected factor after '{c}'";
+                    error ??= $"expected factor after '{unary_operator}'";
                     return false;
                 }
             }
 
-            if (reader.TryReadChar('('))
-                if (!TryParseExpression(reader, false, out factor, out error))
-                {
-                    error ??= "expected expression inside parentheses";
-                    return false;
-                }
-                else if (!reader.TryReadChar(')'))
-                {
-                    error ??= $"expected closing parenthesis ')'";
-                    return false;
-                }
-                else
-                    return true;
-
-            if (reader.TryReadArgument(out string arg, out error, as_function_argument: false))
-                if (global_contracts.TryGetValue(arg, out var contract))
-                {
-                    factor = new ContractExecutor(this, contract, reader);
-                    if (factor.error != null)
+            if (error == null)
+                if (reader.TryReadMatch('('))
+                    if (!TryParseExpression(reader, false, out factor, out error))
                     {
-                        error = factor.error;
+                        error ??= "expected expression inside parentheses";
                         return false;
                     }
-                    return true;
-                }
-                else if (global_variables.TryGetValue(arg, out var variable))
-                {
-                    factor = new(this, cmd_variable, reader, parse_arguments: false);
-                    factor.args.Add(variable);
-                    return true;
-                }
-                else
+                    else if (!reader.TryReadMatch(')'))
+                    {
+                        error ??= $"expected closing parenthesis ')'";
+                        return false;
+                    }
+                    else
+                        return true;
+
+            if (error == null)
+                if (TryParseString(reader, out string str, out error))
                 {
                     factor = new(this, cmd_literal, reader, parse_arguments: false);
-                    string lower = arg.ToLower();
-                    switch (lower)
-                    {
-                        case "true":
-                            factor.args.Add(true);
-                            return true;
-
-                        case "false":
-                            factor.args.Add(false);
-                            return true;
-
-                        default:
-                            if (int.TryParse(arg, out int _int))
-                                factor.args.Add(_int);
-                            else if (Util.TryParseFloat(arg, out float _float))
-                                factor.args.Add(_float);
-                            else
-                                factor.args.Add(arg);
-                            return true;
-                    }
+                    factor.args.Add(str);
+                    return true;
                 }
+
+            if (error == null)
+                if (reader.TryReadArgument(out string arg, out error, as_function_argument: false))
+                    if (global_contracts.TryGetValue(arg, out var contract))
+                    {
+                        factor = new ContractExecutor(this, contract, reader);
+                        if (factor.error != null)
+                        {
+                            error = factor.error;
+                            return false;
+                        }
+                        return true;
+                    }
+                    else if (global_variables.TryGetValue(arg, out var variable))
+                    {
+                        factor = new(this, cmd_variable, reader, parse_arguments: false);
+                        factor.args.Add(variable);
+                        return true;
+                    }
+                    else
+                    {
+                        factor = new(this, cmd_literal, reader, parse_arguments: false);
+                        string lower = arg.ToLower();
+                        switch (lower)
+                        {
+                            case "true":
+                                factor.args.Add(true);
+                                return true;
+
+                            case "false":
+                                factor.args.Add(false);
+                                return true;
+
+                            default:
+                                if (int.TryParse(arg, out int _int))
+                                    factor.args.Add(_int);
+                                else if (Util.TryParseFloat(arg, out float _float))
+                                    factor.args.Add(_float);
+                                else
+                                {
+                                    factor = null;
+                                    error ??= $"unrecognized literal : '{arg}'";
+                                    return false;
+                                }
+                                return true;
+                        }
+                    }
 
             return false;
         }

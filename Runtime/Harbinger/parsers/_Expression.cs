@@ -9,7 +9,7 @@
                 if (!as_function_argument || !reader.IsScript)
                     return true;
 
-                if (reader.TryReadChar(',') || reader.TryPeekChar(')'))
+                if (reader.TryReadMatch(',') || reader.TryPeekSpecific(')'))
                     return true;
 
                 error = $"expected ',' or ')' after expression '{expression.contract.name}'";

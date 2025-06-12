@@ -8,12 +8,12 @@
             error = null;
 
             if (reader.HasNext())
-                if (reader.TryReadChar(';'))
+                if (reader.TryReadMatch(';'))
                 {
                     instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
-                else if (reader.TryReadChar('#'))
+                else if (reader.TryReadMatch('#'))
                 {
                     reader.SkipUntil('\n');
                     instruction = new ContractExecutor(this, null, reader);
@@ -23,7 +23,7 @@
                 {
                     if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
                         if (check_semicolon || reader.IsScript)
-                            if (!reader.TryReadChar(';'))
+                            if (!reader.TryReadMatch(';'))
                                 if (check_semicolon && reader.IsScript)
                                 {
                                     error ??= $"missing ';' at the end of instruction";

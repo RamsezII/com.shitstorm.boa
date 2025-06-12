@@ -90,7 +90,7 @@ namespace _BOA_
             {
                 bool expects_parenthesis = reader.IsScript && contract.function_style_arguments;
 
-                if (expects_parenthesis && !reader.TryReadChar('('))
+                if (expects_parenthesis && !reader.TryReadMatch('('))
                 {
                     error = $"'{contract.name}' expected opening parenthesis '('";
                     return;
@@ -101,7 +101,7 @@ namespace _BOA_
                 if (error != null)
                     return;
 
-                if (expects_parenthesis && !reader.TryReadChar(')'))
+                if (expects_parenthesis && !reader.TryReadMatch(')'))
                 {
                     error = $"'{contract.name}' expected closing parenthesis ')'";
                     return;

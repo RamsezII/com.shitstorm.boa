@@ -8,7 +8,7 @@
             error = null;
 
             if (reader.HasNext())
-                if (reader.TryReadChar('{'))
+                if (reader.TryReadMatch('{'))
                 {
                     if (reader.HasNext())
                     {
@@ -25,7 +25,7 @@
 
                         executor = block;
 
-                        if (reader.TryReadChar('}'))
+                        if (reader.TryReadMatch('}'))
                             return true;
                         else
                             error = $"did not find closing bracket '}}'";

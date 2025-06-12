@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace _BOA_
@@ -12,17 +13,24 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string arg, out exe.error))
-                        exe.args.Add(arg);
+                    if (exe.harbinger.TryParseExpression(exe.reader, true, out var expr, out exe.error))
+                        exe.args.Add(expr);
                 },
                 routine: EStdin));
 
             static IEnumerator<Contract.Status> EStdin(ContractExecutor exe)
             {
+                ContractExecutor expr = (ContractExecutor)exe.args[0];
+                var routine = expr.EExecute();
+                while (routine.MoveNext())
+                    yield return routine.Current;
+                
+                string prefixe = routine.Current.data.IterateThroughData_str().FirstOrDefault();
+
                 Contract.Status status = new()
                 {
                     state = Contract.Status.States.WAIT_FOR_STDIN,
-                    prefixe = (string)exe.args[0],
+                    prefixe = prefixe,
                 };
 
                 while (true)
