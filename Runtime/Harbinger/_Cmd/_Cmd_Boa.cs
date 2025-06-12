@@ -60,8 +60,6 @@ namespace _BOA_
                     exe.error = reader.LocalizeError(error, File.ReadAllLines(script_path));
                     yield break;
                 }
-                else if (false)
-                    Debug.Log(script_text);
 
                 using var routine = executor.EExecute();
                 CMD_STATUS last_status = default;
