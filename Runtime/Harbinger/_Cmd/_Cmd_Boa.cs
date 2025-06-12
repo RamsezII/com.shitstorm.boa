@@ -59,22 +59,23 @@ namespace _BOA_
                     Debug.Log(script_text);
 
                 using var routine = executor.EExecute();
+                CMD_STATUS last_status = default;
                 while (true)
                     if (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
-                        yield return default;
+                        yield return last_status;
                     else
                     {
-                    before_iter:
+                    before_movenext:
                         if (routine.MoveNext())
                             switch (routine.Current.state)
                             {
                                 case Contract.Status.States.WAIT_FOR_STDIN:
-                                    yield return new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                                    yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
                                     break;
-                                case Contract.Status.States.ACTION_skippable:
-                                    goto before_iter;
+                                case Contract.Status.States.ACTION_skip:
+                                    goto before_movenext;
                                 default:
-                                    yield return new CMD_STATUS(progress: routine.Current.progress);
+                                    yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
                                     break;
                             }
                         else

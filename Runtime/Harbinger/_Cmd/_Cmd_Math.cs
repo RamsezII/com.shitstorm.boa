@@ -27,61 +27,51 @@ namespace _BOA_
                                 exe.args.Add(expr2);
                             }
                 },
-                routine: EMath));
+                routine: static exe =>
+                {
+                    OperatorsM code = (OperatorsM)exe.args[0];
+                    Executor expr1 = (Executor)exe.args[1];
+                    Executor expr2 = (Executor)exe.args[2];
+                    object data1 = null, data2 = null;
 
-            static IEnumerator<Contract.Status> EMath(ContractExecutor exe)
-            {
-                OperatorsM code = (OperatorsM)exe.args[0];
-                Executor expr1 = (Executor)exe.args[1];
-                Executor expr2 = (Executor)exe.args[2];
-
-                var routine1 = expr1.EExecute();
-                while (routine1.MoveNext())
-                    yield return routine1.Current;
-                object data1 = routine1.Current.data;
-
-                var routine2 = expr2.EExecute();
-                while (routine2.MoveNext())
-                    yield return routine2.Current;
-                object data2 = routine2.Current.data;
-
-                if (data1 is int i1 && data2 is int i2)
-                    yield return new Contract.Status()
-                    {
-                        data = code switch
+                    return Executor.EExecute(
+                        modify_output: data =>
                         {
-                            OperatorsM.add => i1 + i2,
-                            OperatorsM.sub => i1 - i2,
-                            OperatorsM.mul => i1 * i2,
-                            OperatorsM.div => i1 / i2,
-                            OperatorsM.div_int => i1 / i2,
-                            OperatorsM.mod => i1 % i2,
-                            OperatorsM.eq => i1 == i2,
-                            OperatorsM.neq => i1 != i2,
-                            OperatorsM.gt => i1 > i2,
-                            OperatorsM.lt => i1 < i2,
-                            OperatorsM.ge => i1 >= i2,
-                            OperatorsM.le => i1 <= i2,
-                            OperatorsM.and => i1 & i2,
-                            OperatorsM.or => i1 | i2,
-                            OperatorsM.xor => i1 ^ i2,
-                            _ => 0,
+                            if (data1 is int i1 && data2 is int i2)
+                                return code switch
+                                {
+                                    OperatorsM.add => i1 + i2,
+                                    OperatorsM.sub => i1 - i2,
+                                    OperatorsM.mul => i1 * i2,
+                                    OperatorsM.div => i1 / i2,
+                                    OperatorsM.div_int => i1 / i2,
+                                    OperatorsM.mod => i1 % i2,
+                                    OperatorsM.eq => i1 == i2,
+                                    OperatorsM.neq => i1 != i2,
+                                    OperatorsM.gt => i1 > i2,
+                                    OperatorsM.lt => i1 < i2,
+                                    OperatorsM.ge => i1 >= i2,
+                                    OperatorsM.le => i1 <= i2,
+                                    OperatorsM.and => i1 & i2,
+                                    OperatorsM.or => i1 | i2,
+                                    OperatorsM.xor => i1 ^ i2,
+                                    _ => 0,
+                                };
+                            else if (data1 is bool b1 && data2 is bool b2)
+                                return code switch
+                                {
+                                    OperatorsM.and => b1 & b2,
+                                    OperatorsM.or => b1 | b2,
+                                    OperatorsM.xor => b1 ^ b2,
+                                    _ => false,
+                                };
+                            else
+                                return default;
                         },
-                    };
-                else if (data1 is bool b1 && data2 is bool b2)
-                    yield return new Contract.Status()
-                    {
-                        data = code switch
-                        {
-                            OperatorsM.and => b1 & b2,
-                            OperatorsM.or => b1 | b2,
-                            OperatorsM.xor => b1 ^ b2,
-                            _ => false,
-                        },
-                    };
-                else
-                    yield return default;
-            }
+                        expr1.EExecute(data => data1 = data),
+                        expr2.EExecute(data => data2 = data)
+                    );
+                }));
         }
     }
 }

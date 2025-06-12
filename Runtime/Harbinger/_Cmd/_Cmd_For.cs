@@ -51,41 +51,25 @@ namespace _BOA_
                 Executor block = (Executor)exe.args[3];
 
                 var routine = instr_init.EExecute();
-            before_loop1:
                 while (routine.MoveNext())
-                    if (routine.Current.state == Contract.Status.States.ACTION_skippable)
-                        goto before_loop1;
-                    else
-                        yield return routine.Current;
+                    yield return routine.Current;
 
                 while (true)
                 {
                     routine = cond.EExecute();
-                before_loop2:
                     while (routine.MoveNext())
-                        if (routine.Current.state == Contract.Status.States.ACTION_skippable)
-                            goto before_loop2;
-                        else
-                            yield return routine.Current;
+                        yield return routine.Current;
 
                     if (!routine.Current.data.ToBool())
                         break;
 
                     routine = block.EExecute();
-                before_loop3:
                     while (routine.MoveNext())
-                        if (routine.Current.state == Contract.Status.States.ACTION_skippable)
-                            goto before_loop3;
-                        else
-                            yield return routine.Current;
+                        yield return routine.Current;
 
                     routine = instr_loop.EExecute();
-                before_loop4:
                     while (routine.MoveNext())
-                        if (routine.Current.state == Contract.Status.States.ACTION_skippable)
-                            goto before_loop4;
-                        else
-                            yield return routine.Current;
+                        yield return routine.Current;
                 }
             }
         }

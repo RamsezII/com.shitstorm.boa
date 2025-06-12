@@ -29,8 +29,6 @@ namespace _BOA_
                     if (stack[i] != null)
                     {
                         using var routine = stack[i];
-                        data = routine.Current.data;
-
                         while (routine.MoveNext())
                         {
                             data = routine.Current.data;
@@ -41,7 +39,7 @@ namespace _BOA_
             if (modify_output != null)
                 yield return new Contract.Status()
                 {
-                    state = Contract.Status.States.ACTION_skippable,
+                    state = Contract.Status.States.ACTION_skip,
                     data = modify_output?.Invoke(data),
                 };
         }
@@ -124,7 +122,7 @@ namespace _BOA_
                     data = contract.action(this);
                     yield return new Contract.Status()
                     {
-                        state = Contract.Status.States.ACTION_skippable,
+                        state = Contract.Status.States.ACTION_skip,
                         data = data,
                     };
                 }
@@ -132,8 +130,6 @@ namespace _BOA_
                 if (contract.routine != null)
                 {
                     using var routine = contract.routine(this);
-                    data = routine.Current.data;
-
                     while (routine.MoveNext())
                     {
                         data = routine.Current.data;
@@ -165,8 +161,6 @@ namespace _BOA_
             {
                 var exe = stack[i];
                 using var routine = exe.EExecute();
-                data = routine.Current.data;
-
                 while (routine.MoveNext())
                 {
                     data = routine.Current.data;

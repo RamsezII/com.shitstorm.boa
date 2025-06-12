@@ -12,7 +12,7 @@ namespace _BOA_
             public enum States
             {
                 BLOCKING,
-                ACTION_skippable,
+                ACTION_skip,
                 WAIT_FOR_STDIN,
                 BACKGROUND,
                 DAEMON,

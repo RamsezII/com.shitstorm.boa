@@ -26,7 +26,9 @@ namespace _BOA_
                 };
 
                 while (true)
+                {
                     yield return status;
+                }
             }
         }
     }
