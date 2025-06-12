@@ -8,6 +8,11 @@ namespace _BOA_
 {
     partial class Harbinger
     {
+        public SIG_FLAGS shell_sig_mask;
+        public string shell_stdin;
+
+        //----------------------------------------------------------------------------------------------------------
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Run()
         {
@@ -61,9 +66,16 @@ namespace _BOA_
                 using var routine = executor.EExecute();
                 CMD_STATUS last_status = default;
                 while (true)
-                    if (!exe.line.flags.HasFlag(SIG_FLAGS.TICK))
-                        yield return last_status;
-                    else
+                {
+                    harbinger.shell_sig_mask = exe.line.flags;
+
+                    if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
+                        if (!exe.line.TryReadArgument(out harbinger.shell_stdin, out _))
+                            harbinger.shell_stdin = null;
+                        else
+                            ;
+
+                    if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                     {
                     before_movenext:
                         if (routine.MoveNext())
@@ -81,6 +93,9 @@ namespace _BOA_
                         else
                             yield break;
                     }
+                    else
+                        yield return last_status;
+                }
             }
         }
     }
