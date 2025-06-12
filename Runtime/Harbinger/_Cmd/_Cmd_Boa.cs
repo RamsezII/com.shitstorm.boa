@@ -70,10 +70,8 @@ namespace _BOA_
                     harbinger.shell_sig_mask = exe.line.flags;
 
                     if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
-                        if (!exe.line.TryReadArgument(out harbinger.shell_stdin, out _))
+                        if (!exe.line.TryReadAll(out harbinger.shell_stdin))
                             harbinger.shell_stdin = null;
-                        else
-                            ;
 
                     if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                     {
