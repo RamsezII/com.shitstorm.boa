@@ -5,6 +5,8 @@ namespace _BOA_
         public string LocalizeError(in string error, in string[] lines)
         {
             int char_count = 0;
+            int eol_lenth = Util.is_windows ? 2 : 1;
+
             for (int i = 0; i < lines.Length; ++i)
             {
                 string line = lines[i];
@@ -15,7 +17,7 @@ namespace _BOA_
                         string spaces = new(' ', char_i);
                         return $"({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}|\n{spaces}└──> {error}";
                     }
-                char_count += 1 + line.Length;
+                char_count += eol_lenth + line.Length;
             }
             return error;
         }
