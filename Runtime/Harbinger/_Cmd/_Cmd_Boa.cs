@@ -53,7 +53,7 @@ namespace _BOA_
                 string script_text = File.ReadAllText(script_path);
                 Harbinger harbinger = new(data => exe.Stdout(data));
                 BoaReader reader = new(asCmdLine_flag ? BoaReader.Sources.CommandLine : BoaReader.Sources.Script, script_text);
-                using Executor executor = harbinger.ParseProgram(reader, out string error);
+                using Executor program = harbinger.ParseProgram(reader, out string error);
 
                 if (error != null)
                 {
@@ -61,36 +61,53 @@ namespace _BOA_
                     yield break;
                 }
 
-                using var routine = executor.EExecute();
-                CMD_STATUS last_status = default;
-                while (true)
+                try
                 {
-                    harbinger.shell_sig_mask = exe.line.flags;
+                    harbinger.execution_stack.Add(program.EExecute());
 
-                    if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
-                        if (!exe.line.TryReadAll(out harbinger.shell_stdin))
-                            harbinger.shell_stdin = null;
-
-                    if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                    CMD_STATUS last_status = default;
+                    while (true)
                     {
-                    before_movenext:
-                        if (routine.MoveNext())
-                            switch (routine.Current.state)
+                        harbinger.shell_sig_mask = exe.line.flags;
+
+                        if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
+                            if (!exe.line.TryReadAll(out harbinger.shell_stdin))
+                                harbinger.shell_stdin = null;
+
+                        if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                        {
+                        before_movenext:
+                            var routine = harbinger.execution_stack[^1];
+
+                            if (routine.MoveNext())
+                                switch (routine.Current.state)
+                                {
+                                    case Contract.Status.States.WAIT_FOR_STDIN:
+                                        yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                                        break;
+
+                                    case Contract.Status.States.ACTION_skip:
+                                        goto before_movenext;
+
+                                    default:
+                                        yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
+                                        break;
+                                }
+                            else
                             {
-                                case Contract.Status.States.WAIT_FOR_STDIN:
-                                    yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
-                                    break;
-                                case Contract.Status.States.ACTION_skip:
-                                    goto before_movenext;
-                                default:
-                                    yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
-                                    break;
+                                harbinger.execution_stack.RemoveAt(harbinger.execution_stack.Count - 1);
+                                if (harbinger.execution_stack.Count == 0)
+                                    yield break;
                             }
+                        }
                         else
-                            yield break;
+                            yield return last_status;
                     }
-                    else
-                        yield return last_status;
+                }
+                finally
+                {
+                    for (int i = 0; i < harbinger.execution_stack.Count; i++)
+                        harbinger.execution_stack[i].Dispose();
                 }
             }
         }

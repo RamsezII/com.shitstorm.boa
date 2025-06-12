@@ -12,16 +12,20 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string arg, out exe.error))
-                        if (Util.TryParseFloat(arg, out float time))
-                            exe.args.Add(time);
+                    if (exe.harbinger.TryParseExpression(exe.reader, true, out var expr, out exe.error))
+                        exe.args.Add(expr);
                 },
-                routine: ESleep)
-                );
+                routine: ESleep));
 
             static IEnumerator<Contract.Status> ESleep(ContractExecutor exe)
             {
-                float time = (float)exe.args[0];
+                ContractExecutor expr = (ContractExecutor)exe.args[0];
+
+                float time = 0;
+                var routine = expr.EExecute(data => time = (float)data);
+                while (routine.MoveNext())
+                    yield return routine.Current;
+
                 float timer = 0;
 
                 while (timer < time)
