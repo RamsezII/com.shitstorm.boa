@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        static readonly Contract
+        internal static readonly Contract
             cmd_literal = new("literal", function_style_arguments: false, action: static exe => exe.args[0]),
             cmd_variable = new("variable", function_style_arguments: false, action: static exe => ((BoaVar)exe.args[0]).value);
 
@@ -100,7 +100,7 @@
                                 else
                                 {
                                     factor = null;
-                                    error ??= $"unrecognized literal : '{arg}'";
+                                    error ??= $"unrecognized object : '{arg}'";
                                     return false;
                                 }
                                 return true;

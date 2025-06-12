@@ -21,7 +21,8 @@ namespace _BOA_
                     min_args: 1,
                     args: static exe =>
                     {
-                        if (!exe.harbinger.TryParseExpression(exe.reader, true, out ContractExecutor expression, out exe.error))
+                        ContractExecutor expression = null;
+                        if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, true, out expression, out exe.error))
                             exe.error ??= $"'{exe.contract.name}' expects an expression";
                         else if (!exe.reader.TryReadArgument(out string operation_name, out exe.error))
                             exe.error ??= "missing string operation";

@@ -95,7 +95,7 @@ namespace _BOA_
                                 }
                             else
                             {
-                                harbinger.execution_stack.RemoveAt(harbinger.execution_stack.Count - 1);
+                                harbinger.execution_stack.Remove(routine);
                                 if (harbinger.execution_stack.Count == 0)
                                     yield break;
                             }
