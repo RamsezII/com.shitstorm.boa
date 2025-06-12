@@ -3,8 +3,8 @@
     partial class Harbinger
     {
         static readonly Contract
-            cmd_literal = new("literal", expects_parenthesis: false, action: static exe => exe.args[0]),
-            cmd_variable = new("variable", expects_parenthesis: false, action: static exe => ((BoaVar)exe.args[0]).value);
+            cmd_literal = new("literal", function_style_arguments: false, action: static exe => exe.args[0]),
+            cmd_variable = new("variable", function_style_arguments: false, action: static exe => ((BoaVar)exe.args[0]).value);
 
         //----------------------------------------------------------------------------------------------------------
 

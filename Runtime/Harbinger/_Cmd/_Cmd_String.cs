@@ -47,7 +47,7 @@ namespace _BOA_
                                         case Operations.mirror:
                                             return str.Mirror();
                                     }
-                                exe.error = $"invalid data type '{data.GetType()}' for string operation '{op}'";
+                                exe.error = $"invalid data type '{data?.GetType()}' for string operation '{op}'";
                                 return data;
                             },
                             expression.EExecute());

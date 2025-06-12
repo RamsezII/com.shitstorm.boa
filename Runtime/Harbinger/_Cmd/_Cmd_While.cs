@@ -9,6 +9,8 @@ namespace _BOA_
         static void Init_While()
         {
             AddContract(new("while",
+                function_style_arguments: false,
+                no_semicolon_required: true,
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar('('))

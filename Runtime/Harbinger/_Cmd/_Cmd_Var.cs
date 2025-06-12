@@ -8,19 +8,22 @@ namespace _BOA_
         static void Init_Var()
         {
             AddContract(new("var",
-                expects_parenthesis: false,
+                function_style_arguments: false,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string varname, out exe.error, as_function_argument: false))
-                        if (exe.reader.HasNext())
-                            if (exe.reader.TryReadChar('='))
-                                if (exe.harbinger.TryParseExpression(exe.reader, false, out var expression, out exe.error))
-                                {
-                                    BoaVar variable = new(varname, null);
-                                    exe.harbinger.global_variables[varname] = variable;
-                                    exe.args.Add(expression);
-                                    exe.args.Add(variable);
-                                }
+                    if (!exe.reader.TryReadArgument(out string varname, out exe.error, as_function_argument: false))
+                        exe.error ??= $"Expected variable name after 'var'.";
+                    if (!exe.reader.TryReadChar('='))
+                        exe.error ??= $"Expected '=' after variable name '{varname}'.";
+                    else if (!exe.harbinger.TryParseExpression(exe.reader, false, out var expression, out exe.error))
+                        exe.error ??= $"Failed to parse expression after '=' for variable '{varname}'.";
+                    else
+                    {
+                        BoaVar variable = new(varname, null);
+                        exe.harbinger.global_variables[varname] = variable;
+                        exe.args.Add(expression);
+                        exe.args.Add(variable);
+                    }
                 },
                 routine: static exe =>
                 {

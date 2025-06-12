@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseInstruction(in BoaReader reader, out Executor instruction, out string error)
+        internal bool TryParseInstruction(in BoaReader reader, in bool check_for_comma, out Executor instruction, out string error)
         {
             instruction = null;
             error = null;
@@ -21,11 +21,13 @@
                 }
                 else if (TryParseExpression(reader, false, out var expr, out error))
                 {
-                    if (reader.IsScript && !reader.TryReadChar(';'))
-                    {
-                        error ??= $"missing ';' at the end of instruction";
-                        return false;
-                    }
+                    if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
+                        if ((check_for_comma || reader.IsScript) && !reader.TryReadChar(';'))
+                            if (check_for_comma)
+                            {
+                                error ??= $"missing ';' at the end of instruction";
+                                return false;
+                            }
 
                     instruction = expr;
                     return true;

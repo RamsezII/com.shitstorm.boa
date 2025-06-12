@@ -10,26 +10,27 @@ namespace _BOA_
         {
             AddContract(new("for",
                 min_args: 1,
+                function_style_arguments: false,
+                no_semicolon_required: true,
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar('('))
-                        exe.error = "expected '(' at the beginning of 'for' instruction";
-                    else if (!exe.harbinger.TryParseInstruction(exe.reader, out var instr_init, out exe.error))
-                        exe.error = "expected instruction after '(' in 'for' instruction";
+                        exe.error ??= "expected '(' at the beginning of 'for' instruction";
+                    else if (!exe.harbinger.TryParseInstruction(exe.reader, true, out var instr_init, out exe.error))
+                        exe.error ??= "expected instruction after '(' in 'for' instruction";
                     else
                     {
-                        exe.reader.TryReadChar(';');
                         if (!exe.harbinger.TryParseExpression(exe.reader, false, out var cond, out exe.error))
-                            exe.error = "expected expression after first instruction in 'for' instruction";
+                            exe.error ??= "expected expression after first instruction in 'for' instruction";
                         else
                         {
                             exe.reader.TryReadChar(';');
-                            if (!exe.harbinger.TryParseInstruction(exe.reader, out var instr_loop, out exe.error))
-                                exe.error = "expected instruction after second expression in 'for' instruction";
+                            if (!exe.harbinger.TryParseInstruction(exe.reader, false, out var instr_loop, out exe.error))
+                                exe.error ??= "expected instruction after second expression in 'for' instruction";
                             else if (!exe.reader.TryReadChar(')'))
-                                exe.error = "expected ')' at the end of 'for' instruction";
+                                exe.error ??= "expected ')' at the end of 'for' instruction";
                             else if (!exe.harbinger.TryParseBlock(exe.reader, out var block, out exe.error))
-                                exe.error = "expected block after ')' in 'for' instruction";
+                                exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
                             else
                             {
                                 exe.args.Add(instr_init);
@@ -50,25 +51,41 @@ namespace _BOA_
                 Executor block = (Executor)exe.args[3];
 
                 var routine = instr_init.EExecute();
+            before_loop1:
                 while (routine.MoveNext())
-                    yield return routine.Current;
+                    if (routine.Current.state == Contract.Status.States.ACTION_skippable)
+                        goto before_loop1;
+                    else
+                        yield return routine.Current;
 
                 while (true)
                 {
                     routine = cond.EExecute();
+                before_loop2:
                     while (routine.MoveNext())
-                        yield return routine.Current;
+                        if (routine.Current.state == Contract.Status.States.ACTION_skippable)
+                            goto before_loop2;
+                        else
+                            yield return routine.Current;
 
                     if (!routine.Current.data.ToBool())
                         break;
 
                     routine = block.EExecute();
+                before_loop3:
                     while (routine.MoveNext())
-                        yield return routine.Current;
+                        if (routine.Current.state == Contract.Status.States.ACTION_skippable)
+                            goto before_loop3;
+                        else
+                            yield return routine.Current;
 
                     routine = instr_loop.EExecute();
+                before_loop4:
                     while (routine.MoveNext())
-                        yield return routine.Current;
+                        if (routine.Current.state == Contract.Status.States.ACTION_skippable)
+                            goto before_loop4;
+                        else
+                            yield return routine.Current;
                 }
             }
         }

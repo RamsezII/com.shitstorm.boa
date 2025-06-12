@@ -150,14 +150,14 @@ namespace _BOA_
         }
 
         public bool TryReadMatch(out string value, string match) => TryReadMatch(out value, true, _empties_, match);
-        public bool TryReadMatch(out string value, in bool ignore_case, in string skippables = _empties_, params string[] matches)
+        public bool TryReadMatch(out string value, in bool ignore_case, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
             int read_old = read_i;
 
             if (skippables != null)
                 HasNext(skippables);
 
-            if (TryReadArgument(text, out start_i, ref read_i, out value))
+            if (TryReadArgument(text, out start_i, ref read_i, out value, skippables: skippables, stoppers: stoppers))
                 if (matches.Contains(value, ignore_case ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal))
                 {
                     last_arg = value;

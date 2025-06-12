@@ -10,6 +10,7 @@ namespace _BOA_
         {
             AddContract(new("if",
                 min_args: 1,
+                no_semicolon_required: true,
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar('('))

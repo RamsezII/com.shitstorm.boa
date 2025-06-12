@@ -30,22 +30,13 @@ namespace _BOA_
                                 exe.args.Add(expression);
                             }
                 },
-                routine: EAssign));
-
-            static IEnumerator<Contract.Status> EAssign(ContractExecutor exe)
-            {
-                OperatorsM code = (OperatorsM)exe.args[0];
-                BoaVar variable = (BoaVar)exe.args[1];
-                Executor expression = (Executor)exe.args[2];
-
-                var routine = expression.EExecute();
-                while (routine.MoveNext())
-                    yield return routine.Current;
-                object data = routine.Current.data;
-
-                yield return new Contract.Status()
+                routine: static exe =>
                 {
-                    data = variable.value = (code & ~OperatorsM.assign) switch
+                    OperatorsM code = (OperatorsM)exe.args[0];
+                    BoaVar variable = (BoaVar)exe.args[1];
+                    Executor expression = (Executor)exe.args[2];
+
+                    return Executor.EExecute(modify_output: data => variable.value = (code & ~OperatorsM.assign) switch
                     {
                         OperatorsM.add => (int)variable.value + (int)data,
                         OperatorsM.sub => (int)variable.value - (int)data,
@@ -55,8 +46,8 @@ namespace _BOA_
                         OperatorsM.mod => (int)variable.value % (int)data,
                         _ => data,
                     },
-                };
-            }
+                    expression.EExecute());
+                }));
         }
     }
 }

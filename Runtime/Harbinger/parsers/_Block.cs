@@ -31,7 +31,7 @@
                             error = $"did not find closing bracket '}}'";
                     }
                 }
-                else if (TryParseInstruction(reader, out var instruction, out error))
+                else if (TryParseInstruction(reader, true, out var instruction, out error))
                 {
                     executor = instruction;
                     return true;

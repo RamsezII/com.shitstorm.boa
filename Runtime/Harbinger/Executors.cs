@@ -23,20 +23,27 @@ namespace _BOA_
         public static IEnumerator<Contract.Status> EExecute(Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)
         {
             object data = null;
+
             if (stack != null && stack.Length > 0)
                 for (int i = 0; i < stack.Length; i++)
                     if (stack[i] != null)
                     {
                         using var routine = stack[i];
                         data = routine.Current.data;
+
                         while (routine.MoveNext())
                         {
                             data = routine.Current.data;
                             yield return routine.Current;
                         }
                     }
+
             if (modify_output != null)
-                yield return new Contract.Status() { data = modify_output?.Invoke(data), };
+                yield return new Contract.Status()
+                {
+                    state = Contract.Status.States.ACTION_skippable,
+                    data = modify_output?.Invoke(data),
+                };
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -83,7 +90,7 @@ namespace _BOA_
 
             if (parse_arguments && contract != null)
             {
-                bool expects_parenthesis = reader.IsScript && contract.expects_parenthesis;
+                bool expects_parenthesis = reader.IsScript && contract.function_style_arguments;
 
                 if (expects_parenthesis && !reader.TryReadChar('('))
                 {
@@ -111,22 +118,29 @@ namespace _BOA_
             object data = null;
 
             if (contract != null)
+            {
                 if (contract.action != null)
                 {
                     data = contract.action(this);
-                    yield return new Contract.Status() { data = data, };
+                    yield return new Contract.Status()
+                    {
+                        state = Contract.Status.States.ACTION_skippable,
+                        data = data,
+                    };
                 }
-                else if (contract.routine != null)
+
+                if (contract.routine != null)
                 {
                     using var routine = contract.routine(this);
                     data = routine.Current.data;
 
-                    while (!disposed && routine.MoveNext())
+                    while (routine.MoveNext())
                     {
                         data = routine.Current.data;
                         yield return routine.Current;
                     }
                 }
+            }
 
             end_action?.Invoke(data);
         }
@@ -152,7 +166,8 @@ namespace _BOA_
                 var exe = stack[i];
                 using var routine = exe.EExecute();
                 data = routine.Current.data;
-                while (!exe.disposed && routine.MoveNext())
+
+                while (routine.MoveNext())
                 {
                     data = routine.Current.data;
                     yield return routine.Current;
