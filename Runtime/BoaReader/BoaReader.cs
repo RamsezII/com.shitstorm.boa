@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Text;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -152,17 +154,36 @@ namespace _BOA_
         public bool TryReadMatch(out string value, string match) => TryReadMatch(out value, true, _empties_, match);
         public bool TryReadMatch(out string value, in bool ignore_case, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
+            StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
+            value = null;
 
-            if (skippables != null)
-                HasNext(skippables);
-
-            if (TryReadArgument(text, out start_i, ref read_i, out value, skippables: skippables, stoppers: stoppers))
-                if (matches.Contains(value, ignore_case ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal))
+            if (skippables == null || HasNext(skippables))
+            {
+                value = string.Empty;
+                while (TryPeek(out char peek, skippables: null))
                 {
-                    last_arg = value;
-                    return true;
+                    value += peek;
+                    for (int i = 0; i <= matches.Length; ++i)
+                        if (i == matches.Length)
+                            goto out_of_loop;
+                        else
+                        {
+                            string match = matches[i];
+                            if (match.StartsWith(value, ordinal))
+                            {
+                                ++read_i;
+                                if (match.Equals(value, ordinal))
+                                {
+                                    last_arg = value;
+                                    return true;
+                                }
+                                break;
+                            }
+                        }
                 }
+            }
+        out_of_loop:
 
             read_i = read_old;
             return false;
