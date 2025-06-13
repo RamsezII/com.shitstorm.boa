@@ -11,15 +11,16 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, true, out var expr, out exe.error))
-                        exe.args.Add(expr);
+                    if (exe.pipe_previous == null)
+                        if (exe.harbinger.TryParseExpression(exe.reader, true, out var expr, out exe.error))
+                            exe.args.Add(expr);
                 },
                 routine: static exe =>
                 {
                     ExpressionExecutor expr = (ExpressionExecutor)exe.args[0];
                     return Executor.EExecute(
                         after_execution: expr.pipe_next == null ? exe.harbinger.stdout : null,
-                        modify_output: data => data,
+                        modify_output: null,
                         expr.EExecute());
                 }));
         }

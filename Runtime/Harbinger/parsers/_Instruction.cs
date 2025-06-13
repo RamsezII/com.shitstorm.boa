@@ -7,28 +7,27 @@
             instruction = null;
             error = null;
 
-            if (reader.HasNext())
-                if (reader.TryReadMatch(';'))
-                    return true;
-                else if (reader.TryReadMatch('#'))
-                {
-                    reader.SkipUntil('\n');
-                    return true;
-                }
-                else if (TryParseExpression(reader, false, out var expr, out error))
-                {
-                    if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
-                        if (check_semicolon || reader.strict_syntax)
-                            if (!reader.TryReadMatch(';'))
-                                if (check_semicolon && reader.strict_syntax)
-                                {
-                                    error ??= $"missing ';' at the end of instruction";
-                                    return false;
-                                }
+            if (reader.TryReadMatch(';'))
+                return true;
+            else if (reader.TryReadMatch('#'))
+            {
+                reader.SkipUntil('\n');
+                return true;
+            }
+            else if (TryParseExpression(reader, false, out var expr, out error))
+            {
+                if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
+                    if (check_semicolon || reader.strict_syntax)
+                        if (!reader.TryReadMatch(';'))
+                            if (check_semicolon && reader.strict_syntax)
+                            {
+                                error ??= $"missing ';' at the end of instruction";
+                                return false;
+                            }
 
-                    instruction = expr;
-                    return true;
-                }
+                instruction = expr;
+                return true;
+            }
 
             return false;
         }

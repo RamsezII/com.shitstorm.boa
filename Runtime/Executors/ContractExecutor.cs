@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -20,26 +19,23 @@ namespace _BOA_
 
             if (parse_arguments)
             {
-                if (contract != null)
+                bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
+
+                if (expects_parenthesis && !reader.TryReadMatch('('))
                 {
-                    bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
+                    error = $"'{contract.name}' expected opening parenthesis '('";
+                    return;
+                }
 
-                    if (expects_parenthesis && !reader.TryReadMatch('('))
-                    {
-                        error = $"'{contract.name}' expected opening parenthesis '('";
-                        return;
-                    }
+                contract?.args?.Invoke(this);
 
-                    contract?.args?.Invoke(this);
+                if (error != null)
+                    return;
 
-                    if (error != null)
-                        return;
-
-                    if (expects_parenthesis && !reader.TryReadMatch(')'))
-                    {
-                        error = $"'{contract.name}' expected closing parenthesis ')'";
-                        return;
-                    }
+                if (expects_parenthesis && !reader.TryReadMatch(')'))
+                {
+                    error = $"'{contract.name}' expected closing parenthesis ')'";
+                    return;
                 }
             }
         }

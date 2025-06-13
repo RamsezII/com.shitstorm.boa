@@ -5,7 +5,7 @@
         internal bool TryParseAssignation(in BoaReader reader, out ExpressionExecutor assignation, out string error)
         {
             assignation = null;
-            int read_i = reader.read_i;
+            int read_old = reader.read_i;
 
             if (reader.TryReadArgument(out string varname, out error, as_function_argument: false))
                 if (global_variables.TryGetValue(varname, out var variable))
@@ -39,7 +39,7 @@
                         }
                     }
 
-            reader.read_i = read_i;
+            reader.read_i = read_old;
             return false;
         }
     }

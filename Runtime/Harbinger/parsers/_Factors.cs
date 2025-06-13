@@ -36,7 +36,7 @@
                 if (reader.TryReadMatch('('))
                     if (!TryParseExpression(reader, false, out factor, out error))
                     {
-                        error ??= "expected expression inside parentheses";
+                        error ??= "expected expression inside factor parenthesis";
                         return false;
                     }
                     else if (!reader.TryReadMatch(')'))

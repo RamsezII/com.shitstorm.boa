@@ -8,21 +8,19 @@ namespace _BOA_
         {
             int read_old = read_i;
 
-            argument = null;
             error = null;
 
-            if (HasNext())
-                if (TryReadArgument(text, out start_i, ref read_i, out argument, stoppers: stoppers))
-                {
-                    last_arg = argument;
-                    if (!as_function_argument || !strict_syntax)
-                        return true;
+            if (TryReadArgument(text, out start_i, ref read_i, out argument, stoppers: stoppers))
+            {
+                last_arg = argument;
+                if (!as_function_argument || !strict_syntax)
+                    return true;
 
-                    if (TryReadMatch(',') || TryPeekSpecific(')'))
-                        return true;
+                if (TryReadMatch(',') || TryPeekSpecific(')'))
+                    return true;
 
-                    error = $"expected ',' or ')' after argument '{argument}'";
-                }
+                error = $"expected ',' or ')' after argument '{argument}'";
+            }
 
             read_i = read_old;
             return false;
