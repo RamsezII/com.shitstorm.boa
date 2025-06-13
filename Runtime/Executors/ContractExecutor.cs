@@ -13,7 +13,6 @@ namespace _BOA_
         public readonly BoaReader reader;
         public readonly List<object> args = new();
         public readonly ContractExecutor pipe_previous, pipe_next;
-        public string error;
 
         //----------------------------------------------------------------------------------------------------------
 

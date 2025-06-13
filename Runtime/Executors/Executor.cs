@@ -6,6 +6,7 @@ namespace _BOA_
     public abstract class Executor : IDisposable
     {
         public readonly Harbinger harbinger;
+        public string error;
         public bool disposed;
 
         //----------------------------------------------------------------------------------------------------------
