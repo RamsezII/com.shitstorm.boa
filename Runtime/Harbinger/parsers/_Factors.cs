@@ -20,8 +20,8 @@
                     };
 
                     ContractExecutor exe = new(this, cmd_unary_, reader, parse_arguments: false);
-                    exe.args.Add(code);
                     exe.args.Add(sub_factor);
+                    exe.args.Add(code);
                     factor = exe;
                     return true;
                 }

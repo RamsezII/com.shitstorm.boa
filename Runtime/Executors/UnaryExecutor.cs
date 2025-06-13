@@ -1,0 +1,47 @@
+﻿using System.Collections.Generic;
+
+namespace _BOA_
+{
+    public class UnaryExecutor : ExpressionExecutor
+    {
+        public enum Operators : byte
+        {
+            Add,
+            Sub,
+            Not,
+        }
+
+        readonly Operators code;
+        readonly ExpressionExecutor expr;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public UnaryExecutor(in Harbinger harbinger, in ExpressionExecutor expr, in Operators code) : base(harbinger)
+        {
+            this.code = code;
+            this.expr = expr;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override IEnumerator<Contract.Status> EExecute()
+        {
+            var routine = expr.EExecute();
+            while (routine.MoveNext())
+                yield return routine.Current;
+
+            object data = routine.Current.data;
+
+            yield return new Contract.Status()
+            {
+                data = code switch
+                {
+                    Operators.Add => +(int)data,
+                    Operators.Sub => -(int)data,
+                    Operators.Not => !(bool)data,
+                    _ => data,
+                },
+            };
+        }
+    }
+}

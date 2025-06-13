@@ -16,14 +16,17 @@ namespace _BOA_
             cmd_unary_ = AddContract(new("unary",
                 args: static exe =>
                 {
+                    ExpressionExecutor expr = null;
                     if (!exe.reader.TryReadArgument(out string arg, out exe.error))
                         exe.error ??= "expected operator or factor";
                     else if (!Enum.TryParse(arg, true, out OperatorsM code))
-                        exe.error = $"unknown operator '{arg}'";
-                    else if (exe.harbinger.TryParseFactor(exe.reader, out var factor, out exe.error))
+                        exe.error ??= $"unknown operator '{arg}'";
+                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseFactor(exe.reader, out expr, out exe.error))
+                        exe.error ??= $"could not parse factor for unary operator '{code}'";
+                    else
                     {
+                        exe.args.Add(expr);
                         exe.args.Add(code);
-                        exe.args.Add(factor);
                     }
                 },
                 routine: EUnary));
