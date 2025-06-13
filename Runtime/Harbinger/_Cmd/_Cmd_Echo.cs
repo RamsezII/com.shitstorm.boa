@@ -11,7 +11,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.pipe_previous == null)
+                    if (exe.pipe_previous != null)
                         if (exe.harbinger.TryParseExpression(exe.reader, true, out var expr, out exe.error))
                             exe.args.Add(expr);
                 },

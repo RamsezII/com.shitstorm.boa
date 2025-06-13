@@ -26,8 +26,9 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
 
-                if (next.args.Count > 0)
-                    next.args[0] = new LiteralExecutor(harbinger, routine.Current.data);
+                if (next.args.Count == 0)
+                    next.args.Add(null);
+                next.args[0] = new LiteralExecutor(harbinger, routine.Current.data);
 
                 routine = next.EExecute();
                 while (routine.MoveNext())
