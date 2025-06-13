@@ -31,12 +31,13 @@ namespace _BOA_
                     OperatorsM code = (OperatorsM)exe.args[0];
                     Executor expr1 = (Executor)exe.args[1];
                     Executor expr2 = (Executor)exe.args[2];
-                    object data1 = null, data2 = null;
+                    var routine1 = expr1.EExecute();
+                    var routine2 = expr2.EExecute();
 
                     return Executor.EExecute(
-                        modify_output: data =>
+                        null, data =>
                         {
-                            if (data1 is int i1 && data2 is int i2)
+                            if (routine1.Current.data is int i1 && routine2.Current.data is int i2)
                                 return code switch
                                 {
                                     OperatorsM.add => i1 + i2,
@@ -56,7 +57,7 @@ namespace _BOA_
                                     OperatorsM.xor => i1 ^ i2,
                                     _ => 0,
                                 };
-                            else if (data1 is bool b1 && data2 is bool b2)
+                            else if (routine1.Current.data is bool b1 && routine2.Current.data is bool b2)
                                 return code switch
                                 {
                                     OperatorsM.and => b1 & b2,
@@ -67,8 +68,8 @@ namespace _BOA_
                             else
                                 return default;
                         },
-                        expr1.EExecute(data => data1 = data),
-                        expr2.EExecute(data => data2 = data)
+                        routine1,
+                        routine2
                     );
                 }));
         }

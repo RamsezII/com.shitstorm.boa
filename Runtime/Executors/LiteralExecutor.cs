@@ -1,0 +1,27 @@
+﻿using System.Collections.Generic;
+
+namespace _BOA_
+{
+    public class LiteralExecutor : ExpressionExecutor
+    {
+        readonly object literal;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public LiteralExecutor(in Harbinger harbinger, in object literal) : base(harbinger)
+        {
+            this.literal = literal;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override IEnumerator<Contract.Status> EExecute()
+        {
+            yield return new Contract.Status()
+            {
+                state = Contract.Status.States.ACTION_skip,
+                data = literal,
+            };
+        }
+    }
+}

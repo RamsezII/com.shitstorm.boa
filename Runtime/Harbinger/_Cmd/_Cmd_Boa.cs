@@ -61,7 +61,7 @@ namespace _BOA_
                     yield break;
                 }
 
-                using var routine = program.EExecute(null);
+                var routine = program.EExecute();
 
                 CMD_STATUS last_status = default;
                 while (true)

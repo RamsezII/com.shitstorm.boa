@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseComparison(in BoaReader reader, out ContractExecutor expression, out string error)
+        internal bool TryParseComparison(in BoaReader reader, out ExpressionExecutor expression, out string error)
         {
             expression = null;
             if (TryParseAddSub(reader, out var addsub1, out error))
@@ -22,10 +22,11 @@
 
                     if (TryParseAddSub(reader, out var addsub2, out error))
                     {
-                        expression = new ContractExecutor(this, cmd_math_, reader, parse_arguments: false);
-                        expression.args.Add(code);
-                        expression.args.Add(addsub1);
-                        expression.args.Add(addsub2);
+                        ContractExecutor exe = new(this, cmd_math_, reader, parse_arguments: false);
+                        exe.args.Add(code);
+                        exe.args.Add(addsub1);
+                        exe.args.Add(addsub2);
+                        expression = exe;
                         return true;
                     }
                     else

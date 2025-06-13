@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -15,20 +14,15 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute(Action<object> end_action = null)
+        internal override IEnumerator<Contract.Status> EExecute()
         {
-            object data = null;
             for (int i = 0; i < stack.Count; i++)
             {
                 var exe = stack[i];
-                using var routine = exe.EExecute();
+                var routine = exe.EExecute();
                 while (routine.MoveNext())
-                {
-                    data = routine.Current.data;
                     yield return routine.Current;
-                }
             }
-            end_action?.Invoke(data);
         }
 
         //----------------------------------------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -9,18 +10,29 @@ namespace _BOA_
         public string error;
         public bool disposed;
 
+        static ushort _id;
+        public readonly ushort id;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void OnBeforeSceneLoad()
+        {
+            _id = 0;
+        }
+
         //----------------------------------------------------------------------------------------------------------
 
         public Executor(in Harbinger harbinger)
         {
+            id = _id.LoopID();
             this.harbinger = harbinger;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal abstract IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null);
-
-        public static IEnumerator<Contract.Status> EExecute(Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)
+        internal abstract IEnumerator<Contract.Status> EExecute();
+        public static IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null, Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)
         {
             object data = null;
 
@@ -36,11 +48,13 @@ namespace _BOA_
                         }
                     }
 
+            after_execution?.Invoke(data);
+
             if (modify_output != null)
                 yield return new Contract.Status()
                 {
                     state = Contract.Status.States.ACTION_skip,
-                    data = modify_output?.Invoke(data),
+                    data = modify_output(data),
                 };
         }
 

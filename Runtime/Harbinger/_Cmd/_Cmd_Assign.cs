@@ -34,9 +34,9 @@ namespace _BOA_
                 {
                     OperatorsM code = (OperatorsM)exe.args[0];
                     BoaVar variable = (BoaVar)exe.args[1];
-                    Executor expression = (Executor)exe.args[2];
+                    Executor expr = (Executor)exe.args[2];
 
-                    return Executor.EExecute(modify_output: data => variable.value = (code & ~OperatorsM.assign) switch
+                    return Executor.EExecute(null, data => variable.value = (code & ~OperatorsM.assign) switch
                     {
                         OperatorsM.add => (int)variable.value + (int)data,
                         OperatorsM.sub => (int)variable.value - (int)data,
@@ -46,7 +46,7 @@ namespace _BOA_
                         OperatorsM.mod => (int)variable.value % (int)data,
                         _ => data,
                     },
-                    expression.EExecute());
+                    expr.EExecute());
                 }));
         }
     }

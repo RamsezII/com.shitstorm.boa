@@ -63,7 +63,8 @@ namespace _BOA_
             BlockExecutor program = new(this);
 
             while (TryParseBlock(reader, out Executor block, out error))
-                program.stack.Add(block);
+                if (block != null)
+                    program.stack.Add(block);
 
             return program;
         }

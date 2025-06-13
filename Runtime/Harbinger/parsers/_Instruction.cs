@@ -9,14 +9,10 @@
 
             if (reader.HasNext())
                 if (reader.TryReadMatch(';'))
-                {
-                    instruction = new ContractExecutor(this, null, reader);
                     return true;
-                }
                 else if (reader.TryReadMatch('#'))
                 {
                     reader.SkipUntil('\n');
-                    instruction = new ContractExecutor(this, null, reader);
                     return true;
                 }
                 else if (TryParseExpression(reader, false, out var expr, out error))

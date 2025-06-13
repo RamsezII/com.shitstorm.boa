@@ -16,8 +16,8 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    ContractExecutor expr = (ContractExecutor)exe.args[0];
-                    return Executor.EExecute(modify_output: data => data switch
+                    ExpressionExecutor expr = (ExpressionExecutor)exe.args[0];
+                    return Executor.EExecute(null, data => data switch
                     {
                         int i => i,
                         string s => int.Parse(s),
@@ -35,8 +35,8 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    ContractExecutor expr = (ContractExecutor)exe.args[0];
-                    return Executor.EExecute(modify_output: data => data switch
+                    ExpressionExecutor expr = (ExpressionExecutor)exe.args[0];
+                    return Executor.EExecute(null, data => data switch
                     {
                         int i => i,
                         float f => f,

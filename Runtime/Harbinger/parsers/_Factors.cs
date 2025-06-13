@@ -2,13 +2,7 @@
 {
     partial class Harbinger
     {
-        internal static readonly Contract
-            cmd_literal = new("literal", function_style_arguments: false, action: static exe => exe.args[0]),
-            cmd_variable = new("variable", function_style_arguments: false, action: static exe => ((BoaVar)exe.args[0]).value);
-
-        //----------------------------------------------------------------------------------------------------------
-
-        internal bool TryParseFactor(in BoaReader reader, out ContractExecutor factor, out string error)
+        internal bool TryParseFactor(in BoaReader reader, out ExpressionExecutor factor, out string error)
         {
             factor = null;
             error = null;
@@ -25,9 +19,10 @@
                         _ => 0,
                     };
 
-                    factor = new(this, cmd_unary_, reader, parse_arguments: false);
-                    factor.args.Add(code);
-                    factor.args.Add(sub_factor);
+                    ContractExecutor exe = new(this, cmd_unary_, reader, parse_arguments: false);
+                    exe.args.Add(code);
+                    exe.args.Add(sub_factor);
+                    factor = exe;
                     return true;
                 }
                 else
@@ -55,8 +50,7 @@
             if (error == null)
                 if (TryParseString(reader, out string str, out error))
                 {
-                    factor = new(this, cmd_literal, reader, parse_arguments: false);
-                    factor.args.Add(str);
+                    factor = new LiteralExecutor(this, literal: str);
                     return true;
                 }
 
@@ -70,49 +64,36 @@
                             error = factor.error;
                             return false;
                         }
-
-                        if (reader.TryReadMatch('|'))
-                            if (reader.TryReadArgument(out string pipe_cont, out error, as_function_argument: false))
-                            {
-
-                            }
-
                         return true;
                     }
                     else if (global_variables.TryGetValue(arg, out var variable))
                     {
-                        factor = new(this, cmd_variable, reader, parse_arguments: false);
-                        factor.args.Add(variable);
+                        factor = new VariableExecutor(this, variable);
                         return true;
                     }
                     else
-                    {
-                        factor = new(this, cmd_literal, reader, parse_arguments: false);
-                        string lower = arg.ToLower();
-                        switch (lower)
+                        switch (arg.ToLower())
                         {
                             case "true":
-                                factor.args.Add(true);
+                                factor = new LiteralExecutor(this, literal: true);
                                 return true;
 
                             case "false":
-                                factor.args.Add(false);
+                                factor = new LiteralExecutor(this, literal: false);
                                 return true;
 
                             default:
                                 if (int.TryParse(arg, out int _int))
-                                    factor.args.Add(_int);
+                                    factor = new LiteralExecutor(this, literal: _int);
                                 else if (Util.TryParseFloat(arg, out float _float))
-                                    factor.args.Add(_float);
+                                    factor = new LiteralExecutor(this, literal: _float);
                                 else
                                 {
-                                    factor = null;
                                     error ??= $"unrecognized object : '{arg}'";
                                     return false;
                                 }
                                 return true;
                         }
-                    }
 
             return false;
         }

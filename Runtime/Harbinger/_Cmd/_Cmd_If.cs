@@ -38,20 +38,11 @@ namespace _BOA_
                 Executor block_if = (Executor)exe.args[1];
                 Executor block_else = exe.args.Count > 2 ? (Executor)exe.args[2] : null;
 
-                bool cond_result = false;
-
-                var routine = cond.EExecute(data => cond_result = data switch
-                {
-                    bool b => b,
-                    int i => i > 0,
-                    float f => f > 0,
-                    _ => data != default,
-                });
-
+                var routine = cond.EExecute();
                 while (routine.MoveNext())
                     yield return routine.Current;
 
-                if (cond_result)
+                if (routine.Current.data.ToBool())
                 {
                     routine = block_if.EExecute();
                     while (routine.MoveNext())

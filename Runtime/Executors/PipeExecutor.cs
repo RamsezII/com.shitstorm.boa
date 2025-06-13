@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace _BOA_
 {
-    public class PipeExecutor : Executor
+    public class PipeExecutor : ExpressionExecutor
     {
         readonly Executor previous;
         readonly ContractExecutor next;
@@ -18,7 +17,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null)
+        internal override IEnumerator<Contract.Status> EExecute()
         {
             IEnumerator<Contract.Status> routine = null;
             try
@@ -28,7 +27,7 @@ namespace _BOA_
                     yield return routine.Current;
 
                 if (next.args.Count > 0)
-                    next.args[0] = routine.Current.data;
+                    next.args[0] = new LiteralExecutor(harbinger, routine.Current.data);
 
                 routine = next.EExecute();
                 while (routine.MoveNext())

@@ -2,9 +2,9 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseBlock(in BoaReader reader, out Executor executor, out string error)
+        internal bool TryParseBlock(in BoaReader reader, out Executor block, out string error)
         {
-            executor = null;
+            block = null;
             error = null;
 
             if (reader.HasNext())
@@ -12,18 +12,19 @@
                 {
                     if (reader.HasNext())
                     {
-                        BlockExecutor block = new(this);
+                        BlockExecutor body = new(this);
 
-                        while (TryParseBlock(reader, out Executor exe, out error))
-                            block.stack.Add(exe);
+                        while (TryParseBlock(reader, out Executor sub_block, out error))
+                            if (sub_block != null)
+                                body.stack.Add(sub_block);
 
                         if (error != null)
                         {
-                            executor = null;
+                            block = null;
                             return false;
                         }
 
-                        executor = block;
+                        block = body;
 
                         if (reader.TryReadMatch('}'))
                             return true;
@@ -33,7 +34,7 @@
                 }
                 else if (TryParseInstruction(reader, true, out var instruction, out error))
                 {
-                    executor = instruction;
+                    block = instruction;
                     return true;
                 }
 

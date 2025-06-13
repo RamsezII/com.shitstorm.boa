@@ -21,8 +21,8 @@ namespace _BOA_
                     min_args: 1,
                     args: static exe =>
                     {
-                        ContractExecutor expression = null;
-                        if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, true, out expression, out exe.error))
+                        ExpressionExecutor expr = null;
+                        if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, true, out expr, out exe.error))
                             exe.error ??= $"'{exe.contract.name}' expects an expression";
                         else if (!exe.reader.TryReadArgument(out string operation_name, out exe.error))
                             exe.error ??= "missing string operation";
@@ -30,7 +30,7 @@ namespace _BOA_
                             exe.error ??= $"unknown string operation '{operation_name}'";
                         else
                         {
-                            exe.args.Add(expression);
+                            exe.args.Add(expr);
                             exe.args.Add(op);
                         }
                     },
@@ -40,7 +40,7 @@ namespace _BOA_
                         Operations op = (Operations)exe.args[1];
 
                         return Executor.EExecute(
-                            modify_output: data =>
+                            null, data =>
                             {
                                 if (data is string str)
                                     switch (op)

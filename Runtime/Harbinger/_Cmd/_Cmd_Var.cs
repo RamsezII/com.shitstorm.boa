@@ -11,17 +11,18 @@ namespace _BOA_
                 function_style_arguments: false,
                 args: static exe =>
                 {
+                    ExpressionExecutor expr = null;
                     if (!exe.reader.TryReadArgument(out string varname, out exe.error, as_function_argument: false))
                         exe.error ??= $"Expected variable name after 'var'.";
-                    if (!exe.reader.TryReadMatch('='))
+                    if (exe.pipe_previous == null && !exe.reader.TryReadMatch('='))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, false, out var expression, out exe.error))
+                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, false, out expr, out exe.error))
                         exe.error ??= $"Failed to parse expression after '=' for variable '{varname}'.";
                     else
                     {
                         BoaVar variable = new(varname, null);
                         exe.harbinger.global_variables[varname] = variable;
-                        exe.args.Add(expression);
+                        exe.args.Add(expr);
                         exe.args.Add(variable);
                     }
                 },
@@ -29,7 +30,7 @@ namespace _BOA_
                 {
                     Executor expression = (Executor)exe.args[0];
                     BoaVar variable = (BoaVar)exe.args[1];
-                    return Executor.EExecute(modify_output: data => variable.value = data, expression.EExecute());
+                    return Executor.EExecute(null, data => variable.value = data, expression.EExecute());
                 }));
         }
     }

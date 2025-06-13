@@ -19,13 +19,13 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> ESleep(ContractExecutor exe)
             {
-                ContractExecutor expr = (ContractExecutor)exe.args[0];
+                ExpressionExecutor expr = (ExpressionExecutor)exe.args[0];
 
-                float time = 0;
-                var routine = expr.EExecute(data => time = (float)data);
+                var routine = expr.EExecute();
                 while (routine.MoveNext())
                     yield return routine.Current;
 
+                float time = (float)routine.Current.data;
                 float timer = 0;
 
                 while (timer < time)

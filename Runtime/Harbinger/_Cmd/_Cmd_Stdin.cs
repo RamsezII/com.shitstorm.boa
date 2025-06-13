@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -21,7 +20,7 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> EStdin(ContractExecutor exe)
             {
-                ContractExecutor expr = (ContractExecutor)exe.args[0];
+                ExpressionExecutor expr = (ExpressionExecutor)exe.args[0];
 
                 var routine = expr.EExecute();
                 while (routine.MoveNext())

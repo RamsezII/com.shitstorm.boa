@@ -28,7 +28,6 @@ namespace _BOA_
         internal readonly int min_args, max_args;
         public readonly Action<ContractExecutor> args;
         public readonly bool function_style_arguments, no_semicolon_required;
-        internal readonly Func<ContractExecutor, object> action;
         internal readonly Func<ContractExecutor, IEnumerator<Status>> routine;
 
         //----------------------------------------------------------------------------------------------------------
@@ -39,7 +38,6 @@ namespace _BOA_
             in bool function_style_arguments = true,
             in bool no_semicolon_required = false,
             in Action<ContractExecutor> args = null,
-            in Func<ContractExecutor, object> action = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
         {
@@ -49,7 +47,6 @@ namespace _BOA_
             this.function_style_arguments = function_style_arguments;
             this.no_semicolon_required = no_semicolon_required;
             this.args = args;
-            this.action = action;
             this.routine = routine;
         }
     }
