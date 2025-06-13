@@ -33,8 +33,6 @@ namespace _BOA_
 
         public readonly Action<object> stdout;
 
-        public readonly List<IEnumerator<Contract.Status>> execution_stack = new();
-
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

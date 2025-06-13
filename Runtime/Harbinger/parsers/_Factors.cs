@@ -70,6 +70,13 @@
                             error = factor.error;
                             return false;
                         }
+
+                        if (reader.TryReadMatch('|'))
+                            if (reader.TryReadArgument(out string pipe_cont, out error, as_function_argument: false))
+                            {
+
+                            }
+
                         return true;
                     }
                     else if (global_variables.TryGetValue(arg, out var variable))

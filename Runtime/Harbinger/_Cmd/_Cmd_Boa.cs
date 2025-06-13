@@ -61,53 +61,39 @@ namespace _BOA_
                     yield break;
                 }
 
-                try
-                {
-                    harbinger.execution_stack.Add(program.EExecute());
+                using var routine = program.EExecute(null);
 
-                    CMD_STATUS last_status = default;
-                    while (true)
+                CMD_STATUS last_status = default;
+                while (true)
+                {
+                    harbinger.shell_sig_mask = exe.line.flags;
+
+                    if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
+                        if (!exe.line.TryReadAll(out harbinger.shell_stdin))
+                            harbinger.shell_stdin = null;
+
+                    if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                     {
-                        harbinger.shell_sig_mask = exe.line.flags;
-
-                        if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
-                            if (!exe.line.TryReadAll(out harbinger.shell_stdin))
-                                harbinger.shell_stdin = null;
-
-                        if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
-                        {
-                        before_movenext:
-                            var routine = harbinger.execution_stack[^1];
-
-                            if (routine.MoveNext())
-                                switch (routine.Current.state)
-                                {
-                                    case Contract.Status.States.WAIT_FOR_STDIN:
-                                        yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
-                                        break;
-
-                                    case Contract.Status.States.ACTION_skip:
-                                        goto before_movenext;
-
-                                    default:
-                                        yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
-                                        break;
-                                }
-                            else
+                    before_movenext:
+                        if (routine.MoveNext())
+                            switch (routine.Current.state)
                             {
-                                harbinger.execution_stack.Remove(routine);
-                                if (harbinger.execution_stack.Count == 0)
-                                    yield break;
+                                case Contract.Status.States.WAIT_FOR_STDIN:
+                                    yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                                    break;
+
+                                case Contract.Status.States.ACTION_skip:
+                                    goto before_movenext;
+
+                                default:
+                                    yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
+                                    break;
                             }
-                        }
                         else
-                            yield return last_status;
+                            yield break;
                     }
-                }
-                finally
-                {
-                    for (int i = 0; i < harbinger.execution_stack.Count; i++)
-                        harbinger.execution_stack[i].Dispose();
+                    else
+                        yield return last_status;
                 }
             }
         }
