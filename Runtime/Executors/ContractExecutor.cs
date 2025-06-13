@@ -8,6 +8,7 @@ namespace _BOA_
         public readonly BoaReader reader;
         public readonly List<object> args = new();
         public readonly ExpressionExecutor pipe_previous;
+        public override string toLog => $"'{contract?.name ?? base.toLog}'";
 
         //----------------------------------------------------------------------------------------------------------
 

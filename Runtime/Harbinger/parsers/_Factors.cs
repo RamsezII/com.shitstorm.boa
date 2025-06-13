@@ -11,18 +11,15 @@
             {
                 if (TryParseFactor(reader, out var sub_factor, out error))
                 {
-                    OperatorsM code = unary_operator switch
+                    UnaryExecutor.Operators code = unary_operator switch
                     {
-                        '+' => OperatorsM.add,
-                        '-' => OperatorsM.sub,
-                        '!' => OperatorsM.not,
+                        '+' => UnaryExecutor.Operators.Add,
+                        '-' => UnaryExecutor.Operators.Sub,
+                        '!' => UnaryExecutor.Operators.Not,
                         _ => 0,
                     };
 
-                    ContractExecutor exe = new(this, cmd_unary_, reader, parse_arguments: false);
-                    exe.args.Add(sub_factor);
-                    exe.args.Add(code);
-                    factor = exe;
+                    factor = new UnaryExecutor(this, sub_factor, code);
                     return true;
                 }
                 else
@@ -41,7 +38,8 @@
                     }
                     else if (!reader.TryReadMatch(')'))
                     {
-                        error ??= $"expected closing parenthesis ')'";
+                        error ??= $"expected closing parenthesis ')' after factor {factor.toLog}";
+                        --reader.read_i;
                         return false;
                     }
                     else

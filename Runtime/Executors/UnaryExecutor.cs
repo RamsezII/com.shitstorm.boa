@@ -32,7 +32,7 @@ namespace _BOA_
 
             object data = routine.Current.data;
 
-            yield return new Contract.Status()
+            yield return new Contract.Status(Contract.Status.States.ACTION_skip)
             {
                 data = code switch
                 {

@@ -12,6 +12,7 @@ namespace _BOA_
 
         static ushort _id;
         public readonly ushort id;
+        public virtual string toLog => GetType().Name;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -51,11 +52,7 @@ namespace _BOA_
             after_execution?.Invoke(data);
 
             if (modify_output != null)
-                yield return new Contract.Status()
-                {
-                    state = Contract.Status.States.ACTION_skip,
-                    data = modify_output(data),
-                };
+                yield return new Contract.Status(Contract.Status.States.ACTION_skip, data: modify_output(data));
         }
 
         //----------------------------------------------------------------------------------------------------------

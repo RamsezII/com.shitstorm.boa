@@ -18,10 +18,20 @@ namespace _BOA_
                 DAEMON,
             }
 
-            public States state;
+            public readonly States state;
             public string prefixe;
             [Range(0, 1)] public float progress;
             public object data;
+
+            //----------------------------------------------------------------------------------------------------------
+
+            public Status(in States state, in string prefixe = default, in float progress = default, in object data = default)
+            {
+                this.state = state;
+                this.prefixe = prefixe;
+                this.progress = progress;
+                this.data = data;
+            }
         }
 
         public readonly string name;

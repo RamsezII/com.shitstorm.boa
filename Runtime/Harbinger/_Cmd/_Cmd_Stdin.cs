@@ -28,21 +28,13 @@ namespace _BOA_
 
                 string prefixe = routine.Current.data.IterateThroughData_str().FirstOrDefault();
 
-                Contract.Status status_last = new()
-                {
-                    state = Contract.Status.States.WAIT_FOR_STDIN,
-                    prefixe = prefixe,
-                };
+                Contract.Status status_last = new(Contract.Status.States.WAIT_FOR_STDIN, prefixe: prefixe);
 
                 string stdin;
                 while (!Util.TryPullValue(ref exe.harbinger.shell_stdin, out stdin))
                     yield return status_last;
 
-                yield return new()
-                {
-                    state = Contract.Status.States.ACTION_skip,
-                    data = stdin,
-                };
+                yield return new(Contract.Status.States.ACTION_skip, data: stdin);
             }
         }
     }
