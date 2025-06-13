@@ -4,7 +4,7 @@ namespace _BOA_
 {
     public class VariableExecutor : ExpressionExecutor
     {
-        readonly BoaVar variable;
+        internal readonly BoaVar variable;
 
         //----------------------------------------------------------------------------------------------------------
 
