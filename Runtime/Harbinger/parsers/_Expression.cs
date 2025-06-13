@@ -6,7 +6,7 @@
         {
             if (TryParseAssignation(reader, out expression, out error) || error == null && TryParseOr(reader, out expression, out error))
             {
-                if (as_function_argument && reader.strict_syntax && !reader.TryReadMatch(',') && !reader.TryPeekSpecific(')'))
+                if (as_function_argument && reader.strict_syntax && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
                 {
                     error ??= $"expected ',' or ')' after expression";
                     if (expression is ContractExecutor cont)
@@ -24,7 +24,7 @@
         {
             error = null;
 
-            if (!reader.TryReadMatch('|'))
+            if (!reader.TryReadChar_match('|'))
                 return true;
             else if (!reader.TryReadArgument(out string pipe_cont_name, out error, as_function_argument: false))
                 error ??= $"expected command after pipe operator '|'";

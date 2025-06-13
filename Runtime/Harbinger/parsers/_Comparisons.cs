@@ -7,7 +7,7 @@
             expression = null;
             if (TryParseAddSub(reader, out var addsub1, out error))
             {
-                if (reader.TryReadMatch(out char op_char, true, "<>="))
+                if (reader.TryReadChar_match_out(out char op_char, true, "<>="))
                 {
                     OperatorsM code = op_char switch
                     {
@@ -17,7 +17,7 @@
                         _ => 0,
                     };
 
-                    if (reader.TryReadMatch('=') && code != 0)
+                    if (reader.TryReadChar_match('=') && code != 0)
                         code |= OperatorsM.eq;
 
                     if (TryParseAddSub(reader, out var addsub2, out error))

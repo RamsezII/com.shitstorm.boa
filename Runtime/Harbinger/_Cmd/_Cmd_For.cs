@@ -14,7 +14,7 @@ namespace _BOA_
                 no_semicolon_required: true,
                 args: static exe =>
                 {
-                    if (!exe.reader.TryReadMatch('('))
+                    if (!exe.reader.TryReadChar_match('('))
                         exe.error ??= "expected '(' at the beginning of 'for' instruction";
                     else if (!exe.harbinger.TryParseInstruction(exe.reader, true, out var instr_init, out exe.error))
                         exe.error ??= "expected instruction after '(' in 'for' instruction";
@@ -24,10 +24,10 @@ namespace _BOA_
                             exe.error ??= "expected expression after first instruction in 'for' instruction";
                         else
                         {
-                            exe.reader.TryReadMatch(';');
+                            exe.reader.TryReadChar_match(';');
                             if (!exe.harbinger.TryParseInstruction(exe.reader, false, out var instr_loop, out exe.error))
                                 exe.error ??= "expected instruction after second expression in 'for' instruction";
-                            else if (!exe.reader.TryReadMatch(')'))
+                            else if (!exe.reader.TryReadChar_match(')'))
                                 exe.error ??= "expected ')' at the end of 'for' instruction";
                             else if (!exe.harbinger.TryParseBlock(exe.reader, out var block, out exe.error))
                                 exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";

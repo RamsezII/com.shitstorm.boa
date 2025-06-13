@@ -14,16 +14,16 @@ namespace _BOA_
             {
                 char sep = default;
 
-                if (reader.TryReadMatch('\''))
+                if (reader.TryReadChar_match('\''))
                     sep = '\'';
-                else if (reader.TryReadMatch('"'))
+                else if (reader.TryReadChar_match('"'))
                     sep = '"';
 
                 if (sep != default)
                 {
                     value = string.Empty;
 
-                    while (reader.TryRead(out char c, skippables: null))
+                    while (reader.TryReadChar_out(out char c, skippables: null))
                         switch (c)
                         {
                             case '\\':

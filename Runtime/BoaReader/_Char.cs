@@ -2,7 +2,7 @@
 {
     partial class BoaReader
     {
-        public bool TryPeek(out char value, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryPeekChar_out(out char value, in bool ignore_case = true, in string skippables = _empties_)
         {
             int read_old = read_i;
 
@@ -28,9 +28,9 @@
             return false;
         }
 
-        public bool TryRead(out char value, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryReadChar_out(out char value, in bool ignore_case = true, in string skippables = _empties_)
         {
-            if (TryPeek(out value, ignore_case: ignore_case, skippables: skippables))
+            if (TryPeekChar_out(out value, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
                 return true;
@@ -38,7 +38,7 @@
             return false;
         }
 
-        public bool TryPeekSpecific(in char expected_value, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryPeekChar_match(in char expected_value, in bool ignore_case = true, in string skippables = _empties_)
         {
             int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
@@ -50,7 +50,7 @@
                 if (c == expected_value)
                     return true;
 
-                if (skippables.Contains(c, ordinal))
+                if (skippables != null && skippables.Contains(c, ordinal))
                     ++read_i;
                 else
                     break;
@@ -60,9 +60,9 @@
             return false;
         }
 
-        public bool TryReadMatch(in char expected_value, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryReadChar_match(in char expected_value, in bool ignore_case = true, in string skippables = _empties_)
         {
-            if (TryPeekSpecific(expected_value, ignore_case: ignore_case, skippables: skippables))
+            if (TryPeekChar_match(expected_value, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
                 return true;
@@ -70,11 +70,11 @@
             return false;
         }
 
-        public bool TryReadMatch(out char value, in bool ignore_case, in string expected_values, in string skippables = _empties_)
+        public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in string skippables = _empties_)
         {
             int read_old = read_i;
 
-            if (TryPeek(out value, skippables: skippables) && expected_values.Contains(value, ignore_case.ToOrdinal()))
+            if (TryPeekChar_out(out value, skippables: skippables) && expected_values.Contains(value, ignore_case.ToOrdinal()))
             {
                 ++read_i;
                 return true;

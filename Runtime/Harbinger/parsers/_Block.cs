@@ -8,7 +8,7 @@ namespace _BOA_
         {
             block = null;
 
-            if (reader.TryReadMatch('{'))
+            if (reader.TryReadChar_match('{'))
             {
                 BlockExecutor body = new(this);
 
@@ -24,7 +24,7 @@ namespace _BOA_
 
                 block = body;
 
-                if (reader.TryReadMatch('}'))
+                if (reader.TryReadChar_match('}'))
                     return true;
                 else
                     error ??= $"did not find closing bracket '}}'";
@@ -34,7 +34,7 @@ namespace _BOA_
                 block = instruction;
                 return true;
             }
-            else if (reader.TryPeek(out char peek) && !BoaReader._empties_.Contains(peek, StringComparison.OrdinalIgnoreCase))
+            else if (reader.TryPeekChar_out(out char peek) && !BoaReader._empties_.Contains(peek, StringComparison.OrdinalIgnoreCase))
                 error ??= $"could not parse '{peek}'";
 
             return false;

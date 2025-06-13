@@ -13,11 +13,11 @@ namespace _BOA_
                 no_semicolon_required: true,
                 args: static exe =>
                 {
-                    if (!exe.reader.TryReadMatch('('))
+                    if (!exe.reader.TryReadChar_match('('))
                         exe.error = "expected opening parenthesis '(' for 'while' condition";
                     else if (!exe.harbinger.TryParseExpression(exe.reader, false, out var cond, out exe.error))
                         exe.error ??= "expected expression for 'while' condition";
-                    else if (!exe.reader.TryReadMatch(')'))
+                    else if (!exe.reader.TryReadChar_match(')'))
                         exe.error = "expected closing parenthesis ')' for 'while' condition";
                     else if (!exe.harbinger.TryParseBlock(exe.reader, out var block, out exe.error))
                         exe.error ??= "expected an instruction, or a block of instructions after 'while' condition";

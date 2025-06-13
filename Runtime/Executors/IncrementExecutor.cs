@@ -4,7 +4,7 @@ namespace _BOA_
 {
     public class IncrementExecutor : ExpressionExecutor
     {
-        public enum Codes : byte
+        public enum Operators : byte
         {
             None,
             AddBefore,
@@ -13,12 +13,12 @@ namespace _BOA_
             SubAfter,
         }
 
-        readonly Codes code;
+        readonly Operators code;
         readonly BoaVar variable;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public IncrementExecutor(in Harbinger harbinger, in BoaVar variable, in Codes code) : base(harbinger)
+        public IncrementExecutor(in Harbinger harbinger, in BoaVar variable, in Operators code) : base(harbinger)
         {
             this.code = code;
             this.variable = variable;
@@ -30,10 +30,10 @@ namespace _BOA_
         {
             switch (code)
             {
-                case Codes.AddBefore:
+                case Operators.AddBefore:
                     variable.value = 1 + (int)variable.value;
                     break;
-                case Codes.SubBefore:
+                case Operators.SubBefore:
                     variable.value = 1 - (int)variable.value;
                     break;
             }
@@ -42,10 +42,10 @@ namespace _BOA_
 
             switch (code)
             {
-                case Codes.AddAfter:
+                case Operators.AddAfter:
                     variable.value = 1 + (int)variable.value;
                     break;
-                case Codes.SubAfter:
+                case Operators.SubAfter:
                     variable.value = 1 - (int)variable.value;
                     break;
             }

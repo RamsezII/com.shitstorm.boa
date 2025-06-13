@@ -7,17 +7,52 @@
             factor = null;
             error = null;
 
-            if (reader.TryReadMatch(out char unary_operator, true, "+-!"))
+            if (reader.TryReadChar_match_out(out char unary_operator, true, "+-!"))
             {
+                UnaryExecutor.Operators code = unary_operator switch
+                {
+                    '+' => UnaryExecutor.Operators.Add,
+                    '-' => UnaryExecutor.Operators.Sub,
+                    '!' => UnaryExecutor.Operators.Not,
+                    _ => 0,
+                };
+
+                switch (code)
+                {
+                    case UnaryExecutor.Operators.Add:
+                    case UnaryExecutor.Operators.Sub:
+                        {
+                            int read_old = reader.read_i;
+                            if (reader.TryReadChar_match(unary_operator, skippables: null))
+                            {
+                                if (!reader.TryReadArgument(out string varname, out error, skippables: null))
+                                    error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
+                                else if (!global_variables.TryGetValue(varname, out var variable))
+                                    error ??= $"no variable named '{varname}'";
+                                else
+                                {
+                                    factor = new IncrementExecutor(this, variable, code switch
+                                    {
+                                        UnaryExecutor.Operators.Add => IncrementExecutor.Operators.AddBefore,
+                                        UnaryExecutor.Operators.Sub => IncrementExecutor.Operators.SubBefore,
+                                        _ => 0,
+                                    });
+                                    if (factor.error != null)
+                                    {
+                                        error = factor.error;
+                                        return false;
+                                    }
+                                    return true;
+                                }
+                                reader.read_i = read_old;
+                                return false;
+                            }
+                        }
+                        break;
+                }
+
                 if (TryParseFactor(reader, out var sub_factor, out error))
                 {
-                    UnaryExecutor.Operators code = unary_operator switch
-                    {
-                        '+' => UnaryExecutor.Operators.Add,
-                        '-' => UnaryExecutor.Operators.Sub,
-                        '!' => UnaryExecutor.Operators.Not,
-                        _ => 0,
-                    };
 
                     factor = new UnaryExecutor(this, sub_factor, code);
                     return true;
@@ -30,13 +65,13 @@
             }
 
             if (error == null)
-                if (reader.TryReadMatch('('))
+                if (reader.TryReadChar_match('('))
                     if (!TryParseExpression(reader, false, out factor, out error))
                     {
                         error ??= "expected expression inside factor parenthesis";
                         return false;
                     }
-                    else if (!reader.TryReadMatch(')'))
+                    else if (!reader.TryReadChar_match(')'))
                     {
                         error ??= $"expected closing parenthesis ')' after factor {factor.toLog}";
                         --reader.read_i;

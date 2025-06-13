@@ -14,7 +14,7 @@ namespace _BOA_
                     ExpressionExecutor expr = null;
                     if (!exe.reader.TryReadArgument(out string varname, out exe.error, as_function_argument: false))
                         exe.error ??= $"Expected variable name after 'var'.";
-                    if (exe.pipe_previous == null && !exe.reader.TryReadMatch('='))
+                    if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('='))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
                     else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, false, out expr, out exe.error))
                         exe.error ??= $"Failed to parse expression after '=' for variable '{varname}'.";

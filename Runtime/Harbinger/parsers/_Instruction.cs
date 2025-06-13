@@ -7,9 +7,9 @@
             instruction = null;
             error = null;
 
-            if (reader.TryReadMatch(';'))
+            if (reader.TryReadChar_match(';'))
                 return true;
-            else if (reader.TryReadMatch('#'))
+            else if (reader.TryReadChar_match('#'))
             {
                 reader.SkipUntil('\n');
                 return true;
@@ -18,7 +18,7 @@
             {
                 if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
                     if (check_semicolon || reader.strict_syntax)
-                        if (!reader.TryReadMatch(';'))
+                        if (!reader.TryReadChar_match(';'))
                             if (check_semicolon && reader.strict_syntax)
                             {
                                 error ??= $"missing ';' at the end of instruction";
