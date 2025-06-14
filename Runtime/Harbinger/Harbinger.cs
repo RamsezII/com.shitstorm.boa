@@ -68,16 +68,19 @@ namespace _BOA_
                     program.stack.Add(sub_block);
 
             if (error != null)
-                return false;
+                goto failure;
 
             if (reader.TryPeekChar_out(out char peek))
             {
                 error ??= $"could not parse '{peek}'";
-                return false;
+                goto failure;
             }
 
             executor = program;
             return true;
+
+        failure:
+            return false;
         }
     }
 }
