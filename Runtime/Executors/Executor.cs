@@ -15,7 +15,7 @@ namespace _BOA_
         public readonly ushort id;
         public virtual string toLog => GetType().Name;
 
-        readonly Dictionary<string, BoaVar> variables = new(StringComparer.Ordinal);
+        internal readonly Dictionary<string, BoaVar> _variables = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ namespace _BOA_
 
         public bool TryGetVariable(string name, out BoaVar value)
         {
-            if (variables.TryGetValue(name, out value))
+            if (_variables.TryGetValue(name, out value))
                 return true;
             else if (parent != null && parent.TryGetVariable(name, out value))
                 return true;

@@ -21,7 +21,7 @@ namespace _BOA_
                     else
                     {
                         BoaVar variable = new(varname, null);
-                        exe.harbinger.global_variables[varname] = variable;
+                        exe.parent._variables[varname] = variable;
                         exe.args.Add(expr);
                         exe.args.Add(variable);
                     }

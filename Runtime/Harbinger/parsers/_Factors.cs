@@ -27,7 +27,7 @@
                             {
                                 if (!reader.TryReadArgument(out string varname, out error, skippables: null))
                                     error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
-                                else if (!global_variables.TryGetValue(varname, out var variable))
+                                else if (!parent.TryGetVariable(varname, out var variable))
                                     error ??= $"no variable named '{varname}'";
                                 else
                                 {
@@ -99,7 +99,7 @@
                         }
                         return true;
                     }
-                    else if (global_variables.TryGetValue(arg, out var variable))
+                    else if (parent.TryGetVariable(arg, out var variable))
                     {
                         factor = new VariableExecutor(this, parent, variable);
                         return true;

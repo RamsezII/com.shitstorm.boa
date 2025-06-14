@@ -29,7 +29,6 @@ namespace _BOA_
         */
 
         internal static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
-        readonly Dictionary<string, BoaVar> global_variables = new(StringComparer.Ordinal);
 
         public readonly Action<object> stdout;
 
