@@ -65,14 +65,42 @@ namespace _BOA_
                     return false;
                 }
 
-                dynamic_contract = new DynamicContract(func_name, args.Count, args.Count > 0 ? ReadArgs : null, exe => block.EExecute());
+                dynamic_contract = new DynamicContract(func_name, args.Count, args.Count > 0 ? ReadArgs : null, ERoutine);
                 return true;
 
-                static void ReadArgs(ContractExecutor exe)
+                void ReadArgs(ContractExecutor exe)
                 {
-                    for (int i = 0; i < exe.contract.max_args; ++i)
-                        if (exe.reader.TryReadArgument(out string arg, out _))
-                            exe.args.Add(arg);
+                    for (int i = 0; i < args.Count; ++i)
+                    {
+                        string arg_name = args[i];
+                        exe._variables[arg_name] = new(arg_name);
+
+                        if (i == 0 && exe.pipe_previous != null)
+                            continue;
+                        
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr, out exe.error))
+                            exe.args.Add(expr);
+                        else
+                        {
+                            exe.error ??= $"missing argument for function '{func_name}'";
+                            return;
+                        }
+                    }
+                }
+
+                IEnumerator<Status> ERoutine(ContractExecutor exe)
+                {
+                    for (int i = 0; i < args.Count; ++i)
+                    {
+                        string arg_name = args[i];
+                        ExpressionExecutor expr = (ExpressionExecutor)exe.args[i];
+
+                        var routine = expr.EExecute();
+                        while (routine.MoveNext())
+                            yield return routine.Current;
+
+                        exe._variables[arg_name] = new BoaVar(arg_name, routine.Current.data);
+                    }
                 }
             }
 

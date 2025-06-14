@@ -14,7 +14,7 @@ namespace _BOA_
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void InitCmd_Run()
+        static void InitCmd_RunScript()
         {
             const string
                 flag_strict = "--strict-syntax";
