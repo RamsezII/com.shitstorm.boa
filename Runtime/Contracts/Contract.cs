@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public sealed class Contract
+    public class Contract
     {
         [Serializable]
         public struct Status
