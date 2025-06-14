@@ -17,20 +17,20 @@ namespace _BOA_
                 {
                     if (!exe.reader.TryReadChar_match('('))
                         exe.error ??= "expected '(' at the beginning of 'for' instruction";
-                    else if (!exe.harbinger.TryParseInstruction(exe.reader, true, out var instr_init, out exe.error))
+                    else if (!exe.harbinger.TryParseInstruction(exe.reader, exe.parent, true, out var instr_init, out exe.error))
                         exe.error ??= "expected instruction after '(' in 'for' instruction";
                     else
                     {
-                        if (!exe.harbinger.TryParseExpression(exe.reader, false, out var cond, out exe.error))
+                        if (!exe.harbinger.TryParseExpression(exe.reader, exe.parent, false, out var cond, out exe.error))
                             exe.error ??= "expected expression after first instruction in 'for' instruction";
                         else
                         {
                             exe.reader.TryReadChar_match(';');
-                            if (!exe.harbinger.TryParseInstruction(exe.reader, false, out var instr_loop, out exe.error))
+                            if (!exe.harbinger.TryParseInstruction(exe.reader, exe.parent, false, out var instr_loop, out exe.error))
                                 exe.error ??= "expected instruction after second expression in 'for' instruction";
                             else if (!exe.reader.TryReadChar_match(')'))
                                 exe.error ??= "expected ')' at the end of 'for' instruction";
-                            else if (!exe.harbinger.TryParseBlock(exe.reader, out var block, out exe.error))
+                            else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block, out exe.error))
                                 exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
                             else
                             {

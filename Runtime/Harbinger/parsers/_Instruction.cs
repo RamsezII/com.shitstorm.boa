@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseInstruction(in BoaReader reader, in bool check_semicolon, out Executor instruction, out string error)
+        internal bool TryParseInstruction(in BoaReader reader, in Executor parent, in bool check_semicolon, out Executor instruction, out string error)
         {
             instruction = null;
             error = null;
@@ -14,7 +14,7 @@
                 reader.SkipUntil('\n');
                 return true;
             }
-            else if (TryParseExpression(reader, false, out var expr, out error))
+            else if (TryParseExpression(reader, parent, false, out var expr, out error))
             {
                 if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
                     if (check_semicolon || reader.strict_syntax)

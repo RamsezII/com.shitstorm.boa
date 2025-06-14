@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseAssignation(in BoaReader reader, out ExpressionExecutor assignation, out string error)
+        internal bool TryParseAssignation(in BoaReader reader, in Executor parent, out ExpressionExecutor assignation, out string error)
         {
             assignation = null;
             int read_old = reader.read_i;
@@ -23,9 +23,9 @@
 
                         code |= OperatorsM.assign;
 
-                        if (TryParseExpression(reader, false, out var expr, out error))
+                        if (TryParseExpression(reader, parent, false, out var expr, out error))
                         {
-                            ContractExecutor exe = new(this, cmd_assign_, reader, parse_arguments: false);
+                            ContractExecutor exe = new(this, parent, cmd_assign_, reader, parse_arguments: false);
                             exe.args.Add(code);
                             exe.args.Add(variable);
                             exe.args.Add(expr);

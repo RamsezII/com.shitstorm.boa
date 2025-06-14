@@ -6,7 +6,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected ExpressionExecutor(in Harbinger harbinger) : base(harbinger)
+        protected ExpressionExecutor(in Harbinger harbinger, in Executor parent) : base(harbinger, parent)
         {
         }
     }

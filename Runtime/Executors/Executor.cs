@@ -7,12 +7,15 @@ namespace _BOA_
     public abstract class Executor : IDisposable
     {
         public readonly Harbinger harbinger;
+        public readonly Executor parent;
         public string error;
         public bool disposed;
 
         static ushort _id;
         public readonly ushort id;
         public virtual string toLog => GetType().Name;
+
+        readonly Dictionary<string, BoaVar> variables = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -24,13 +27,24 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Executor(in Harbinger harbinger)
+        public Executor(in Harbinger harbinger, in Executor parent)
         {
             id = _id.LoopID();
             this.harbinger = harbinger;
+            this.parent = parent;
         }
 
         //----------------------------------------------------------------------------------------------------------
+
+        public bool TryGetVariable(string name, out BoaVar value)
+        {
+            if (variables.TryGetValue(name, out value))
+                return true;
+            else if (parent != null && parent.TryGetVariable(name, out value))
+                return true;
+            value = null;
+            return false;
+        }
 
         internal abstract IEnumerator<Contract.Status> EExecute();
         public static IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null, Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)

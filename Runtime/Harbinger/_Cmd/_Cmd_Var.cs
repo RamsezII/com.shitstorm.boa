@@ -16,7 +16,7 @@ namespace _BOA_
                         exe.error ??= $"Expected variable name after 'var'.";
                     if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('='))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
-                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, false, out expr, out exe.error))
+                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.parent, false, out expr, out exe.error))
                         exe.error ??= $"Failed to parse expression after '=' for variable '{varname}'.";
                     else
                     {

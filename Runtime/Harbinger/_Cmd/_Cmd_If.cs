@@ -16,18 +16,18 @@ namespace _BOA_
                 {
                     if (!exe.reader.TryReadChar_match('('))
                         exe.error ??= "expected opening parenthesis '(' for 'if' condition";
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, false, out var cond, out exe.error))
+                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe.parent, false, out var cond, out exe.error))
                         exe.error ??= "expected expression for 'if' condition";
                     else if (!exe.reader.TryReadChar_match(')'))
                         exe.error ??= "expected closing parenthesis ')' for 'if' condition";
-                    else if (!exe.harbinger.TryParseBlock(exe.reader, out var block_if, out exe.error))
+                    else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block_if, out exe.error))
                         exe.error ??= "expected block after 'if' condition";
                     else
                     {
                         exe.args.Add(cond);
                         exe.args.Add(block_if);
                         if (exe.reader.TryReadMatch(out _, "else"))
-                            if (exe.harbinger.TryParseBlock(exe.reader, out var block_else, out exe.error))
+                            if (exe.harbinger.TryParseBlock(exe.reader, exe, out var block_else, out exe.error))
                                 exe.args.Add(block_else);
                     }
                 },

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace _BOA_
@@ -21,7 +20,7 @@ namespace _BOA_
                         if (exe.reader.TryReadArgument(out string operator_name, out exe.error, as_function_argument: false))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                                 exe.error = $"unknown operator '{operator_name}'";
-                            else if (exe.harbinger.TryParseExpression(exe.reader, false, out var expression, out exe.error))
+                            else if (exe.harbinger.TryParseExpression(exe.reader, exe.parent, false, out var expression, out exe.error))
                             {
                                 BoaVar variable = new(varname, null);
                                 exe.harbinger.global_variables[varname] = variable;

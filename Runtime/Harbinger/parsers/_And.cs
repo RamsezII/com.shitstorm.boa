@@ -2,15 +2,15 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseAnd(in BoaReader reader, out ExpressionExecutor expression, out string error)
+        internal bool TryParseAnd(in BoaReader reader, in Executor parent, out ExpressionExecutor expression, out string error)
         {
             expression = null;
-            if (TryParseComparison(reader, out var and1, out error))
+            if (TryParseComparison(reader, parent, out var and1, out error))
                 if (reader.TryReadMatch(out string op_name, "and"))
                 {
-                    if (TryParseComparison(reader, out var and2, out error))
+                    if (TryParseComparison(reader, parent, out var and2, out error))
                     {
-                        ContractExecutor exe = new(this, cmd_math_, reader, parse_arguments: false);
+                        ContractExecutor exe = new(this, parent, cmd_math_, reader, parse_arguments: false);
                         exe.args.Add(OperatorsM.and);
                         exe.args.Add(and1);
                         exe.args.Add(and2);

@@ -9,7 +9,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public PipeExecutor(in Harbinger harbinger, in Executor previous, in ContractExecutor next) : base(harbinger)
+        public PipeExecutor(in Harbinger harbinger, in Executor parent, in Executor previous, in ContractExecutor next) : base(harbinger, parent)
         {
             this.previous = previous;
             this.next = next;
@@ -28,7 +28,7 @@ namespace _BOA_
 
                 if (next.args.Count == 0)
                     next.args.Add(null);
-                next.args[0] = new LiteralExecutor(harbinger, routine.Current.data);
+                next.args[0] = new LiteralExecutor(harbinger, parent, routine.Current.data);
 
                 routine = next.EExecute();
                 while (routine.MoveNext())

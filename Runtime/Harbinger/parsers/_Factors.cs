@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseFactor(in BoaReader reader, out ExpressionExecutor factor, out string error)
+        internal bool TryParseFactor(in BoaReader reader, in Executor parent, out ExpressionExecutor factor, out string error)
         {
             factor = null;
             error = null;
@@ -31,7 +31,7 @@
                                     error ??= $"no variable named '{varname}'";
                                 else
                                 {
-                                    factor = new IncrementExecutor(this, variable, code switch
+                                    factor = new IncrementExecutor(this, parent, variable, code switch
                                     {
                                         UnaryExecutor.Operators.Add => IncrementExecutor.Operators.AddBefore,
                                         UnaryExecutor.Operators.Sub => IncrementExecutor.Operators.SubBefore,
@@ -51,10 +51,10 @@
                         break;
                 }
 
-                if (TryParseFactor(reader, out var sub_factor, out error))
+                if (TryParseFactor(reader, parent, out var sub_factor, out error))
                 {
 
-                    factor = new UnaryExecutor(this, sub_factor, code);
+                    factor = new UnaryExecutor(this, parent, sub_factor, code);
                     return true;
                 }
                 else
@@ -66,7 +66,7 @@
 
             if (error == null)
                 if (reader.TryReadChar_match('('))
-                    if (!TryParseExpression(reader, false, out factor, out error))
+                    if (!TryParseExpression(reader, parent, false, out factor, out error))
                     {
                         error ??= "expected expression inside factor parenthesis";
                         return false;
@@ -83,7 +83,7 @@
             if (error == null)
                 if (TryParseString(reader, out string str, out error))
                 {
-                    factor = new LiteralExecutor(this, literal: str);
+                    factor = new LiteralExecutor(this, parent, literal: str);
                     return true;
                 }
 
@@ -91,7 +91,7 @@
                 if (reader.TryReadArgument(out string arg, out error, as_function_argument: false))
                     if (global_contracts.TryGetValue(arg, out var contract))
                     {
-                        factor = new ContractExecutor(this, contract, reader);
+                        factor = new ContractExecutor(this, parent, contract, reader);
                         if (factor.error != null)
                         {
                             error = factor.error;
@@ -101,25 +101,25 @@
                     }
                     else if (global_variables.TryGetValue(arg, out var variable))
                     {
-                        factor = new VariableExecutor(this, variable);
+                        factor = new VariableExecutor(this, parent, variable);
                         return true;
                     }
                     else
                         switch (arg.ToLower())
                         {
                             case "true":
-                                factor = new LiteralExecutor(this, literal: true);
+                                factor = new LiteralExecutor(this, parent, literal: true);
                                 return true;
 
                             case "false":
-                                factor = new LiteralExecutor(this, literal: false);
+                                factor = new LiteralExecutor(this, parent, literal: false);
                                 return true;
 
                             default:
                                 if (int.TryParse(arg, out int _int))
-                                    factor = new LiteralExecutor(this, literal: _int);
+                                    factor = new LiteralExecutor(this, parent, literal: _int);
                                 else if (Util.TryParseFloat(arg, out float _float))
-                                    factor = new LiteralExecutor(this, literal: _float);
+                                    factor = new LiteralExecutor(this, parent, literal: _float);
                                 else
                                 {
                                     error ??= $"unrecognized object : '{arg}'";
