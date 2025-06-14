@@ -87,7 +87,7 @@
                 }
 
             if (reader.error == null)
-                if (reader.TryReadArgument(out string arg, false))
+                if (reader.TryReadArgument(out string arg, true))
                     if (caller._functions.TryGet(arg, out var func))
                     {
                         factor = new ContractExecutor(this, caller, func, reader);

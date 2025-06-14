@@ -89,13 +89,15 @@ namespace _BOA_
                 args: exe =>
                 {
                     for (int i = 0; i < args_names.Count; i++)
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe.caller, true, out var expr))
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
                             exe._variables.Add(args_names[i], new BoaVariable(expr));
+
+                    exe.caller = caller;
 
                     exe.args.Add(null);
                     var reader = new BoaReader(caller.harbinger.strict_syntax, function.text);
 
-                    if (exe.harbinger.TryParseBlock(reader, caller, out var block))
+                    if (exe.harbinger.TryParseBlock(reader, exe, out var block))
                         exe.args.Add(block);
                     else
                         exe.error ??= reader.error;
@@ -124,7 +126,7 @@ namespace _BOA_
                     bvar.value = expr_routine.Current.data;
                 }
 
-                ExpressionExecutor block = (ExpressionExecutor)exe.args[1];
+                Executor block = (Executor)exe.args[1];
                 var block_routine = block.EExecute();
                 while (block_routine.MoveNext())
                     yield return block_routine.Current;

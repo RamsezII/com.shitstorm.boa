@@ -22,7 +22,7 @@
                 if (reader.TryReadChar_match('}'))
                     return true;
                 else
-                    reader.error ??= $"did not find closing bracket '}}'";
+                    reader.error ??= $"expected closing bracket '}}'";
             }
             else if (TryParseInstruction(reader, caller, true, out block))
                 return true;

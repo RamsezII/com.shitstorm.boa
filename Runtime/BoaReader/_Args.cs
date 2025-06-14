@@ -13,10 +13,15 @@ namespace _BOA_
             if (TryReadArgument(text, out start_i, ref read_i, out argument, skippables: skippables, stoppers: stoppers))
             {
                 last_arg = argument;
+
+                if (as_function_argument)
+                    if (TryReadChar_match(','))
+                        return true;
+
                 if (!as_function_argument || !strict_syntax)
                     return true;
 
-                if (TryReadChar_match(',') || TryPeekChar_match(')'))
+                if (TryPeekChar_match(')'))
                     return true;
 
                 error = $"expected ',' or ')' after argument '{argument}'";
