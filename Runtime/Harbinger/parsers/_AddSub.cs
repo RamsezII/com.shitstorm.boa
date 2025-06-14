@@ -2,10 +2,10 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseAddSub(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression, out string error)
+        internal bool TryParseAddSub(in BoaReader reader, in Executor caller, out ExpressionExecutor expression, out string error)
         {
             expression = null;
-            if (TryParseTerm(reader, scope, out var term1, out error))
+            if (TryParseTerm(reader, caller, out var term1, out error))
             {
                 int read_old = reader.read_i;
                 if (reader.TryReadChar_match_out(out char op_char, true, "+-") && !reader.TryReadChar_match(op_char, skippables: null))
@@ -17,9 +17,9 @@
                         _ => 0,
                     };
 
-                    if (TryParseTerm(reader, scope, out var term2, out error))
+                    if (TryParseTerm(reader, caller, out var term2, out error))
                     {
-                        ContractExecutor exe = new(this, scope, cmd_math_, reader, parse_arguments: false);
+                        ContractExecutor exe = new(this, caller, cmd_math_, reader, parse_arguments: false);
                         exe.args.Add(code);
                         exe.args.Add(term1);
                         exe.args.Add(term2);

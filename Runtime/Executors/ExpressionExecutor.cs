@@ -6,7 +6,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        protected ExpressionExecutor(in Harbinger harbinger, in ScopeNode scope) : base(harbinger, scope)
+        protected ExpressionExecutor(in Harbinger harbinger, in Executor scope) : base(harbinger, scope)
         {
         }
     }

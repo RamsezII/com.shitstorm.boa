@@ -61,9 +61,9 @@ namespace _BOA_
         {
             executor = null;
 
-            BlockExecutor program = new(this, new ScopeNode(null));
+            BlockExecutor program = new(this, null);
 
-            while (TryParseBlock(reader, program.scope, out var sub_block, out error))
+            while (TryParseBlock(reader, program, out var sub_block, out error))
                 if (sub_block != null)
                     program.stack.Add(sub_block);
 

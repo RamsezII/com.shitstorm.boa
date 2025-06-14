@@ -16,7 +16,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public UnaryExecutor(in Harbinger harbinger, in ScopeNode scope, in ExpressionExecutor expr, in Operators code) : base(harbinger, scope)
+        public UnaryExecutor(in Harbinger harbinger, in Executor caller, in ExpressionExecutor expr, in Operators code) : base(harbinger, caller)
         {
             this.code = code;
             this.expr = expr;

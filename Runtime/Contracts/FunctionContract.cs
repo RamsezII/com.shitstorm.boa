@@ -5,11 +5,11 @@ namespace _BOA_
 {
     public class FunctionContract : Contract
     {
-        internal readonly ScopeNode scope;
+        internal readonly Executor caller;
 
         //----------------------------------------------------------------------------------------------------------
 
-        FunctionContract(in string name, in ScopeNode scope,
+        FunctionContract(in string name, in Executor caller,
             in int args_count,
             in Action<ContractExecutor> args,
             in Func<ContractExecutor, IEnumerator<Status>> routine
@@ -23,10 +23,10 @@ namespace _BOA_
                   args: args,
                   routine: routine)
         {
-            this.scope = scope;
+            this.caller = caller;
         }
 
-        internal static bool TryParseFunction(in Harbinger harbinger, in ScopeNode scope, in BoaReader reader, out string error)
+        internal static bool TryParseFunction(in Harbinger harbinger, in Executor caller, in BoaReader reader, out string error)
         {
             error = null;
             int read_old = reader.read_i;
@@ -64,22 +64,22 @@ namespace _BOA_
                 }
 
                 Executor function_body = null;
-                var function = new FunctionContract(func_name, scope, args_names.Count, args_names.Count > 0 ? ReadArgs : null, ERoutine);
+                var function = new FunctionContract(func_name, caller, args_names.Count, args_names.Count > 0 ? ReadArgs : null, ERoutine);
 
-                var executor = new ContractExecutor(harbinger, scope, function, reader, parse_arguments: false);
+                var executor = new ContractExecutor(harbinger, caller, function, reader, parse_arguments: false);
                 for (int i = 0; i < args_names.Count; ++i)
                 {
                     string arg_name = args_names[i];
-                    executor.scope._variables[arg_name] = new BoaVar(arg_name, null);
+                    executor.caller._variables[arg_name] = new BoaVar(arg_name, null);
                 }
 
-                if (!harbinger.TryParseBlock(reader, executor.scope, out function_body, out error))
+                if (!harbinger.TryParseBlock(reader, executor.caller, out function_body, out error))
                 {
                     error ??= $"could not parse body for function '{func_name}'";
                     return false;
                 }
 
-                scope._functions[func_name] = function;
+                caller._functions[func_name] = function;
 
                 return true;
 
@@ -88,11 +88,11 @@ namespace _BOA_
                     for (int i = 0; i < args_names.Count; ++i)
                     {
                         string arg_name = args_names[i];
-                        var variable = exe.scope._variables[arg_name] = new(arg_name, null);
+                        var variable = exe.caller._variables[arg_name] = new(arg_name, null);
 
                         if (i == 0 && exe.pipe_previous != null)
                             exe.args.Add(null);
-                        else if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr, out exe.error))
+                        else if (exe.harbinger.TryParseExpression(exe.reader, exe.caller, true, out var expr, out exe.error))
                             exe.args.Add(expr);
                         else
                         {
@@ -119,7 +119,7 @@ namespace _BOA_
                         while (expr_routine.MoveNext())
                             yield return expr_routine.Current;
 
-                        exe.scope._variables[arg_name] = new BoaVar(arg_name, expr_routine.Current.data);
+                        exe.caller._variables[arg_name] = new BoaVar(arg_name, expr_routine.Current.data);
                     }
 
                     var block_routine = function_body.EExecute();

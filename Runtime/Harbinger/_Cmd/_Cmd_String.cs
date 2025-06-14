@@ -22,7 +22,7 @@ namespace _BOA_
                     args: static exe =>
                     {
                         ExpressionExecutor expr = null;
-                        if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out expr, out exe.error))
+                        if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe, true, out expr, out exe.error))
                             exe.error ??= $"'{exe.contract.name}' expects an expression";
                         else if (!exe.reader.TryReadArgument(out string operation_name, out exe.error))
                             exe.error ??= "missing string operation";

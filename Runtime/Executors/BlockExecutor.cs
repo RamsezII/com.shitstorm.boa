@@ -8,7 +8,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal BlockExecutor(in Harbinger harbinger, in ScopeNode scope) : base(harbinger, scope)
+        internal BlockExecutor(in Harbinger harbinger, in Executor caller) : base(harbinger, caller)
         {
         }
 

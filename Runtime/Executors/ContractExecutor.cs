@@ -12,7 +12,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ContractExecutor(in Harbinger harbinger, in ScopeNode scope, in Contract contract, in BoaReader reader, in ExpressionExecutor pipe_previous = null, in bool parse_arguments = true) : base(harbinger, scope)
+        public ContractExecutor(in Harbinger harbinger, in Executor caller, in Contract contract, in BoaReader reader, in ExpressionExecutor pipe_previous = null, in bool parse_arguments = true) : base(harbinger, caller)
         {
             this.contract = contract;
             this.reader = reader;

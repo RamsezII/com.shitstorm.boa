@@ -8,7 +8,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public LiteralExecutor(in Harbinger harbinger, in ScopeNode scope, in object literal) : base(harbinger, scope)
+        public LiteralExecutor(in Harbinger harbinger, in Executor caller, in object literal) : base(harbinger, caller)
         {
             this.literal = literal;
         }
