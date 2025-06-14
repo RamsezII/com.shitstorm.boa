@@ -11,6 +11,7 @@ namespace _BOA_
             AddContract(new("while",
                 function_style_arguments: false,
                 no_semicolon_required: true,
+                no_parenthesis: true,
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar_match('('))

@@ -37,7 +37,7 @@ namespace _BOA_
         public readonly string name;
         internal readonly int min_args, max_args;
         public readonly Action<ContractExecutor> args;
-        public readonly bool function_style_arguments, no_semicolon_required;
+        public readonly bool function_style_arguments, no_semicolon_required, no_parenthesis;
         internal readonly Func<ContractExecutor, IEnumerator<Status>> routine;
 
         //----------------------------------------------------------------------------------------------------------
@@ -47,6 +47,7 @@ namespace _BOA_
             in int max_args = 0,
             in bool function_style_arguments = true,
             in bool no_semicolon_required = false,
+            in bool no_parenthesis = false,
             in Action<ContractExecutor> args = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
@@ -56,6 +57,7 @@ namespace _BOA_
             this.max_args = Mathf.Max(min_args, max_args);
             this.function_style_arguments = function_style_arguments;
             this.no_semicolon_required = no_semicolon_required;
+            this.no_parenthesis = no_parenthesis;
             this.args = args;
             this.routine = routine;
         }

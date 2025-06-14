@@ -11,6 +11,7 @@ namespace _BOA_
             AddContract(new("for",
                 min_args: 1,
                 function_style_arguments: false,
+                no_parenthesis: true,
                 no_semicolon_required: true,
                 args: static exe =>
                 {

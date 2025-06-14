@@ -19,27 +19,30 @@ namespace _BOA_
             this.pipe_previous = pipe_previous;
 
             if (parse_arguments)
-            {
-                bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
-                bool found_parenthesis = reader.TryReadChar_match('(');
-
-                if (expects_parenthesis && !found_parenthesis)
+                if (contract != null && contract.no_parenthesis)
+                    contract?.args?.Invoke(this);
+                else
                 {
-                    error = $"'{contract.name}' expected opening parenthesis '('";
-                    return;
+                    bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
+                    bool found_parenthesis = reader.TryReadChar_match('(');
+
+                    if (expects_parenthesis && !found_parenthesis)
+                    {
+                        error ??= $"'{contract.name}' expected opening parenthesis '('";
+                        return;
+                    }
+
+                    contract?.args?.Invoke(this);
+
+                    if (error != null)
+                        return;
+
+                    if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')'))
+                    {
+                        error ??= $"'{contract.name}' expected closing parenthesis ')'";
+                        return;
+                    }
                 }
-
-                contract?.args?.Invoke(this);
-
-                if (error != null)
-                    return;
-
-                if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')'))
-                {
-                    error = $"'{contract.name}' expected closing parenthesis ')'";
-                    return;
-                }
-            }
         }
 
         //----------------------------------------------------------------------------------------------------------
