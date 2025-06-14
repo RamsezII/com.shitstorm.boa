@@ -21,7 +21,7 @@ namespace _BOA_
                     else
                     {
                         BoaVar variable = new(varname, null);
-                        exe.caller._variables[varname] = variable;
+                        exe.caller.AddVariable(varname, variable);
                         exe.args.Add(expr);
                         exe.args.Add(variable);
                     }

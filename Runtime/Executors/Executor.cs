@@ -8,7 +8,6 @@ namespace _BOA_
     {
         public readonly Harbinger harbinger;
         internal Executor caller;
-        public readonly ScopeNode scope;
         public string error;
         public bool disposed;
 
@@ -16,8 +15,7 @@ namespace _BOA_
         public readonly ushort id;
         public virtual string ToLog => $"{GetType().Name}[{id}]";
 
-        public readonly Dictionary<string, BoaVar> _variables = new(StringComparer.Ordinal);
-        public readonly Dictionary<string, FunctionContract> _functions = new(StringComparer.Ordinal);
+        Dictionary<string, BoaVar> _variables;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -34,26 +32,16 @@ namespace _BOA_
             id = _id.LoopID();
             this.harbinger = harbinger;
             this.caller = caller;
-            scope = caller.scope ?? new ScopeNode(null);
         }
 
         //----------------------------------------------------------------------------------------------------------
 
+        public void AddVariable(in string name, in BoaVar value) => (_variables ??= new(StringComparer.Ordinal))[name] = value;
         public bool TryGetVariable(string name, out BoaVar value)
         {
-            if (_variables.TryGetValue(name, out value))
+            if (_variables != null && _variables.TryGetValue(name, out value))
                 return true;
             else if (caller != null && caller != this && caller.TryGetVariable(name, out value))
-                return true;
-            value = null;
-            return false;
-        }
-
-        public bool TryGetFunction(string name, out FunctionContract value)
-        {
-            if (_functions.TryGetValue(name, out value))
-                return true;
-            else if (caller != null && caller != this && caller.TryGetFunction(name, out value))
                 return true;
             value = null;
             return false;

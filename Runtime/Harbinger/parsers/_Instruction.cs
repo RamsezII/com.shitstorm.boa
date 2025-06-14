@@ -14,10 +14,6 @@
                 reader.SkipUntil('\n');
                 return true;
             }
-            else if (FunctionContract.TryParseFunction(this, caller, reader, out error))
-                return true;
-            else if (error != null)
-                return false;
             else if (TryParseExpression(reader, caller, false, out var expr, out error))
             {
                 if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)

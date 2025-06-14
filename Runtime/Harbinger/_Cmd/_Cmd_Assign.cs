@@ -22,7 +22,7 @@ namespace _BOA_
                             else if (exe.harbinger.TryParseExpression(exe.reader, exe.caller, false, out var expression, out exe.error))
                             {
                                 BoaVar variable = new(varname, null);
-                                exe.caller._variables[varname] = variable;
+                                exe.caller.AddVariable(varname, variable);
                                 exe.args.Add(code);
                                 exe.args.Add(variable);
                                 exe.args.Add(expression);

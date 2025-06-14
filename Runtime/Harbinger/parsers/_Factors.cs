@@ -99,16 +99,6 @@
                         }
                         return true;
                     }
-                    else if (caller.TryGetFunction(arg, out var function))
-                    {
-                        factor = new FunctionExecutor(this, caller, function, reader);
-                        if (factor.error != null)
-                        {
-                            error ??= factor.error;
-                            return false;
-                        }
-                        return true;
-                    }
                     else if (caller.TryGetVariable(arg, out var variable))
                     {
                         factor = new VariableExecutor(this, caller, variable);
