@@ -15,7 +15,7 @@ namespace _BOA_
             error = reader.error;
 
             if (reader.error != null && reader.long_error == null)
-                reader.LocalizeError(File.ReadAllLines(script_path));
+                reader.LocalizeError(script_path, File.ReadAllLines(script_path));
 
             long_error = reader.long_error;
 
