@@ -50,10 +50,9 @@ namespace _BOA_
                     yield break;
                 }
 
-                string script_text = File.ReadAllText(script_path);
-                Harbinger harbinger = new(data => exe.Stdout(data));
+                Harbinger harbinger = new(data => exe.Stdout(data), script_path, strict_syntax);
 
-                if (!harbinger.TryRunScript(script_path, out Executor program, out string error, out string error_long, strict_syntax) || error != null)
+                if (!harbinger.TryRunScript(out Executor program, out string error, out string error_long, strict_syntax) || error != null)
                 {
                     exe.error = error_long;
                     yield break;

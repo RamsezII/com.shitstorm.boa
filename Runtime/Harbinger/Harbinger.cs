@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
 namespace _BOA_
@@ -31,6 +30,8 @@ namespace _BOA_
 
         internal static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
 
+        public readonly string script_path;
+        public readonly bool strict_syntax;
         public Action<object> stdout;
 
         //----------------------------------------------------------------------------------------------------------
@@ -43,59 +44,15 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static Contract AddContract(in Contract contract)
-        {
-            global_contracts.Add(contract.name, contract);
-            return contract;
-        }
+        public static void AddContract(in Contract contract) => global_contracts.Add(contract.name, contract);
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Harbinger(in Action<object> stdout)
+        public Harbinger(in Action<object> stdout, in string path, in bool strict_syntax = false)
         {
             this.stdout = stdout;
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        public bool TryRunScript(in string path, out Executor executor, out string error, out string error_long, in bool strict_syntax = false)
-        {
-            BoaReader reader = new(strict_syntax, File.ReadAllText(path));
-
-            if (!TryParseProgram(reader, out executor, out error) || error != null)
-            {
-                error_long = reader.LocalizeError(error, File.ReadAllLines(path));
-                return false;
-            }
-
-            error_long = null;
-            return true;
-        }
-
-        public bool TryParseProgram(in BoaReader reader, out Executor executor, out string error)
-        {
-            executor = null;
-
-            BlockExecutor program = new(this, null);
-
-            while (TryParseBlock(reader, program, out var sub_block, out error))
-                if (sub_block != null)
-                    program.stack.Add(sub_block);
-
-            if (error != null)
-                goto failure;
-
-            if (reader.TryPeekChar_out(out char peek))
-            {
-                error ??= $"could not parse '{peek}'";
-                goto failure;
-            }
-
-            executor = program;
-            return true;
-
-        failure:
-            return false;
+            script_path = path;
+            this.strict_syntax = strict_syntax;
         }
     }
 }

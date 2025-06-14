@@ -12,7 +12,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Math()
         {
-            cmd_math_ = AddContract(new("math",
+            AddContract(cmd_math_ = new("math",
                 args: static exe =>
                 {
                     if (exe.reader.TryReadArgument(out string operator_name, out exe.error))

@@ -12,7 +12,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Assign()
         {
-            cmd_assign_ = AddContract(new("assign",
+            AddContract(cmd_assign_ = new("assign",
                 args: static exe =>
                 {
                     if (exe.reader.TryReadArgument(out string varname, out exe.error, as_function_argument: false))
