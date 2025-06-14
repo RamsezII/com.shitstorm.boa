@@ -16,11 +16,11 @@ namespace _BOA_
                 {
                     if (!exe.reader.TryReadChar_match('('))
                         exe.error = "expected opening parenthesis '(' for 'while' condition";
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond, out exe.error))
+                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var cond, out exe.error))
                         exe.error ??= "expected expression for 'while' condition";
                     else if (!exe.reader.TryReadChar_match(')'))
                         exe.error = "expected closing parenthesis ')' for 'while' condition";
-                    else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block, out exe.error))
+                    else if (!exe.harbinger.TryParseBlock(exe.reader, exe.scope, out var block, out exe.error))
                         exe.error ??= "expected an instruction, or a block of instructions after 'while' condition";
                     else
                     {

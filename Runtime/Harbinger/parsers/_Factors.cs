@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseFactor(in BoaReader reader, in Executor parent, out ExpressionExecutor factor, out string error)
+        internal bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor, out string error)
         {
             factor = null;
             error = null;
@@ -27,11 +27,11 @@
                             {
                                 if (!reader.TryReadArgument(out string varname, out error, skippables: null))
                                     error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
-                                else if (!parent.TryGetVariable(varname, out var variable))
+                                else if (!scope.TryGetVariable(varname, out var variable))
                                     error ??= $"no variable named '{varname}'";
                                 else
                                 {
-                                    factor = new IncrementExecutor(this, parent, variable, code switch
+                                    factor = new IncrementExecutor(this, scope, variable, code switch
                                     {
                                         UnaryExecutor.Operators.Add => IncrementExecutor.Operators.AddBefore,
                                         UnaryExecutor.Operators.Sub => IncrementExecutor.Operators.SubBefore,
@@ -51,10 +51,10 @@
                         break;
                 }
 
-                if (TryParseFactor(reader, parent, out var sub_factor, out error))
+                if (TryParseFactor(reader, scope, out var sub_factor, out error))
                 {
 
-                    factor = new UnaryExecutor(this, parent, sub_factor, code);
+                    factor = new UnaryExecutor(this, scope, sub_factor, code);
                     return true;
                 }
                 else
@@ -66,7 +66,7 @@
 
             if (error == null)
                 if (reader.TryReadChar_match('('))
-                    if (!TryParseExpression(reader, parent, false, out factor, out error))
+                    if (!TryParseExpression(reader, scope, false, out factor, out error))
                     {
                         error ??= "expected expression inside factor parenthesis";
                         return false;
@@ -83,7 +83,7 @@
             if (error == null)
                 if (TryParseString(reader, out string str, out error))
                 {
-                    factor = new LiteralExecutor(this, parent, literal: str);
+                    factor = new LiteralExecutor(this, scope, literal: str);
                     return true;
                 }
 
@@ -91,7 +91,7 @@
                 if (reader.TryReadArgument(out string arg, out error, as_function_argument: false))
                     if (global_contracts.TryGetValue(arg, out var contract))
                     {
-                        factor = new ContractExecutor(this, parent, contract, reader);
+                        factor = new ContractExecutor(this, scope, contract, reader);
                         if (factor.error != null)
                         {
                             error = factor.error;
@@ -99,9 +99,9 @@
                         }
                         return true;
                     }
-                    else if (parent.TryGetFunction(arg, out var function))
+                    else if (scope.TryGetFunction(arg, out var function))
                     {
-                        factor = new ContractExecutor(this, function.parent, function, reader);
+                        factor = new FunctionExecutor(this, function.scope, function, reader);
                         if (factor.error != null)
                         {
                             error ??= factor.error;
@@ -109,27 +109,27 @@
                         }
                         return true;
                     }
-                    else if (parent.TryGetVariable(arg, out var variable))
+                    else if (scope.TryGetVariable(arg, out var variable))
                     {
-                        factor = new VariableExecutor(this, parent, variable);
+                        factor = new VariableExecutor(this, scope, variable);
                         return true;
                     }
                     else
                         switch (arg.ToLower())
                         {
                             case "true":
-                                factor = new LiteralExecutor(this, parent, literal: true);
+                                factor = new LiteralExecutor(this, scope, literal: true);
                                 return true;
 
                             case "false":
-                                factor = new LiteralExecutor(this, parent, literal: false);
+                                factor = new LiteralExecutor(this, scope, literal: false);
                                 return true;
 
                             default:
                                 if (int.TryParse(arg, out int _int))
-                                    factor = new LiteralExecutor(this, parent, literal: _int);
+                                    factor = new LiteralExecutor(this, scope, literal: _int);
                                 else if (Util.TryParseFloat(arg, out float _float))
-                                    factor = new LiteralExecutor(this, parent, literal: _float);
+                                    factor = new LiteralExecutor(this, scope, literal: _float);
                                 else
                                 {
                                     error ??= $"unrecognized object : '{arg}'";

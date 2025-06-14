@@ -8,7 +8,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public VariableExecutor(in Harbinger harbinger, in Executor parent, in BoaVar variable) : base(harbinger, parent)
+        public VariableExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaVar variable) : base(harbinger, scope)
         {
             this.variable = variable;
         }

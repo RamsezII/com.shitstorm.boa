@@ -5,7 +5,6 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-
         static Contract cmd_assign_;
 
         //----------------------------------------------------------------------------------------------------------
@@ -20,10 +19,10 @@ namespace _BOA_
                         if (exe.reader.TryReadArgument(out string operator_name, out exe.error, as_function_argument: false))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                                 exe.error = $"unknown operator '{operator_name}'";
-                            else if (exe.harbinger.TryParseExpression(exe.reader, exe.parent, false, out var expression, out exe.error))
+                            else if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expression, out exe.error))
                             {
                                 BoaVar variable = new(varname, null);
-                                exe._variables[varname] = variable;
+                                exe.scope._variables[varname] = variable;
                                 exe.args.Add(code);
                                 exe.args.Add(variable);
                                 exe.args.Add(expression);

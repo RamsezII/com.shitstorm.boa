@@ -18,7 +18,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public IncrementExecutor(in Harbinger harbinger, in Executor parent, in BoaVar variable, in Operators code) : base(harbinger, parent)
+        public IncrementExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaVar variable, in Operators code) : base(harbinger, scope)
         {
             this.code = code;
             this.variable = variable;

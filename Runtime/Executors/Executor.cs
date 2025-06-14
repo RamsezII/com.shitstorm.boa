@@ -7,16 +7,13 @@ namespace _BOA_
     public abstract class Executor : IDisposable
     {
         public readonly Harbinger harbinger;
-        public readonly Executor parent;
+        internal readonly ScopeNode scope;
         public string error;
         public bool disposed;
 
         static ushort _id;
         public readonly ushort id;
         public virtual string ToLog => $"{GetType().Name}[{id}]";
-
-        internal readonly Dictionary<string, BoaVar> _variables = new(StringComparer.Ordinal);
-        internal readonly Dictionary<string, DynamicContract> _functions = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -28,34 +25,14 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Executor(in Harbinger harbinger, in Executor parent)
+        internal Executor(in Harbinger harbinger, in ScopeNode scope)
         {
             id = _id.LoopID();
             this.harbinger = harbinger;
-            this.parent = parent;
+            this.scope = scope;
         }
 
         //----------------------------------------------------------------------------------------------------------
-
-        public bool TryGetVariable(string name, out BoaVar value)
-        {
-            if (_variables.TryGetValue(name, out value))
-                return true;
-            else if (parent != null && parent.TryGetVariable(name, out value))
-                return true;
-            value = null;
-            return false;
-        }
-
-        public bool TryGetFunction(string name, out DynamicContract value)
-        {
-            if (_functions.TryGetValue(name, out value))
-                return true;
-            else if (parent != null && parent.TryGetFunction(name, out value))
-                return true;
-            value = null;
-            return false;
-        }
 
         internal abstract IEnumerator<Contract.Status> EExecute();
         public static IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null, Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)

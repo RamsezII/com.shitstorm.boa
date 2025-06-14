@@ -60,9 +60,10 @@ namespace _BOA_
         public bool TryParseProgram(in BoaReader reader, out Executor executor, out string error)
         {
             executor = null;
-            BlockExecutor program = new(this, null);
 
-            while (TryParseBlock(reader, program, out var sub_block, out error))
+            BlockExecutor program = new(this, new ScopeNode(null));
+
+            while (TryParseBlock(reader, program.scope, out var sub_block, out error))
                 if (sub_block != null)
                     program.stack.Add(sub_block);
 

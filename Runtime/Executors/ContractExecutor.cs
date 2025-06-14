@@ -2,7 +2,7 @@
 
 namespace _BOA_
 {
-    public sealed class ContractExecutor : ExpressionExecutor
+    public class ContractExecutor : ExpressionExecutor
     {
         public readonly Contract contract;
         public readonly BoaReader reader;
@@ -12,7 +12,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ContractExecutor(in Harbinger harbinger, in Executor parent, in Contract contract, in BoaReader reader, in ExpressionExecutor pipe_previous = null, in bool parse_arguments = true) : base(harbinger, parent)
+        public ContractExecutor(in Harbinger harbinger, in ScopeNode scope, in Contract contract, in BoaReader reader, in ExpressionExecutor pipe_previous = null, in bool parse_arguments = true) : base(harbinger, scope)
         {
             this.contract = contract;
             this.reader = reader;
