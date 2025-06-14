@@ -14,7 +14,7 @@ namespace _BOA_
         readonly int _text_length;
 #endif
 
-        public string error;
+        public string error, long_error;
 
         //----------------------------------------------------------------------------------------------------------
 

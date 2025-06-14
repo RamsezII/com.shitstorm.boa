@@ -20,6 +20,7 @@
                 if (sep != default)
                 {
                     value = string.Empty;
+                    int start_i = reader.read_i;
 
                     while (reader.TryReadChar_out(out char c, skippables: null))
                         switch (c)
@@ -38,8 +39,13 @@
                         }
 
                     if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
+                    {
                         value = value[..err_index];
-                    reader.error ??= $"string error: expected closing quote '{sep}' after {{ {sep}{value} }}";
+                        reader.read_i = start_i + err_index;
+                    }
+
+                    reader.error ??= $"string error: expected closing quote '{sep}'";
+                    return false;
                 }
             }
 

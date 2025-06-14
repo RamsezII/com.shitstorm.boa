@@ -7,17 +7,17 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public bool TryRunScript(out Executor executor, out string error, out string long_error, bool strict_syntax)
+        public bool TryRunScript(out Executor executor, out string error, out string long_error)
         {
             BoaReader reader = new(strict_syntax, File.ReadAllText(script_path));
 
             bool success = TryParseProgram(reader, out executor);
             error = reader.error;
 
-            if (reader.error != null)
-                long_error = reader.LocalizeError(File.ReadAllLines(script_path));
-            else
-                long_error = null;
+            if (reader.error != null && reader.long_error == null)
+                reader.LocalizeError(File.ReadAllLines(script_path));
+
+            long_error = reader.long_error;
 
             return success;
         }
