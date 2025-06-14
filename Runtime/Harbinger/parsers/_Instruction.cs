@@ -14,6 +14,10 @@
                 reader.SkipUntil('\n');
                 return true;
             }
+            else if (DynamicContract.TryParseFunction(this, parent, reader, out _, out error))
+                return true;
+            else if (error != null)
+                return false;
             else if (TryParseExpression(reader, parent, false, out var expr, out error))
             {
                 if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)

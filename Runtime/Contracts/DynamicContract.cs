@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace _BOA_
 {
-    internal class DynamicContract : Contract
+    public class DynamicContract : Contract
     {
         DynamicContract(in string name,
             in int args_count,
@@ -21,11 +21,18 @@ namespace _BOA_
         {
         }
 
-        public static bool TryParseFunction(in Harbinger harbinger, in Executor parent, in BoaReader reader, out DynamicContract dynamic_contract, out string error)
+        internal static bool TryParseFunction(in Harbinger harbinger, in Executor parent, in BoaReader reader, out DynamicContract dynamic_contract, out string error)
         {
             dynamic_contract = null;
+            error = null;
+            int read_old = reader.read_i;
 
-            if (!reader.TryReadArgument(out string func_name, out error))
+            if (!reader.TryReadString_match("func"))
+            {
+                reader.read_i = read_old;
+                return false;
+            }
+            else if (!reader.TryReadArgument(out string func_name, out error))
                 error ??= $"please specify a name for your function";
             else
             {
@@ -48,7 +55,7 @@ namespace _BOA_
 
                 if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')'))
                 {
-                    error ??= $"function declaration expected opening parenthesis '('";
+                    error ??= $"function declaration expected closing parenthesis ')'";
                     return false;
                 }
 

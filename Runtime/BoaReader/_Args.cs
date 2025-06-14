@@ -26,8 +26,9 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadMatch(out string value, string match) => TryReadMatch(out value, true, _empties_, match);
-        public bool TryReadMatch(out string value, in bool ignore_case, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
+        public bool TryReadString_match(in string match) => TryReadString_matches_out(out _, true, matches: match);
+        public bool TryReadString_match_out(out string value, string match) => TryReadString_matches_out(out value, true, _empties_, match);
+        public bool TryReadString_matches_out(out string value, in bool ignore_case, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;

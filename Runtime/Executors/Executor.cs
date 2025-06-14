@@ -16,6 +16,7 @@ namespace _BOA_
         public virtual string toLog => GetType().Name;
 
         internal readonly Dictionary<string, BoaVar> _variables = new(StringComparer.Ordinal);
+        internal readonly Dictionary<string, DynamicContract> _functions = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -41,6 +42,16 @@ namespace _BOA_
             if (_variables.TryGetValue(name, out value))
                 return true;
             else if (parent != null && parent.TryGetVariable(name, out value))
+                return true;
+            value = null;
+            return false;
+        }
+
+        public bool TryGetFunction(string name, out DynamicContract value)
+        {
+            if (_functions.TryGetValue(name, out value))
+                return true;
+            else if (parent != null && parent.TryGetFunction(name, out value))
                 return true;
             value = null;
             return false;

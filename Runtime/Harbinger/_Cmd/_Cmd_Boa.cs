@@ -53,47 +53,53 @@ namespace _BOA_
                 string script_text = File.ReadAllText(script_path);
                 Harbinger harbinger = new(data => exe.Stdout(data));
                 BoaReader reader = new(strict_syntax, script_text);
-                using Executor program = harbinger.ParseProgram(reader, out string error);
 
-                if (error != null)
+                if (!harbinger.TryParseProgram(reader, out Executor program, out string error) || error != null)
                 {
                     exe.error = reader.LocalizeError(error, File.ReadAllLines(script_path));
                     yield break;
                 }
 
-                var routine = program.EExecute();
-
-                CMD_STATUS last_status = default;
-                while (true)
+                try
                 {
-                    harbinger.shell_sig_mask = exe.line.flags;
+                    var routine = program.EExecute();
 
-                    if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
-                        if (!exe.line.TryReadAll(out harbinger.shell_stdin))
-                            harbinger.shell_stdin = null;
-
-                    if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                    CMD_STATUS last_status = default;
+                    while (true)
                     {
-                    before_movenext:
-                        if (routine.MoveNext())
-                            switch (routine.Current.state)
-                            {
-                                case Contract.Status.States.WAIT_FOR_STDIN:
-                                    yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
-                                    break;
+                        harbinger.shell_sig_mask = exe.line.flags;
 
-                                case Contract.Status.States.ACTION_skip:
-                                    goto before_movenext;
+                        if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
+                            if (!exe.line.TryReadAll(out harbinger.shell_stdin))
+                                harbinger.shell_stdin = null;
 
-                                default:
-                                    yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
-                                    break;
-                            }
+                        if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                        {
+                        before_movenext:
+                            if (routine.MoveNext())
+                                switch (routine.Current.state)
+                                {
+                                    case Contract.Status.States.WAIT_FOR_STDIN:
+                                        yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                                        break;
+
+                                    case Contract.Status.States.ACTION_skip:
+                                        goto before_movenext;
+
+                                    default:
+                                        yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
+                                        break;
+                                }
+                            else
+                                yield break;
+                        }
                         else
-                            yield break;
+                            yield return last_status;
                     }
-                    else
-                        yield return last_status;
+                }
+                finally
+                {
+                    program.Dispose();
                 }
             }
         }

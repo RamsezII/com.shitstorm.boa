@@ -9,7 +9,7 @@
 
             if (reader.TryReadArgument(out string varname, out error, as_function_argument: false))
                 if (parent.TryGetVariable(varname, out var variable))
-                    if (reader.TryReadMatch(out string op_name, true, skippables: BoaReader._empties_, stoppers: " \n\r{}(),;'\"", "=", "+=", "-=", "*=", "/="))
+                    if (reader.TryReadString_matches_out(out string op_name, true, skippables: BoaReader._empties_, stoppers: " \n\r{}(),;'\"", "=", "+=", "-=", "*=", "/="))
                     {
                         OperatorsM code = op_name switch
                         {

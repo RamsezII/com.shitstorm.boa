@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace _BOA_
+﻿namespace _BOA_
 {
     partial class Harbinger
     {
@@ -28,10 +26,7 @@ namespace _BOA_
             }
             else if (TryParseInstruction(reader, parent, true, out block, out error))
                 return true;
-            else if (reader.TryPeekChar_out(out char peek) && !BoaReader._empties_.Contains(peek, StringComparison.OrdinalIgnoreCase))
-                error ??= $"could not parse '{peek}'";
 
-            block = null;
             return false;
         }
     }

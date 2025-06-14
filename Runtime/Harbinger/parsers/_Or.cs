@@ -6,7 +6,7 @@
         {
             expression = null;
             if (TryParseAnd(reader, parent, out var or1, out error))
-                if (reader.TryReadMatch(out string op_name, "or"))
+                if (reader.TryReadString_match_out(out string op_name, "or"))
                 {
                     if (TryParseAnd(reader, parent, out var or2, out error))
                     {

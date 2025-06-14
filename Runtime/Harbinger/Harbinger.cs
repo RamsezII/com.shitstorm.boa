@@ -57,15 +57,26 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Executor ParseProgram(in BoaReader reader, out string error)
+        public bool TryParseProgram(in BoaReader reader, out Executor executor, out string error)
         {
+            executor = null;
             BlockExecutor program = new(this, null);
 
-            while (TryParseBlock(reader, program, out var block, out error))
-                if (block != null)
-                    program.stack.Add(block);
+            while (TryParseBlock(reader, program, out var sub_block, out error))
+                if (sub_block != null)
+                    program.stack.Add(sub_block);
 
-            return program;
+            if (error != null)
+                return false;
+
+            if (reader.TryPeekChar_out(out char peek))
+            {
+                error ??= $"could not parse '{peek}'";
+                return false;
+            }
+
+            executor = program;
+            return true;
         }
     }
 }
