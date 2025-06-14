@@ -52,11 +52,10 @@ namespace _BOA_
 
                 string script_text = File.ReadAllText(script_path);
                 Harbinger harbinger = new(data => exe.Stdout(data));
-                BoaReader reader = new(strict_syntax, script_text);
 
-                if (!harbinger.TryParseProgram(reader, out Executor program, out string error) || error != null)
+                if (!harbinger.TryRunScript(script_path, out Executor program, out string error, out string error_long, strict_syntax) || error != null)
                 {
-                    exe.error = reader.LocalizeError(error, File.ReadAllLines(script_path));
+                    exe.error = error_long;
                     yield break;
                 }
 
