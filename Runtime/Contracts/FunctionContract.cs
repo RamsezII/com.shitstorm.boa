@@ -30,6 +30,7 @@ namespace _BOA_
                   )
         {
             this.caller = caller;
+            this.text = text;
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -87,7 +88,17 @@ namespace _BOA_
                 args_count: args_names.Count,
                 args: exe =>
                 {
-                    BoaReader reader = new BoaReader(caller.harbinger.strict_syntax, function.text);
+                    for (int i = 0; i < args_names.Count; i++)
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe.caller, true, out var expr))
+                            exe._variables.Add(args_names[i], new BoaVariable(expr));
+
+                    exe.args.Add(null);
+                    var reader = new BoaReader(caller.harbinger.strict_syntax, function.text);
+
+                    if (exe.harbinger.TryParseBlock(reader, caller, out var block))
+                        exe.args.Add(block);
+                    else
+                        exe.error ??= reader.error;
                 },
                 routine: ERoutine);
 
@@ -98,9 +109,25 @@ namespace _BOA_
         failure:
             return false;
 
-            IEnumerator<Status> ERoutine(Executor executor)
+            IEnumerator<Status> ERoutine(ContractExecutor exe)
             {
-                yield break;
+                for (int i = 0; i < args_names.Count; i++)
+                {
+                    string arg_name = args_names[i];
+                    BoaVariable bvar = exe._variables.Get(arg_name);
+                    ExpressionExecutor expr = (ExpressionExecutor)bvar.value;
+
+                    var expr_routine = expr.EExecute();
+                    while (expr_routine.MoveNext())
+                        yield return expr_routine.Current;
+
+                    bvar.value = expr_routine.Current.data;
+                }
+
+                ExpressionExecutor block = (ExpressionExecutor)exe.args[1];
+                var block_routine = block.EExecute();
+                while (block_routine.MoveNext())
+                    yield return block_routine.Current;
             }
         }
     }

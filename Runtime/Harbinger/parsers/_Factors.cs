@@ -88,7 +88,17 @@
 
             if (reader.error == null)
                 if (reader.TryReadArgument(out string arg, false))
-                    if (global_contracts.TryGetValue(arg, out var contract))
+                    if (caller._functions.TryGet(arg, out var func))
+                    {
+                        factor = new ContractExecutor(this, caller, func, reader);
+                        if (factor.error != null)
+                        {
+                            reader.error = factor.error;
+                            return false;
+                        }
+                        return true;
+                    }
+                    else if (global_contracts.TryGetValue(arg, out var contract))
                     {
                         factor = new ContractExecutor(this, caller, contract, reader);
                         if (factor.error != null)

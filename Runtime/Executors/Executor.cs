@@ -21,6 +21,7 @@ namespace _BOA_
             //----------------------------------------------------------------------------------------------------------
 
             public void Add(in string name, in T value) => (_variables ??= new(StringComparer.Ordinal))[name] = value;
+            public T Get(in string name) => _variables[name];
             public bool TryGet(string name, out T value)
             {
                 if (_variables != null && _variables.TryGetValue(name, out value))

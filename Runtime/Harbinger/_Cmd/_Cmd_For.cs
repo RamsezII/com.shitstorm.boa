@@ -16,22 +16,22 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar_match('('))
-                        exe.reader.error ??= "expected '(' at the beginning of 'for' instruction";
+                        exe.error ??= "expected '(' at the beginning of 'for' instruction";
                     else if (!exe.harbinger.TryParseInstruction(exe.reader, exe, true, out var instr_init))
-                        exe.reader.error ??= "expected instruction after '(' in 'for' instruction";
+                        exe.error ??= "expected instruction after '(' in 'for' instruction";
                     else
                     {
                         if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
-                            exe.reader.error ??= "expected expression after first instruction in 'for' instruction";
+                            exe.error ??= "expected expression after first instruction in 'for' instruction";
                         else
                         {
                             exe.reader.TryReadChar_match(';');
                             if (!exe.harbinger.TryParseInstruction(exe.reader, exe, false, out var instr_loop))
-                                exe.reader.error ??= "expected instruction after second expression in 'for' instruction";
+                                exe.error ??= "expected instruction after second expression in 'for' instruction";
                             else if (!exe.reader.TryReadChar_match(')'))
-                                exe.reader.error ??= "expected ')' at the end of 'for' instruction";
+                                exe.error ??= "expected ')' at the end of 'for' instruction";
                             else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block))
-                                exe.reader.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
+                                exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
                             else
                             {
                                 exe.args.Add(instr_init);
