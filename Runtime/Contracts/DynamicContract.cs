@@ -5,7 +5,11 @@ namespace _BOA_
 {
     public class DynamicContract : Contract
     {
-        DynamicContract(in string name,
+        internal readonly Executor parent;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        DynamicContract(in string name, in Executor parent,
             in int args_count,
             in Action<ContractExecutor> args,
             in Func<ContractExecutor, IEnumerator<Status>> routine
@@ -19,11 +23,11 @@ namespace _BOA_
                   args: args,
                   routine: routine)
         {
+            this.parent = parent;
         }
 
-        internal static bool TryParseFunction(in Harbinger harbinger, in Executor parent, in BoaReader reader, out DynamicContract dynamic_contract, out string error)
+        internal static bool TryParseFunction(in Harbinger harbinger, in Executor parent, in BoaReader reader, out string error)
         {
-            dynamic_contract = null;
             error = null;
             int read_old = reader.read_i;
 
@@ -45,10 +49,10 @@ namespace _BOA_
                     return false;
                 }
 
-                List<string> args = new();
+                List<string> args_names = new();
 
                 while (reader.TryReadArgument(out string arg_name, out error, as_function_argument: true) && error == null)
-                    args.Add(arg_name);
+                    args_names.Add(arg_name);
 
                 if (error != null)
                     return false;
@@ -59,25 +63,36 @@ namespace _BOA_
                     return false;
                 }
 
-                if (!harbinger.TryParseBlock(reader, parent, out var block, out error))
+                Executor function_body = null;
+                var function = new DynamicContract(func_name, parent, args_names.Count, args_names.Count > 0 ? ReadArgs : null, ERoutine);
+
+                var executor = new ContractExecutor(harbinger, parent, function, reader, parse_arguments: false);
+                for (int i = 0; i < args_names.Count; ++i)
+                {
+                    string arg_name = args_names[i];
+                    executor._variables[arg_name] = new BoaVar(arg_name, null);
+                }
+
+                if (!harbinger.TryParseBlock(reader, executor, out function_body, out error))
                 {
                     error ??= $"could not parse body for function '{func_name}'";
                     return false;
                 }
 
-                dynamic_contract = new DynamicContract(func_name, args.Count, args.Count > 0 ? ReadArgs : null, ERoutine);
+                parent._functions[func_name] = function;
+
                 return true;
 
                 void ReadArgs(ContractExecutor exe)
                 {
-                    for (int i = 0; i < args.Count; ++i)
+                    for (int i = 0; i < args_names.Count; ++i)
                     {
-                        string arg_name = args[i];
-                        exe._variables[arg_name] = new(arg_name);
+                        string arg_name = args_names[i];
+                        var variable = exe._variables[arg_name] = new(arg_name, null);
 
                         if (i == 0 && exe.pipe_previous != null)
-                            continue;
-                        
+                            exe.args.Add(null);
+
                         if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr, out exe.error))
                             exe.args.Add(expr);
                         else
@@ -90,17 +105,21 @@ namespace _BOA_
 
                 IEnumerator<Status> ERoutine(ContractExecutor exe)
                 {
-                    for (int i = 0; i < args.Count; ++i)
+                    for (int i = 0; i < args_names.Count; ++i)
                     {
-                        string arg_name = args[i];
+                        string arg_name = args_names[i];
                         ExpressionExecutor expr = (ExpressionExecutor)exe.args[i];
 
-                        var routine = expr.EExecute();
-                        while (routine.MoveNext())
-                            yield return routine.Current;
+                        var expr_routine = expr.EExecute();
+                        while (expr_routine.MoveNext())
+                            yield return expr_routine.Current;
 
-                        exe._variables[arg_name] = new BoaVar(arg_name, routine.Current.data);
+                        function_body._variables[arg_name] = new BoaVar(arg_name, expr_routine.Current.data);
                     }
+
+                    var block_routine = function_body.EExecute();
+                    while (block_routine.MoveNext())
+                        yield return block_routine.Current;
                 }
             }
 

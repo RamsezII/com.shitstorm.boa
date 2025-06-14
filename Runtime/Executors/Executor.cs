@@ -13,7 +13,7 @@ namespace _BOA_
 
         static ushort _id;
         public readonly ushort id;
-        public virtual string toLog => GetType().Name;
+        public virtual string ToLog => $"{GetType().Name}[{id}]";
 
         internal readonly Dictionary<string, BoaVar> _variables = new(StringComparer.Ordinal);
         internal readonly Dictionary<string, DynamicContract> _functions = new(StringComparer.Ordinal);

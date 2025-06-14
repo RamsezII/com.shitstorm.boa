@@ -12,8 +12,9 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (exe.pipe_previous == null)
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe.parent, true, out var expr, out exe.error))
-                            exe.args.Add(expr);
+                        exe.args.Add(null);
+                    else if (exe.harbinger.TryParseExpression(exe.reader, exe.parent, true, out var expr, out exe.error))
+                        exe.args.Add(expr);
                 },
                 routine: static exe =>
                 {

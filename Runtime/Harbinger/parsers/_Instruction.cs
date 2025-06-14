@@ -14,7 +14,7 @@
                 reader.SkipUntil('\n');
                 return true;
             }
-            else if (DynamicContract.TryParseFunction(this, parent, reader, out _, out error))
+            else if (DynamicContract.TryParseFunction(this, parent, reader, out error))
                 return true;
             else if (error != null)
                 return false;

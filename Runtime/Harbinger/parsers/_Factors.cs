@@ -73,7 +73,7 @@
                     }
                     else if (!reader.TryReadChar_match(')'))
                     {
-                        error ??= $"expected closing parenthesis ')' after factor {factor.toLog}";
+                        error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
                         --reader.read_i;
                         return false;
                     }
@@ -95,6 +95,16 @@
                         if (factor.error != null)
                         {
                             error = factor.error;
+                            return false;
+                        }
+                        return true;
+                    }
+                    else if (parent.TryGetFunction(arg, out var function))
+                    {
+                        factor = new ContractExecutor(this, function.parent, function, reader);
+                        if (factor.error != null)
+                        {
+                            error ??= factor.error;
                             return false;
                         }
                         return true;

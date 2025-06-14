@@ -7,7 +7,7 @@
 
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaVar(in string name, in object value = default)
+        public BoaVar(in string name, in object value)
         {
             this.name = name;
             this.value = value;
