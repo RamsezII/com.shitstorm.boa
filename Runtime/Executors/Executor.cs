@@ -8,6 +8,7 @@ namespace _BOA_
     {
         public readonly Harbinger harbinger;
         internal Executor caller;
+        public readonly ScopeNode scope;
         public string error;
         public bool disposed;
 
@@ -33,6 +34,7 @@ namespace _BOA_
             id = _id.LoopID();
             this.harbinger = harbinger;
             this.caller = caller;
+            scope = caller.scope ?? new ScopeNode(null);
         }
 
         //----------------------------------------------------------------------------------------------------------
