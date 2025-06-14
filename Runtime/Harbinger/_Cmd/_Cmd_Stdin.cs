@@ -31,7 +31,7 @@ namespace _BOA_
                 Contract.Status status_last = new(Contract.Status.States.WAIT_FOR_STDIN, prefixe: prefixe);
 
                 string stdin;
-                while (!Util.TryPullValue(ref exe.harbinger.shell_stdin, out stdin))
+                while (!exe.harbinger.TryPullStdin(out stdin))
                     yield return status_last;
 
                 yield return new(Contract.Status.States.ACTION_skip, data: stdin);

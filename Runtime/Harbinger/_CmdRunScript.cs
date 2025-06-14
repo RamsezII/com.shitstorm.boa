@@ -9,7 +9,6 @@ namespace _BOA_
     partial class Harbinger
     {
         public SIG_FLAGS shell_sig_mask;
-        public string shell_stdin;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -20,8 +19,9 @@ namespace _BOA_
                 flag_strict = "--strict-syntax";
 
             Command.static_domain.AddRoutine(
-                "run-boa-script",
+                "run-script",
                 min_args: 1,
+                max_args: 10,
                 opts: static exe =>
                 {
                     if (exe.line.TryRead_one_flag(exe, flag_strict))
@@ -30,7 +30,14 @@ namespace _BOA_
                 args: exe =>
                 {
                     if (exe.line.TryReadArgument(out string script_path, out _, strict: true, path_mode: FS_TYPES.FILE))
+                    {
                         exe.args.Add(script_path);
+                        while (exe.line.TryReadArgument(out string arg, out _, lint: false))
+                        {
+                            exe.line.LintToThisPosition(Color.white);
+                            exe.args.Add(arg);
+                        }
+                    }
                 },
                 routine: ERunScript);
 
@@ -50,7 +57,7 @@ namespace _BOA_
                     yield break;
                 }
 
-                Harbinger harbinger = new(data => exe.Stdout(data), script_path, strict_syntax);
+                Harbinger harbinger = new(null, data => exe.Stdout(data), script_path, strict_syntax);
 
                 if (!harbinger.TryRunScript(out Executor program, out string error, out string error_long) || error != null)
                 {
@@ -70,6 +77,8 @@ namespace _BOA_
                         if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
                             if (!exe.line.TryReadAll(out harbinger.shell_stdin))
                                 harbinger.shell_stdin = null;
+                            else
+                                ;
 
                         if (exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                         {
