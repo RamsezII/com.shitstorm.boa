@@ -2,48 +2,46 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseExpression(in BoaReader reader, in Executor caller, in bool as_function_argument, out ExpressionExecutor expression, out string error)
+        internal bool TryParseExpression(in BoaReader reader, in Executor caller, in bool as_function_argument, out ExpressionExecutor expression)
         {
-            if (TryParseAssignation(reader, caller, out expression, out error) || error == null && TryParseOr(reader, caller, out expression, out error))
+            if (TryParseAssignation(reader, caller, out expression) || reader.error == null && TryParseOr(reader, caller, out expression))
             {
                 if (as_function_argument && reader.strict_syntax && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
                 {
-                    error ??= $"expected ',' or ')' after expression";
+                    reader.error ??= $"expected ',' or ')' after expression";
                     if (expression is ContractExecutor cont)
-                        error += $" ('{cont.contract.name}')";
+                        reader.error += $" ('{cont.contract.name}')";
                     else
-                        error += $" ('{expression.GetType()}')";
+                        reader.error += $" ('{expression.GetType()}')";
                 }
-                else if (TryPipe(reader, caller, ref expression, out error))
+                else if (TryPipe(reader, caller, ref expression))
                     return true;
             }
             return false;
         }
 
-        bool TryPipe(in BoaReader reader, in Executor caller, ref ExpressionExecutor expression, out string error)
+        bool TryPipe(in BoaReader reader, in Executor caller, ref ExpressionExecutor expression)
         {
-            error = null;
-
             if (!reader.TryReadChar_match('|'))
                 return true;
-            else if (!reader.TryReadArgument(out string pipe_cont_name, out error, as_function_argument: false))
-                error ??= $"expected command after pipe operator '|'";
+            else if (!reader.TryReadArgument(out string pipe_cont_name, as_function_argument: false))
+                reader.error ??= $"expected command after pipe operator '|'";
             else if (!global_contracts.TryGetValue(pipe_cont_name, out var pipe_cont))
-                error ??= $"can not find command with name '{pipe_cont_name}'";
+                reader.error ??= $"can not find command with name '{pipe_cont_name}'";
             else
             {
                 expression.pipe_next = new ContractExecutor(this, caller, pipe_cont, reader, pipe_previous: expression);
                 if (expression.pipe_next.error != null)
                 {
-                    error ??= expression.pipe_next.error;
+                    reader.error ??= expression.pipe_next.error;
                     return false;
                 }
 
                 expression = new PipeExecutor(this, caller, expression, expression.pipe_next);
 
-                if (!TryPipe(reader, caller, ref expression, out error) || error != null)
+                if (!TryPipe(reader, caller, ref expression) || reader.error != null)
                 {
-                    error ??= $"could not parse pipe statement";
+                    reader.error ??= $"could not parse pipe statement";
                     return false;
                 }
 

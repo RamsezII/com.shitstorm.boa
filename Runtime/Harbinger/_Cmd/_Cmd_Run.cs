@@ -11,7 +11,7 @@ namespace _BOA_
                 max_args: 10,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string path, out exe.error))
+                    if (exe.reader.TryReadArgument(out string path, true))
                         ;
                 },
                 routine: static exe =>

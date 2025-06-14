@@ -20,10 +20,7 @@
             }
 
             if (read_i > read_old)
-            {
                 read_i = read_old;
-                return true;
-            }
 
             return false;
         }

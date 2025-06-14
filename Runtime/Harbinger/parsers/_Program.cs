@@ -7,36 +7,37 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public bool TryRunScript(out Executor executor, out string error, out string error_long, bool strict_syntax)
+        public bool TryRunScript(out Executor executor, out string error, out string long_error, bool strict_syntax)
         {
             BoaReader reader = new(strict_syntax, File.ReadAllText(script_path));
 
-            if (!TryParseProgram(reader, out executor, out error) || error != null)
-            {
-                error_long = reader.LocalizeError(error, File.ReadAllLines(script_path));
-                return false;
-            }
+            bool success = TryParseProgram(reader, out executor);
+            error = reader.error;
 
-            error_long = null;
-            return true;
+            if (reader.error != null)
+                long_error = reader.LocalizeError(File.ReadAllLines(script_path));
+            else
+                long_error = null;
+
+            return success;
         }
 
-        public bool TryParseProgram(in BoaReader reader, out Executor executor, out string error)
+        public bool TryParseProgram(in BoaReader reader, out Executor executor)
         {
             executor = null;
 
             BlockExecutor program = new(this, null);
 
-            while (TryParseBlock(reader, program, out var sub_block, out error))
+            while (TryParseBlock(reader, program, out var sub_block))
                 if (sub_block != null)
                     program.stack.Add(sub_block);
 
-            if (error != null)
+            if (reader.error != null)
                 goto failure;
 
             if (reader.TryPeekChar_out(out char peek))
             {
-                error ??= $"could not parse '{peek}'";
+                reader.error ??= $"could not parse everything ({nameof(peek)}: '{peek}')";
                 goto failure;
             }
 

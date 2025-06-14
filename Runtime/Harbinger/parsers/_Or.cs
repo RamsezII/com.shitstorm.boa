@@ -2,13 +2,13 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseOr(in BoaReader reader, in Executor caller, out ExpressionExecutor expression, out string error)
+        internal bool TryParseOr(in BoaReader reader, in Executor caller, out ExpressionExecutor expression)
         {
             expression = null;
-            if (TryParseAnd(reader, caller, out var or1, out error))
-                if (reader.TryReadString_match_out(out string op_name, "or"))
+            if (TryParseAnd(reader, caller, out var or1))
+                if (reader.TryReadString_matches_out(out string op_name, true, false, matches: "or"))
                 {
-                    if (TryParseAnd(reader, caller, out var or2, out error))
+                    if (TryParseAnd(reader, caller, out var or2))
                     {
                         ContractExecutor exe = new(this, caller, cmd_math_, reader, parse_arguments: false);
                         exe.args.Add(OperatorsM.or);
@@ -19,7 +19,7 @@
                     }
                     else
                     {
-                        error ??= $"expected right operand for '{op_name}' operator";
+                        reader.error ??= $"expected expression after '{op_name}' operator";
                         return false;
                     }
                 }

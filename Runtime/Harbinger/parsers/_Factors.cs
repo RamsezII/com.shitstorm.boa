@@ -2,10 +2,9 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseFactor(in BoaReader reader, in Executor caller, out ExpressionExecutor factor, out string error)
+        internal bool TryParseFactor(in BoaReader reader, in Executor caller, out ExpressionExecutor factor)
         {
             factor = null;
-            error = null;
 
             if (reader.TryReadChar_match_out(out char unary_operator, true, "+-!"))
             {
@@ -25,10 +24,10 @@
                             int read_old = reader.read_i;
                             if (reader.TryReadChar_match(unary_operator, skippables: null))
                             {
-                                if (!reader.TryReadArgument(out string varname, out error, skippables: null))
-                                    error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
-                                else if (!caller.TryGetVariable(varname, out var variable))
-                                    error ??= $"no variable named '{varname}'";
+                                if (!reader.TryReadArgument(out string varname, false, skippables: null))
+                                    reader.error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
+                                else if (!caller._variables.TryGet(varname, out var variable))
+                                    reader.error ??= $"no variable named '{varname}'";
                                 else
                                 {
                                     factor = new IncrementExecutor(this, caller, variable, code switch
@@ -39,7 +38,7 @@
                                     });
                                     if (factor.error != null)
                                     {
-                                        error = factor.error;
+                                        reader.error = factor.error;
                                         return false;
                                     }
                                     return true;
@@ -51,7 +50,7 @@
                         break;
                 }
 
-                if (TryParseFactor(reader, caller, out var sub_factor, out error))
+                if (TryParseFactor(reader, caller, out var sub_factor))
                 {
 
                     factor = new UnaryExecutor(this, caller, sub_factor, code);
@@ -59,47 +58,47 @@
                 }
                 else
                 {
-                    error ??= $"expected factor after '{unary_operator}'";
+                    reader.error ??= $"expected factor after '{unary_operator}'";
                     return false;
                 }
             }
 
-            if (error == null)
+            if (reader.error == null)
                 if (reader.TryReadChar_match('('))
-                    if (!TryParseExpression(reader, caller, false, out factor, out error))
+                    if (!TryParseExpression(reader, caller, false, out factor))
                     {
-                        error ??= "expected expression inside factor parenthesis";
+                        reader.error ??= "expected expression inside factor parenthesis";
                         return false;
                     }
                     else if (!reader.TryReadChar_match(')'))
                     {
-                        error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
+                        reader.error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
                         --reader.read_i;
                         return false;
                     }
                     else
                         return true;
 
-            if (error == null)
-                if (TryParseString(reader, out string str, out error))
+            if (reader.error == null)
+                if (TryParseString(reader, out string str))
                 {
                     factor = new LiteralExecutor(this, caller, literal: str);
                     return true;
                 }
 
-            if (error == null)
-                if (reader.TryReadArgument(out string arg, out error, as_function_argument: false))
+            if (reader.error == null)
+                if (reader.TryReadArgument(out string arg, false))
                     if (global_contracts.TryGetValue(arg, out var contract))
                     {
                         factor = new ContractExecutor(this, caller, contract, reader);
                         if (factor.error != null)
                         {
-                            error = factor.error;
+                            reader.error = factor.error;
                             return false;
                         }
                         return true;
                     }
-                    else if (caller.TryGetVariable(arg, out var variable))
+                    else if (caller._variables.TryGet(arg, out var variable))
                     {
                         factor = new VariableExecutor(this, caller, variable);
                         return true;
@@ -122,7 +121,7 @@
                                     factor = new LiteralExecutor(this, caller, literal: _float);
                                 else
                                 {
-                                    error ??= $"unrecognized object : '{arg}'";
+                                    reader.error ??= $"unrecognized object : '{arg}'";
                                     return false;
                                 }
                                 return true;

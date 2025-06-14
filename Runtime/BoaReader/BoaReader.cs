@@ -14,6 +14,8 @@ namespace _BOA_
         readonly int _text_length;
 #endif
 
+        public string error;
+
         //----------------------------------------------------------------------------------------------------------
 
         public BoaReader(in bool strict_syntax, in string text, in int read_i = 0)

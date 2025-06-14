@@ -2,7 +2,7 @@ namespace _BOA_
 {
     partial class BoaReader
     {
-        public string LocalizeError(in string error, in string[] lines)
+        public string LocalizeError(in string[] lines)
         {
             int char_count = 0;
             int eol_lenth = Util.is_windows ? 2 : 1;

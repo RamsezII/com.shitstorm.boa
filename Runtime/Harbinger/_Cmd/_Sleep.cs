@@ -12,7 +12,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr, out exe.error))
+                    if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
                         exe.args.Add(expr);
                 },
                 routine: ESleep));

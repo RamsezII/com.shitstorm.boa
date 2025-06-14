@@ -2,10 +2,10 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseComparison(in BoaReader reader, in Executor caller, out ExpressionExecutor expression, out string error)
+        internal bool TryParseComparison(in BoaReader reader, in Executor caller, out ExpressionExecutor expression)
         {
             expression = null;
-            if (TryParseAddSub(reader, caller, out var addsub1, out error))
+            if (TryParseAddSub(reader, caller, out var addsub1))
             {
                 if (reader.TryReadChar_match_out(out char op_char, true, "<>="))
                 {
@@ -17,10 +17,10 @@
                         _ => 0,
                     };
 
-                    if (reader.TryReadChar_match('=') && code != 0)
+                    if (reader.TryReadChar_match('=', skippables: null) && code != 0)
                         code |= OperatorsM.eq;
 
-                    if (TryParseAddSub(reader, caller, out var addsub2, out error))
+                    if (TryParseAddSub(reader, caller, out var addsub2))
                     {
                         ContractExecutor exe = new(this, caller, cmd_math_, reader, parse_arguments: false);
                         exe.args.Add(code);
@@ -31,7 +31,7 @@
                     }
                     else
                     {
-                        error ??= $"expected comparison after '{op_char}' operator";
+                        reader.error ??= $"expected expression after '{op_char}' operator";
                         return false;
                     }
                 }

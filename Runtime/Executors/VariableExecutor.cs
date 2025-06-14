@@ -4,11 +4,11 @@ namespace _BOA_
 {
     public class VariableExecutor : ExpressionExecutor
     {
-        internal readonly BoaVar variable;
+        internal readonly BoaVariable variable;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public VariableExecutor(in Harbinger harbinger, in Executor caller, in BoaVar variable) : base(harbinger, caller)
+        public VariableExecutor(in Harbinger harbinger, in Executor caller, in BoaVariable variable) : base(harbinger, caller)
         {
             this.variable = variable;
         }

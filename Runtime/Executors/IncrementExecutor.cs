@@ -14,11 +14,11 @@ namespace _BOA_
         }
 
         readonly Operators code;
-        readonly BoaVar variable;
+        readonly BoaVariable variable;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public IncrementExecutor(in Harbinger harbinger, in Executor caller, in BoaVar variable, in Operators code) : base(harbinger, caller)
+        public IncrementExecutor(in Harbinger harbinger, in Executor caller, in BoaVariable variable, in Operators code) : base(harbinger, caller)
         {
             this.code = code;
             this.variable = variable;

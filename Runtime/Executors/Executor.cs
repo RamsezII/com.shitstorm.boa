@@ -6,6 +6,32 @@ namespace _BOA_
 {
     public abstract class Executor : IDisposable
     {
+        sealed internal class BoaDict<T>
+        {
+            readonly BoaDict<T> parent;
+            Dictionary<string, T> _variables;
+
+            //----------------------------------------------------------------------------------------------------------
+
+            internal BoaDict(in BoaDict<T> parent)
+            {
+                this.parent = parent;
+            }
+
+            //----------------------------------------------------------------------------------------------------------
+
+            public void Add(in string name, in T value) => (_variables ??= new(StringComparer.Ordinal))[name] = value;
+            public bool TryGet(string name, out T value)
+            {
+                if (_variables != null && _variables.TryGetValue(name, out value))
+                    return true;
+                else if (parent != null && parent != this && parent.TryGet(name, out value))
+                    return true;
+                value = default;
+                return false;
+            }
+        }
+
         public readonly Harbinger harbinger;
         internal Executor caller;
         public string error;
@@ -15,7 +41,8 @@ namespace _BOA_
         public readonly ushort id;
         public virtual string ToLog => $"{GetType().Name}[{id}]";
 
-        Dictionary<string, BoaVar> _variables;
+        internal readonly BoaDict<BoaVariable> _variables;
+        internal readonly BoaDict<FunctionContract> _functions;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -27,25 +54,18 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal Executor(in Harbinger harbinger, in Executor caller)
+        protected Executor(in Harbinger harbinger, in Executor caller)
         {
             id = _id.LoopID();
+
             this.harbinger = harbinger;
             this.caller = caller;
+
+            _variables = new(caller?._variables);
+            _functions = new(caller?._functions);
         }
 
         //----------------------------------------------------------------------------------------------------------
-
-        public void AddVariable(in string name, in BoaVar value) => (_variables ??= new(StringComparer.Ordinal))[name] = value;
-        public bool TryGetVariable(string name, out BoaVar value)
-        {
-            if (_variables != null && _variables.TryGetValue(name, out value))
-                return true;
-            else if (caller != null && caller != this && caller.TryGetVariable(name, out value))
-                return true;
-            value = null;
-            return false;
-        }
 
         internal abstract IEnumerator<Contract.Status> EExecute();
         public static IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null, Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)

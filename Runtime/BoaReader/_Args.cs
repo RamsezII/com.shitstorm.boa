@@ -4,7 +4,7 @@ namespace _BOA_
 {
     partial class BoaReader
     {
-        public bool TryReadArgument(out string argument, out string error, in string skippables = _empties_, in string stoppers = _stoppers_, in bool as_function_argument = true)
+        public bool TryReadArgument(out string argument, in bool as_function_argument, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
             int read_old = read_i;
 
@@ -26,9 +26,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadString_match(in string match) => TryReadString_matches_out(out _, true, matches: match);
-        public bool TryReadString_match_out(out string value, string match) => TryReadString_matches_out(out value, true, _empties_, match);
-        public bool TryReadString_matches_out(out string value, in bool ignore_case, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
+        public bool TryReadString_matches_out(out string value, in bool ignore_case, in bool as_function_argument, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
@@ -52,6 +50,13 @@ namespace _BOA_
                                 if (match.Equals(value, ordinal))
                                 {
                                     last_arg = value;
+                                    if (!as_function_argument || !strict_syntax)
+                                        return true;
+
+                                    if (TryReadChar_match(',') || TryPeekChar_match(')'))
+                                        return true;
+
+                                    error = $"expected ',' or ')' after argument '{value}'";
                                     return true;
                                 }
                                 break;
