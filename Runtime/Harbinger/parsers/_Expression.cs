@@ -6,8 +6,8 @@
         {
             if (TryParseAssignation(reader, caller, out expression) || reader.error == null && TryParseOr(reader, caller, out expression))
             {
-                if (as_function_argument && reader.strict_syntax)
-                    if (!reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
+                if (as_function_argument && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
+                    if (reader.strict_syntax)
                     {
                         reader.error ??= $"expected ',' or ')' after expression";
                         if (expression is ContractExecutor cont)
