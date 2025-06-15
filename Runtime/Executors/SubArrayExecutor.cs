@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -24,17 +23,14 @@ namespace _BOA_
             while (routine_list.MoveNext())
                 yield return routine_list.Current;
 
-            List<Executor> list = (List<Executor>)routine_list.Current.output;
+            List<object> list = (List<object>)routine_list.Current.output;
 
             var routine_access = expr_access.EExecute();
             while (routine_access.MoveNext())
                 yield return routine_access.Current;
 
             int index = (int)routine_access.Current.output;
-            var item_expr = list[index];
-            var routine = item_expr.EExecute();
-            while (routine.MoveNext())
-                yield return routine.Current;
+            yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: list[index]);
         }
     }
 }

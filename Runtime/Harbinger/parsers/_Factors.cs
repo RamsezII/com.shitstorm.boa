@@ -25,31 +25,6 @@ namespace _BOA_
                         return true;
 
             if (reader.error == null)
-                if (reader.TryReadChar_match('['))
-                {
-                    List<Executor> list = new();
-
-                    while (TryParseExpression(reader, caller, false, out var expr))
-                    {
-                        list.Add(expr);
-                        if (!reader.TryReadChar_match(','))
-                            if (strict_syntax)
-                                break;
-                    }
-
-                    if (!reader.TryReadChar_match(']'))
-                    {
-                        reader.error ??= $"list expression expected closing braquet ']'";
-                        return false;
-                    }
-                    else
-                    {
-                        factor = new LiteralExecutor(this, caller, list);
-                        return true;
-                    }
-                }
-
-            if (reader.error == null)
                 if (TryParseString(reader, out string str))
                 {
                     factor = new LiteralExecutor(this, caller, literal: str);
