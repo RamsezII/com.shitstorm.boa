@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace _BOA_
 {
@@ -27,6 +29,12 @@ namespace _BOA_
             executor = null;
 
             BlockExecutor program = new(this, null);
+
+            List<Executor> args_list = new(args.Count);
+            for (int i = 0; i < args.Count; ++i)
+                args_list.Add(new LiteralExecutor(this, program, args[i]));
+
+            program._variables.Add("_args_", new BoaVariable(args_list));
 
             while (TryParseBlock(reader, program, out var sub_block))
                 if (sub_block != null)

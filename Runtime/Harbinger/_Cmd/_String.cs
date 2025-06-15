@@ -36,7 +36,7 @@ namespace _BOA_
                     },
                     routine: static exe =>
                     {
-                        Operations op = (Operations)exe.args[1];
+                        Operations op = (Operations)exe.args[0];
                         return Executor.EExecute(
                             null, data =>
                             {

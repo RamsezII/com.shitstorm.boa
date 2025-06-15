@@ -28,7 +28,7 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    BoaVariable variable = (BoaVariable)exe.args[1];
+                    BoaVariable variable = (BoaVariable)exe.args[0];
                     return Executor.EExecute(
                         null,
                         data => variable.value = data,

@@ -21,7 +21,7 @@ namespace _BOA_
                         exe.error ??= "specify an item name";
                     if (!exe.reader.TryReadString_match("in"))
                         exe.error ??= $"expected 'in' keyword";
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var list))
+                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var expr_list))
                         exe.error ??= "expected expression to iterate through";
                     else
                     {
@@ -30,7 +30,7 @@ namespace _BOA_
                             exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
                         else
                         {
-                            exe.args.Add(list);
+                            exe.args.Add(expr_list);
                             exe.args.Add(var_name);
                             exe.args.Add(block);
                         }
