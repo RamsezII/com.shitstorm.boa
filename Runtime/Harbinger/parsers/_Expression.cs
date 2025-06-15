@@ -17,6 +17,27 @@
                         goto failure;
                     }
 
+                if (!reader.TryReadChar_match('?'))
+                    return true;
+                else
+                {
+                    var cond = expression;
+                    if (!TryParseExpression(reader, caller, false, out var _if))
+                        reader.error ??= $"expected expression after ternary operator '?'";
+                    else if (!reader.TryReadChar_match(':'))
+                        reader.error ??= $"expected ternary operator delimiter ':'";
+                    else if (!TryParseExpression(reader, caller, false, out var _else))
+                        reader.error ??= $"expected second expression after ternary operator ':'";
+                    else
+                    {
+                        expression = new TernaryOpExecutor(this, caller, cond, _if, _else);
+                        if (expression.error != null)
+                        {
+                            reader.error ??= expression.error;
+                            return false;
+                        }
+                    }
+                }
                 if (TryPipe(reader, caller, ref expression))
                     return true;
             }

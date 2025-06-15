@@ -76,7 +76,7 @@ namespace _BOA_
                                     factor = new LiteralExecutor(this, caller, literal: _float);
                                 else
                                 {
-                                    reader.error ??= $"unrecognized object : '{arg}'";
+                                    reader.error ??= $"unrecognized literal : '{arg}'";
                                     return false;
                                 }
                                 return true;
