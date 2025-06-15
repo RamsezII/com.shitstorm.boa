@@ -49,7 +49,7 @@ namespace _BOA_
                     yield return routine_list.Current;
 
                 BoaVariable variable = exe._variables.Get(var_name);
-                List<Executor> list = (List<Executor>)routine_list.Current.data;
+                List<Executor> list = (List<Executor>)routine_list.Current.output;
 
                 for (int i = 0; i < list.Count; i++)
                 {
@@ -59,7 +59,7 @@ namespace _BOA_
                     while (routine_item.MoveNext())
                         yield return routine_item.Current;
 
-                    variable.value = routine_item.Current.data;
+                    variable.value = routine_item.Current.output;
 
                     var routine_block = block.EExecute();
                     while (routine_block.MoveNext())

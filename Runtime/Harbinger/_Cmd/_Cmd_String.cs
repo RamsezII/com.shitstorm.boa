@@ -30,15 +30,13 @@ namespace _BOA_
                             exe.error ??= $"unknown string operation '{operation_name}'";
                         else
                         {
-                            exe.args.Add(expr);
+                            exe.arg_0 = expr;
                             exe.args.Add(op);
                         }
                     },
                     routine: static exe =>
                     {
-                        Executor expression = (Executor)exe.args[0];
                         Operations op = (Operations)exe.args[1];
-
                         return Executor.EExecute(
                             null, data =>
                             {
@@ -51,7 +49,7 @@ namespace _BOA_
                                 exe.error = $"invalid data type '{data?.GetType()}' for string operation '{op}'";
                                 return data;
                             },
-                            expression.EExecute());
+                            exe.arg_0.EExecute());
                     }));
             }
         }

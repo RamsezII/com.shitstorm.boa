@@ -22,15 +22,17 @@ namespace _BOA_
                     {
                         BoaVariable variable = new(null);
                         exe.caller._variables.Add(varname, variable);
-                        exe.args.Add(expr);
+                        exe.arg_0 = expr;
                         exe.args.Add(variable);
                     }
                 },
                 routine: static exe =>
                 {
-                    Executor expression = (Executor)exe.args[0];
                     BoaVariable variable = (BoaVariable)exe.args[1];
-                    return Executor.EExecute(null, data => variable.value = data, expression.EExecute());
+                    return Executor.EExecute(
+                        null,
+                        data => variable.value = data,
+                        exe.arg_0.EExecute());
                 }));
         }
     }

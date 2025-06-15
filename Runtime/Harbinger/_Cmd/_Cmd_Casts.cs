@@ -11,8 +11,8 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
-                        exe.args.Add(expr);
+                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
+                        exe.arg_0 = expr;
                 },
                 routine: static exe =>
                 {
@@ -30,12 +30,11 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
-                        exe.args.Add(expr);
+                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
+                        exe.arg_0 = expr;
                 },
                 routine: static exe =>
                 {
-                    ExpressionExecutor expr = (ExpressionExecutor)exe.args[0];
                     return Executor.EExecute(null, data => data switch
                     {
                         int i => i,
@@ -43,7 +42,7 @@ namespace _BOA_
                         string s => Util.ParseFloat(s),
                         _ => 0,
                     },
-                    expr.EExecute());
+                    exe.arg_0.EExecute());
                 }));
         }
     }

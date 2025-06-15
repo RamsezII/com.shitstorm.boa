@@ -61,7 +61,7 @@ namespace _BOA_
                     while (routine.MoveNext())
                         yield return routine.Current;
 
-                    if (!routine.Current.data.ToBool())
+                    if (!routine.Current.output.ToBool())
                         break;
 
                     routine = block.EExecute();

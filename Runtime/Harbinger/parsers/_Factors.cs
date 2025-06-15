@@ -32,8 +32,9 @@ namespace _BOA_
                     while (TryParseExpression(reader, caller, false, out var expr))
                     {
                         list.Add(expr);
-                        if (!reader.TryReadChar_match(',') && strict_syntax)
-                            break;
+                        if (!reader.TryReadChar_match(','))
+                            if (strict_syntax)
+                                break;
                     }
 
                     if (!reader.TryReadChar_match(']'))
@@ -56,7 +57,7 @@ namespace _BOA_
                 }
 
             if (reader.error == null)
-                if (reader.TryReadArgument(out string arg, true))
+                if (reader.TryReadArgument(out string arg, false))
                     if (caller._functions.TryGet(arg, out var func))
                     {
                         factor = new ContractExecutor(this, caller, func, reader);

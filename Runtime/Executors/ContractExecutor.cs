@@ -6,6 +6,7 @@ namespace _BOA_
     {
         public readonly Contract contract;
         public readonly BoaReader reader;
+        public Executor arg_0;
         public readonly List<object> args = new();
         public readonly ExpressionExecutor pipe_previous;
         public override string ToLog => $"'{base.ToLog}[{contract?.name}]'";
@@ -50,7 +51,7 @@ namespace _BOA_
         internal override IEnumerator<Contract.Status> EExecute()
         {
             if (contract.action != null)
-                yield return new Contract.Status(Contract.Status.States.ACTION_skip, data: contract.action(this));
+                yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: contract.action(this));
 
             if (contract.routine != null)
             {

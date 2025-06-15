@@ -38,7 +38,7 @@ namespace _BOA_
                     break;
             }
 
-            yield return new Contract.Status(Contract.Status.States.ACTION_skip, data: variable.value);
+            yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: variable.value);
 
             switch (code)
             {

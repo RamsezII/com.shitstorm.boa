@@ -37,7 +37,7 @@ namespace _BOA_
                     return Executor.EExecute(
                         null, data =>
                         {
-                            if (routine1.Current.data is int i1 && routine2.Current.data is int i2)
+                            if (routine1.Current.output is int i1 && routine2.Current.output is int i2)
                                 return code switch
                                 {
                                     OperatorsM.add => i1 + i2,
@@ -57,7 +57,7 @@ namespace _BOA_
                                     OperatorsM.xor => i1 ^ i2,
                                     _ => 0,
                                 };
-                            else if (routine1.Current.data is bool b1 && routine2.Current.data is bool b2)
+                            else if (routine1.Current.output is bool b1 && routine2.Current.output is bool b2)
                                 return code switch
                                 {
                                     OperatorsM.and => b1 & b2,

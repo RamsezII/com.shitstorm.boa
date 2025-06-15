@@ -12,6 +12,8 @@ namespace _BOA_
                 max_args: 10,
                 args: static exe =>
                 {
+                    exe.args.Add(null);
+
                     if (exe.reader.TryReadArgument(out string path, true))
                     {
                         string long_path = Path.Combine(Directory.GetParent(exe.harbinger.script_path).FullName, path);
@@ -33,7 +35,7 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    Executor program = (Executor)exe.args[0];
+                    Executor program = (Executor)exe.args[1];
                     return program.EExecute();
                 }));
 

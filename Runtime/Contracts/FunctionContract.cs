@@ -123,7 +123,7 @@ namespace _BOA_
                     while (expr_routine.MoveNext())
                         yield return expr_routine.Current;
 
-                    bvar.value = expr_routine.Current.data;
+                    bvar.value = expr_routine.Current.output;
                 }
 
                 Executor block = (Executor)exe.args[1];

@@ -80,7 +80,7 @@ namespace _BOA_
                         using var routine = stack[i];
                         while (routine.MoveNext())
                         {
-                            data = routine.Current.data;
+                            data = routine.Current.output;
                             yield return routine.Current;
                         }
                     }
@@ -88,7 +88,7 @@ namespace _BOA_
             after_execution?.Invoke(data);
 
             if (modify_output != null)
-                yield return new Contract.Status(Contract.Status.States.ACTION_skip, data: modify_output(data));
+                yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: modify_output(data));
         }
 
         //----------------------------------------------------------------------------------------------------------

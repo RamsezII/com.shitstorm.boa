@@ -30,6 +30,7 @@
             if (TryPeekChar_out(out value, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
+                last_arg = value.ToString();
                 return true;
             }
             return false;
@@ -62,6 +63,7 @@
             if (TryPeekChar_match(expected_value, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
+                last_arg = expected_value.ToString();
                 return true;
             }
             return false;
@@ -74,6 +76,7 @@
             if (TryPeekChar_out(out value, skippables: skippables) && expected_values.Contains(value, ignore_case.ToOrdinal()))
             {
                 ++read_i;
+                last_arg = value.ToString();
                 return true;
             }
 

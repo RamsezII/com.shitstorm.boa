@@ -6,17 +6,22 @@
         {
             if (TryParseAssignation(reader, caller, out expression) || reader.error == null && TryParseOr(reader, caller, out expression))
             {
-                if (as_function_argument && reader.strict_syntax && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
-                {
-                    reader.error ??= $"expected ',' or ')' after expression";
-                    if (expression is ContractExecutor cont)
-                        reader.error += $" ('{cont.contract.name}')";
-                    else
-                        reader.error += $" ('{expression.GetType()}')";
-                }
-                else if (TryPipe(reader, caller, ref expression))
+                if (as_function_argument && reader.strict_syntax)
+                    if (!reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
+                    {
+                        reader.error ??= $"expected ',' or ')' after expression";
+                        if (expression is ContractExecutor cont)
+                            reader.error += $" ('{cont.contract.name}')";
+                        else
+                            reader.error += $" ('{expression.GetType()}')";
+                        goto failure;
+                    }
+
+                if (TryPipe(reader, caller, ref expression))
                     return true;
             }
+
+        failure:
             return false;
         }
 

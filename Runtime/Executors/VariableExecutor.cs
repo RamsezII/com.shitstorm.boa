@@ -17,7 +17,7 @@ namespace _BOA_
 
         internal override IEnumerator<Contract.Status> EExecute()
         {
-            yield return new Contract.Status(Contract.Status.States.ACTION_skip, data: variable.value);
+            yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: variable.value);
         }
     }
 }

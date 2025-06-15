@@ -12,6 +12,7 @@ namespace _BOA_
 
 #if UNITY_EDITOR
         readonly int _text_length;
+        string toLog => text[..read_i] + "°" + text[read_i..];
 #endif
 
         public string error, long_error;

@@ -30,11 +30,11 @@ namespace _BOA_
             while (routine.MoveNext())
                 yield return routine.Current;
 
-            object data = routine.Current.data;
+            object data = routine.Current.output;
 
             yield return new Contract.Status(Contract.Status.States.ACTION_skip)
             {
-                data = code switch
+                output = code switch
                 {
                     Operators.Add => +(int)data,
                     Operators.Sub => -(int)data,
