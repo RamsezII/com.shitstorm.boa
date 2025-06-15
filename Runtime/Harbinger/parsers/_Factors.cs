@@ -27,7 +27,7 @@ namespace _BOA_
             if (reader.error == null)
                 if (reader.TryReadChar_match('['))
                 {
-                    List<ExpressionExecutor> list = new();
+                    List<Executor> list = new();
 
                     while (TryParseExpression(reader, caller, false, out var expr))
                     {

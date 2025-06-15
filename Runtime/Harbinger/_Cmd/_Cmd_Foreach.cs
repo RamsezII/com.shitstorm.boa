@@ -40,7 +40,7 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> EFor(ContractExecutor exe)
             {
-                ExpressionExecutor expr_list = (ExpressionExecutor)exe.args[0];
+                Executor expr_list = (Executor)exe.args[0];
                 string var_name = (string)exe.args[1];
                 Executor block = (Executor)exe.args[2];
 

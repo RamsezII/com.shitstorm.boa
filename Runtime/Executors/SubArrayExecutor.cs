@@ -24,7 +24,7 @@ namespace _BOA_
             while (routine_list.MoveNext())
                 yield return routine_list.Current;
 
-            List<ExpressionExecutor> list = (List<ExpressionExecutor>)routine_list.Current.data;
+            List<Executor> list = (List<Executor>)routine_list.Current.data;
 
             var routine_access = expr_access.EExecute();
             while (routine_access.MoveNext())
