@@ -6,7 +6,7 @@
         {
             term = null;
 
-            if (!TryParseFactor(reader, caller, out var factor1))
+            if (!TryParseUnary(reader, caller, out var expr1))
                 return false;
 
             if (reader.TryReadChar_match_out(out char op_char, true, "*/%"))
@@ -19,12 +19,12 @@
                     _ => 0,
                 };
 
-                if (TryParseFactor(reader, caller, out var factor2))
+                if (TryParseUnary(reader, caller, out var expr2))
                 {
                     ContractExecutor exe = new(this, caller, cmd_math_, reader, parse_arguments: false);
                     exe.args.Add(code);
-                    exe.args.Add(factor1);
-                    exe.args.Add(factor2);
+                    exe.args.Add(expr1);
+                    exe.args.Add(expr2);
                     term = exe;
                     return true;
                 }
@@ -36,7 +36,7 @@
             }
             else
             {
-                term = factor1;
+                term = expr1;
                 return true;
             }
         }

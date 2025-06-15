@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace _BOA_
+{
+    internal sealed class SubArrayExecutor : ExpressionExecutor
+    {
+        readonly ExpressionExecutor expr_list;
+        readonly ExpressionExecutor expr_access;
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public SubArrayExecutor(in Harbinger harbinger, in Executor caller, in ExpressionExecutor array, in ExpressionExecutor index) : base(harbinger, caller)
+        {
+            expr_list = array;
+            expr_access = index;
+        }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        internal override IEnumerator<Contract.Status> EExecute()
+        {
+            var routine_list = expr_list.EExecute();
+            while (routine_list.MoveNext())
+                yield return routine_list.Current;
+
+            List<ExpressionExecutor> list = (List<ExpressionExecutor>)routine_list.Current.data;
+
+            var routine_access = expr_access.EExecute();
+            while (routine_access.MoveNext())
+                yield return routine_access.Current;
+
+            int index = (int)routine_access.Current.data;
+            var item_expr = list[index];
+            var routine = item_expr.EExecute();
+            while (routine.MoveNext())
+                yield return routine.Current;
+        }
+    }
+}

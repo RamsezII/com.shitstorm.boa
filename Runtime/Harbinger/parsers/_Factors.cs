@@ -1,67 +1,12 @@
-﻿namespace _BOA_
+﻿using System.Collections.Generic;
+
+namespace _BOA_
 {
     partial class Harbinger
     {
         internal bool TryParseFactor(in BoaReader reader, in Executor caller, out ExpressionExecutor factor)
         {
             factor = null;
-
-            if (reader.TryReadChar_match_out(out char unary_operator, true, "+-!"))
-            {
-                UnaryExecutor.Operators code = unary_operator switch
-                {
-                    '+' => UnaryExecutor.Operators.Add,
-                    '-' => UnaryExecutor.Operators.Sub,
-                    '!' => UnaryExecutor.Operators.Not,
-                    _ => 0,
-                };
-
-                switch (code)
-                {
-                    case UnaryExecutor.Operators.Add:
-                    case UnaryExecutor.Operators.Sub:
-                        {
-                            int read_old = reader.read_i;
-                            if (reader.TryReadChar_match(unary_operator, skippables: null))
-                            {
-                                if (!reader.TryReadArgument(out string varname, false, skippables: null))
-                                    reader.error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
-                                else if (!caller._variables.TryGet(varname, out var variable))
-                                    reader.error ??= $"no variable named '{varname}'";
-                                else
-                                {
-                                    factor = new IncrementExecutor(this, caller, variable, code switch
-                                    {
-                                        UnaryExecutor.Operators.Add => IncrementExecutor.Operators.AddBefore,
-                                        UnaryExecutor.Operators.Sub => IncrementExecutor.Operators.SubBefore,
-                                        _ => 0,
-                                    });
-                                    if (factor.error != null)
-                                    {
-                                        reader.error = factor.error;
-                                        return false;
-                                    }
-                                    return true;
-                                }
-                                reader.read_i = read_old;
-                                return false;
-                            }
-                        }
-                        break;
-                }
-
-                if (TryParseFactor(reader, caller, out var sub_factor))
-                {
-
-                    factor = new UnaryExecutor(this, caller, sub_factor, code);
-                    return true;
-                }
-                else
-                {
-                    reader.error ??= $"expected factor after '{unary_operator}'";
-                    return false;
-                }
-            }
 
             if (reader.error == null)
                 if (reader.TryReadChar_match('('))
@@ -78,6 +23,30 @@
                     }
                     else
                         return true;
+
+            if (reader.error == null)
+                if (reader.TryReadChar_match('['))
+                {
+                    List<ExpressionExecutor> list = new();
+
+                    while (TryParseExpression(reader, caller, false, out var expr))
+                    {
+                        list.Add(expr);
+                        if (!reader.TryReadChar_match(',') && strict_syntax)
+                            break;
+                    }
+
+                    if (!reader.TryReadChar_match(']'))
+                    {
+                        reader.error ??= $"list expression expected closing braquet ']'";
+                        return false;
+                    }
+                    else
+                    {
+                        factor = new LiteralExecutor(this, caller, list);
+                        return true;
+                    }
+                }
 
             if (reader.error == null)
                 if (TryParseString(reader, out string str))

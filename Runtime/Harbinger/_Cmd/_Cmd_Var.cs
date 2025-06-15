@@ -17,7 +17,7 @@ namespace _BOA_
                     if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('='))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
                     else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe, false, out expr))
-                        exe.error ??= $"Failed to parse expression after '=' for variable '{varname}'.";
+                        exe.error ??= exe.reader.error ?? $"Failed to parse expression after '=' for variable '{varname}'.";
                     else
                     {
                         BoaVariable variable = new(null);

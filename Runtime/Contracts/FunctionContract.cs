@@ -38,7 +38,7 @@ namespace _BOA_
         public static bool TryParseFunction(BoaReader reader, Executor caller)
         {
             int read_old = reader.read_i;
-            if (!reader.TryReadString_matches_out(out _, true, false, matches: "func"))
+            if (!reader.TryReadString_match("func"))
             {
                 reader.read_i = read_old;
                 goto failure;

@@ -31,13 +31,15 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadString_matches_out(out string value, in bool ignore_case, in bool as_function_argument, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
+        public bool TryReadString_match(in string match) => TryReadString_matches_out(out _, matches: match);
+        public bool TryReadString_match_out(out string value, in string match) => TryReadString_matches_out(out value, matches: match);
+        public bool TryReadString_matches_out(out string value, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
-            StringComparison ordinal = ignore_case.ToOrdinal();
+            StringComparison ordinal = StringComparison.OrdinalIgnoreCase;
             int read_old = read_i;
             value = null;
 
-            if (skippables == null || HasNext(ignore_case: ignore_case, skippables: skippables))
+            if (skippables == null || HasNext(true, skippables: skippables))
             {
                 value = string.Empty;
                 while (TryPeekChar_out(out char peek, skippables: null))
@@ -53,17 +55,7 @@ namespace _BOA_
                             {
                                 ++read_i;
                                 if (match.Equals(value, ordinal))
-                                {
                                     last_arg = value;
-                                    if (!as_function_argument || !strict_syntax)
-                                        return true;
-
-                                    if (TryReadChar_match(',') || TryPeekChar_match(')'))
-                                        return true;
-
-                                    error = $"expected ',' or ')' after argument '{value}'";
-                                    return true;
-                                }
                                 break;
                             }
                         }
