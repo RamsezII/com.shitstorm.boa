@@ -59,7 +59,7 @@ namespace _BOA_
 
                 Harbinger harbinger = new(null, data => exe.Stdout(data), script_path, strict_syntax);
 
-                if (!harbinger.TryRunScript(out Executor program, out string error, out string error_long) || error != null)
+                if (!harbinger.TryParseScript(out Executor program, out string error, out string error_long) || error != null)
                 {
                     exe.error = error_long;
                     yield break;

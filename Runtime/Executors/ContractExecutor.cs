@@ -20,8 +20,8 @@ namespace _BOA_
             this.pipe_previous = pipe_previous;
 
             if (parse_arguments)
-                if (contract != null && contract.no_parenthesis)
-                    contract?.args?.Invoke(this);
+                if (contract.no_parenthesis)
+                    contract.args?.Invoke(this);
                 else
                 {
                     bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
@@ -33,7 +33,7 @@ namespace _BOA_
                         return;
                     }
 
-                    contract?.args?.Invoke(this);
+                    contract.args?.Invoke(this);
 
                     if (error != null)
                         return;

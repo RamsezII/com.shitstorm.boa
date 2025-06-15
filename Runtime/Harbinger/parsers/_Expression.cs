@@ -2,11 +2,11 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseExpression(in BoaReader reader, in Executor caller, in bool as_function_argument, out ExpressionExecutor expression)
+        internal bool TryParseExpression(in BoaReader reader, in Executor caller, in bool allow_argument_syntax, out ExpressionExecutor expression)
         {
             if (TryParseAssignation(reader, caller, out expression) || reader.error == null && TryParseOr(reader, caller, out expression))
             {
-                if (as_function_argument && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
+                if (allow_argument_syntax && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
                     if (reader.strict_syntax)
                     {
                         reader.error ??= $"expected ',' or ')' after expression";

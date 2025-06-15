@@ -1,15 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
-
-        //----------------------------------------------------------------------------------------------------------
-
-        public bool TryRunScript(out Executor executor, out string error, out string long_error)
+        public bool TryParseScript(out Executor executor, out string error, out string long_error)
         {
             BoaReader reader = new(strict_syntax, File.ReadAllText(script_path));
 
@@ -29,12 +24,7 @@ namespace _BOA_
             executor = null;
 
             BlockExecutor program = new(this, null);
-
-            List<Executor> args_list = new(args.Count);
-            for (int i = 0; i < args.Count; ++i)
-                args_list.Add(new LiteralExecutor(this, program, args[i]));
-
-            program._variables.Add("_args_", new BoaVariable(args_list));
+            program._variables.Add("_args_", new BoaVariable(args));
 
             while (TryParseBlock(reader, program, out var sub_block))
                 if (sub_block != null)
