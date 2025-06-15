@@ -55,7 +55,10 @@ namespace _BOA_
                             {
                                 ++read_i;
                                 if (match.Equals(value, ordinal))
+                                {
                                     last_arg = value;
+                                    return true;
+                                }
                                 break;
                             }
                         }
