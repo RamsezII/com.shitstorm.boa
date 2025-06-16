@@ -26,7 +26,10 @@ namespace _BOA_
                             var reader = BoaReader.ReadCommandLines(false, arg);
 
                             if (!harbinger.TryParseProgram(reader, out var program))
-                                cobra_exe.error ??= reader.long_error ?? reader.error ?? $"could not parse command {{ {arg} }}";
+                            {
+                                string error = reader.long_error ?? reader.error ?? $"could not parse command {{ {arg} }}";
+                                cobra_exe.Stdout(error, error.SetColor(Color.orange));
+                            }
                             else
                             {
                                 var routine = program.EExecute();
