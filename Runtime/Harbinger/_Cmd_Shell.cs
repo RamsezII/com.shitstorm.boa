@@ -19,18 +19,25 @@ namespace _BOA_
 
                 while (true)
                 {
-                    if (cobra_exe.line.TryReadArgument(out string arg, out _))
-                        if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
-                        {
-                            var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
-                            var reader = BoaReader.ReadCommandLines(false, arg);
+                    int read_old = cobra_exe.line.read_i;
+                    if (cobra_exe.line.TryReadAll(out string input_line, lint: false))
+                    {
+                        var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
+                        var reader = BoaReader.ReadCommandLines(false, input_line);
 
-                            if (!harbinger.TryParseProgram(reader, out var program))
-                            {
-                                string error = reader.long_error ?? reader.error ?? $"could not parse command {{ {arg} }}";
+                        if (!harbinger.TryParseProgram(reader, out var program))
+                        {
+                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, input_line.SetColor(Color.magenta));
+
+                            string error = reader.long_error ?? reader.error ?? $"could not parse command {{ {input_line} }}";
+                            if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                                 cobra_exe.Stdout(error, error.SetColor(Color.orange));
-                            }
-                            else
+                        }
+                        else
+                        {
+                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, input_line.SetColor(Color.blue));
+
+                            if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                             {
                                 var routine = program.EExecute();
                                 CMD_STATUS last_status = default;
@@ -68,6 +75,7 @@ namespace _BOA_
                                 }
                             }
                         }
+                    }
                     yield return shell_status;
                 }
             }
