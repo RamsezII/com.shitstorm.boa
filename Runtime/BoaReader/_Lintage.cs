@@ -24,41 +24,38 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public void AddLintCursor(in int index, in Color color)
+        public void LintToThisPosition(in int index, in Color color)
         {
-            RemoveLintCursorsAboveIndex(index);
+            UnlintAbovePosition(index);
             lint_cursors.Add(new(index, color));
         }
 
-        public void RemoveLintCursorsAboveIndex(in int index)
+        public void UnlintAbovePosition(in int index)
         {
             for (int i = lint_cursors.Count - 1; i >= 0; i--)
                 if (lint_cursors[i].index >= index)
                     lint_cursors.RemoveAt(i);
         }
 
-        public string GetLintResult(in Color default_color)
+        public string GetLintResult(in Color default_color, in int start = 0)
         {
+            if (lint_cursors.Count == 0)
+                return text[start..].SetColor(default_color);
+
             StringBuilder sb = new();
+            int last_lint = start;
 
-            for (int i = 1; i < lint_cursors.Count; ++i)
-                sb.Append(text[lint_cursors[i - 1].index..lint_cursors[i].index].SetColor(lint_cursors[i].color));
-
-            if (lint_cursors[^1].index < text.Length)
-                switch (lint_cursors.Count)
+            for (int i = 0; i < lint_cursors.Count; ++i)
+                if (lint_cursors[i].index >= start)
                 {
-                    case 0:
-                        sb.Append(text.SetColor(default_color));
-                        break;
-
-                    case 1:
-                        sb.Append(text[lint_cursors[^1].index..].SetColor(default_color));
-                        break;
-
-                    default:
-                        sb.Append(text[lint_cursors[^2].index..lint_cursors[^1].index].SetColor(default_color));
-                        break;
+                    LintCursor cursor = lint_cursors[i];
+                    int index_left = last_lint;
+                    sb.Append(text[index_left..cursor.index].SetColor(cursor.color));
+                    last_lint = cursor.index;
                 }
+
+            if (last_lint < text.Length)
+                sb.Append(text[last_lint..].SetColor(default_color));
 
             return sb.ToString();
         }

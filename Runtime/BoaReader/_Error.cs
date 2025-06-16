@@ -15,10 +15,15 @@ namespace _BOA_
                     int char_i = read_i - char_count + 6;
                     string spaces = new(' ', char_i);
 
-                    if (false)
-                        long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}|\n{spaces}└──> {error}";
+                    if (multiline)
+                    {
+                        if (false)
+                            long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}|\n{spaces}└──> {error}";
+                        else
+                            long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}└──> {error}";
+                    }
                     else
-                        long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}└──> {error}";
+                        long_error = $"{line}\n{new string(' ', read_i - char_count)}└──> {error}";
 
                     return;
                 }
