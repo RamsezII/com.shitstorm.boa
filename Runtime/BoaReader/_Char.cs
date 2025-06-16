@@ -1,4 +1,6 @@
-﻿namespace _BOA_
+﻿using UnityEngine;
+
+namespace _BOA_
 {
     partial class BoaReader
     {

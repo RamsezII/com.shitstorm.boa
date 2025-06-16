@@ -21,20 +21,26 @@ namespace _BOA_
         }
 
         readonly List<LintCursor> lint_cursors = new();
+        int last_lint_i;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public void LintToThisPosition(in int index, in Color color)
+        public void LintToThisPosition(in Color color)
         {
-            UnlintAbovePosition(index);
-            lint_cursors.Add(new(index, color));
+            if (read_i <= last_lint_i)
+                UnlintAbovePosition(read_i);
+            lint_cursors.Add(new(read_i, color));
+            last_lint_i = read_i;
         }
 
         public void UnlintAbovePosition(in int index)
         {
-            for (int i = lint_cursors.Count - 1; i >= 0; i--)
+            for (int i = 0; i < lint_cursors.Count; i++)
                 if (lint_cursors[i].index >= index)
-                    lint_cursors.RemoveAt(i);
+                {
+                    lint_cursors.RemoveRange(i, lint_cursors.Count - i);
+                    break;
+                }
         }
 
         public string GetLintResult(in Color default_color, in int start = 0)
