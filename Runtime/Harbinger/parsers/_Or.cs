@@ -6,7 +6,7 @@
         {
             expression = null;
             if (TryParseAnd(reader, caller, out var or1))
-                if (reader.TryReadString_match_out(out string op_name, "or"))
+                if (reader.TryReadString_match_out(out string op_name, lint: reader.lint_theme.keywords, match: "or"))
                 {
                     if (TryParseAnd(reader, caller, out var or2))
                     {

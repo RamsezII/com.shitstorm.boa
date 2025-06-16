@@ -13,7 +13,7 @@ namespace _BOA_
                 max_args: 10,
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string path, true))
+                    if (exe.reader.TryReadArgument(out string path, true, lint: exe.reader.lint_theme.paths))
                     {
                         string long_path = Path.Combine(Directory.GetParent(exe.reader.script_path).FullName, path);
                         if (!File.Exists(long_path))
@@ -22,7 +22,7 @@ namespace _BOA_
                         {
                             List<Executor> args_exprs = new();
                             var harbinger = new Harbinger(exe.harbinger, exe.harbinger.stdout);
-                            var reader = BoaReader.ReadScript(exe.reader.strict_syntax, long_path);
+                            var reader = BoaReader.ReadScript(exe.reader.lint_theme, exe.reader.strict_syntax, long_path);
 
                             while (exe.harbinger.TryParseExpression(exe.reader, exe.caller, true, out var expr))
                             {

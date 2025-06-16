@@ -17,9 +17,9 @@ namespace _BOA_
                 {
                     //bool got_parenthesis = exe.reader.TryReadChar_match('(');
 
-                    if (!exe.reader.TryReadArgument(out string var_name, false))
+                    if (!exe.reader.TryReadArgument(out string var_name, false, lint: exe.reader.lint_theme.variables))
                         exe.error ??= "specify an item name";
-                    if (!exe.reader.TryReadString_match("in"))
+                    if (!exe.reader.TryReadString_match("in", lint: exe.reader.lint_theme.keywords))
                         exe.error ??= $"expected 'in' keyword";
                     else if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var expr_list))
                         exe.error ??= "expected expression to iterate through";

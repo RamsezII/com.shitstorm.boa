@@ -17,7 +17,7 @@
                         _ => 0,
                     };
 
-                    if (reader.TryReadChar_match('=', skippables: null) && code != 0)
+                    if (reader.TryReadChar_match('=', lint: reader.lint_theme.operators, skippables: null) && code != 0)
                         code |= OperatorsM.eq;
 
                     if (TryParseAddSub(reader, caller, out var addsub2))

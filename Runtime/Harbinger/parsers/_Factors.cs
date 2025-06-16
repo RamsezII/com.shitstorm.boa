@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace _BOA_
+﻿namespace _BOA_
 {
     partial class Harbinger
     {
@@ -9,13 +7,13 @@ namespace _BOA_
             factor = null;
 
             if (reader.error == null)
-                if (reader.TryReadChar_match('('))
+                if (reader.TryReadChar_match('(', lint: reader.OpenBraquetLint()))
                     if (!TryParseExpression(reader, caller, false, out factor))
                     {
                         reader.error ??= "expected expression inside factor parenthesis";
                         return false;
                     }
-                    else if (!reader.TryReadChar_match(')'))
+                    else if (!reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
                         reader.error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
                         --reader.read_i;
@@ -32,9 +30,10 @@ namespace _BOA_
                 }
 
             if (reader.error == null)
-                if (reader.TryReadArgument(out string arg, false))
+                if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
                     if (caller._functions.TryGet(arg, out var func))
                     {
+                        reader.LintToThisPosition(reader.lint_theme.functions);
                         factor = new ContractExecutor(this, caller, func, reader);
                         if (factor.error != null)
                         {
@@ -45,6 +44,7 @@ namespace _BOA_
                     }
                     else if (global_contracts.TryGetValue(arg, out var contract))
                     {
+                        reader.LintToThisPosition(reader.lint_theme.contracts);
                         factor = new ContractExecutor(this, caller, contract, reader);
                         if (factor.error != null)
                         {
@@ -55,6 +55,7 @@ namespace _BOA_
                     }
                     else if (caller._variables.TryGet(arg, out var variable))
                     {
+                        reader.LintToThisPosition(reader.lint_theme.variables);
                         factor = new VariableExecutor(this, caller, variable);
                         return true;
                     }

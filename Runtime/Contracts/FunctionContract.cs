@@ -38,20 +38,20 @@ namespace _BOA_
         public static bool TryParseFunction(BoaReader reader, Executor caller)
         {
             int read_old = reader.read_i;
-            if (!reader.TryReadString_match("func"))
+            if (!reader.TryReadString_match("func", lint: reader.lint_theme.keywords))
             {
                 reader.read_i = read_old;
                 goto failure;
             }
 
-            if (!reader.TryReadArgument(out string func_name, false))
+            if (!reader.TryReadArgument(out string func_name, lint: reader.lint_theme.functions, as_function_argument: false))
             {
                 reader.error ??= $"please specify a function name";
                 goto failure;
             }
 
             bool expects_parenthesis = reader.strict_syntax;
-            bool found_parenthesis = reader.TryReadChar_match('(');
+            bool found_parenthesis = reader.TryReadChar_match('(', lint: reader.OpenBraquetLint());
 
             if (expects_parenthesis && !found_parenthesis)
             {
@@ -60,13 +60,13 @@ namespace _BOA_
             }
 
             List<string> args_names = new();
-            while (reader.TryReadArgument(out string arg_name, true))
+            while (reader.TryReadArgument(out string arg_name, lint: reader.lint_theme.variables, as_function_argument: true))
                 args_names.Add(arg_name);
 
             if (reader.error != null)
                 goto failure;
 
-            if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')'))
+            if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
             {
                 reader.error ??= $"'{func_name}' expected closing parenthesis ')'";
                 goto failure;
@@ -95,7 +95,7 @@ namespace _BOA_
                     exe.caller = caller;
 
                     exe.args.Add(null);
-                    var reader2 = BoaReader.ReadCommandLines(reader.strict_syntax, command_lines: function.text.Split('\n', '\r', StringSplitOptions.None));
+                    var reader2 = BoaReader.ReadCommandLines(reader.lint_theme, reader.strict_syntax, command_lines: function.text.Split('\n', '\r', StringSplitOptions.None));
 
                     if (exe.harbinger.TryParseBlock(reader2, exe, out var block))
                         exe.args.Add(block);

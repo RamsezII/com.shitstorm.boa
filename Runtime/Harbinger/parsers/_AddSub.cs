@@ -8,12 +8,12 @@
             if (TryParseTerm(reader, caller, out var term1))
             {
                 int read_old = reader.read_i;
-                if (reader.TryReadChar_match_out(out char op_char, true, "+-") && !reader.TryReadChar_match(op_char, skippables: null))
+                if (reader.TryReadString_matches_out(out string op_symbol, lint: reader.lint_theme.operators, matches: new string[] { "++", "--", }))
                 {
-                    OperatorsM code = op_char switch
+                    OperatorsM code = op_symbol switch
                     {
-                        '+' => OperatorsM.add,
-                        '-' => OperatorsM.sub,
+                        "++" => OperatorsM.add,
+                        "--" => OperatorsM.sub,
                         _ => 0,
                     };
 
@@ -28,7 +28,7 @@
                     }
                     else
                     {
-                        reader.error ??= $"expected expression after '{op_char}' operator";
+                        reader.error ??= $"expected expression after '{op_symbol}' operator";
                         return false;
                     }
                 }

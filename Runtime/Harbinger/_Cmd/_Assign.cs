@@ -15,8 +15,8 @@ namespace _BOA_
             AddContract(cmd_assign_ = new("assign",
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string varname, as_function_argument: false))
-                        if (exe.reader.TryReadArgument(out string operator_name, as_function_argument: false))
+                    if (exe.reader.TryReadArgument(out string varname, lint: exe.reader.lint_theme.variables, as_function_argument: false))
+                        if (exe.reader.TryReadArgument(out string operator_name, lint: exe.reader.lint_theme.operators, as_function_argument: false))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                                 exe.error ??= $"unknown operator '{operator_name}'";
                             else

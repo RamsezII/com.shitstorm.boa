@@ -12,9 +12,9 @@ namespace _BOA_
                 args: static exe =>
                 {
                     ExpressionExecutor expr = null;
-                    if (!exe.reader.TryReadArgument(out string varname, as_function_argument: false))
+                    if (!exe.reader.TryReadArgument(out string varname, as_function_argument: false, lint: exe.reader.lint_theme.variables))
                         exe.error ??= $"Expected variable name after 'var'.";
-                    if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('='))
+                    if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('=', lint: exe.reader.lint_theme.operators))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
                     else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe, false, out expr))
                         exe.error ??= exe.reader.error ?? $"Failed to parse expression after '=' for variable '{varname}'.";

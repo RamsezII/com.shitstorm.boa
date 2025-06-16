@@ -12,15 +12,16 @@
             {
                 char sep = default;
 
-                if (reader.TryReadChar_match('\''))
+                if (reader.TryReadChar_match('\'', lint: reader.lint_theme.quotes))
                     sep = '\'';
-                else if (reader.TryReadChar_match('"'))
+                else if (reader.TryReadChar_match('"', lint: reader.lint_theme.quotes))
                     sep = '"';
 
                 if (sep != default)
                 {
                     value = string.Empty;
                     int start_i = reader.read_i;
+                    reader.LintToThisPosition(reader.lint_theme.quotes);
 
                     while (reader.TryReadChar_out(out char c, skippables: null))
                         switch (c)
@@ -30,6 +31,8 @@
                                 break;
 
                             case '\'' or '"' when c == sep:
+                                reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
+                                reader.LintToThisPosition(reader.lint_theme.quotes);
                                 reader.last_arg = value;
                                 return true;
 

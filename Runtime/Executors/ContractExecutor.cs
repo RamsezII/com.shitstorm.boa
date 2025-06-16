@@ -25,7 +25,7 @@ namespace _BOA_
                 else
                 {
                     bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
-                    bool found_parenthesis = reader.TryReadChar_match('(');
+                    bool found_parenthesis = reader.TryReadChar_match('(', lint: reader.OpenBraquetLint());
 
                     if (expects_parenthesis && !found_parenthesis)
                     {
@@ -38,7 +38,7 @@ namespace _BOA_
                     if (error != null)
                         return;
 
-                    if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')'))
+                    if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
                         error ??= $"'{contract.name}' expected closing parenthesis ')'";
                         return;

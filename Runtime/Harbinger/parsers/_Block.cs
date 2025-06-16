@@ -4,7 +4,7 @@
     {
         internal bool TryParseBlock(in BoaReader reader, in Executor caller, out Executor block)
         {
-            if (reader.TryReadChar_match('{'))
+            if (reader.TryReadChar_match('{', lint: reader.OpenBraquetLint()))
             {
                 BlockExecutor body = new(this, caller);
                 block = body;
@@ -19,7 +19,7 @@
                     return false;
                 }
 
-                if (reader.TryReadChar_match('}'))
+                if (reader.TryReadChar_match('}', lint: reader.CloseBraquetLint()))
                     return true;
                 else
                     reader.error ??= $"expected closing bracket '}}'";

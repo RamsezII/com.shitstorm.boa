@@ -6,7 +6,7 @@
         {
             if (TryParseAssignation(reader, caller, out expression) || reader.error == null && TryParseOr(reader, caller, out expression))
             {
-                if (allow_argument_syntax && !reader.TryReadChar_match(',') && !reader.TryPeekChar_match(')'))
+                if (allow_argument_syntax && !reader.TryReadChar_match(',', lint: reader.lint_theme.argument_coma) && !reader.TryPeekChar_match(')'))
                     if (reader.strict_syntax)
                     {
                         reader.error ??= $"expected ',' or ')' after expression";
@@ -17,14 +17,12 @@
                         goto failure;
                     }
 
-                if (!reader.TryReadChar_match('?'))
-                    return true;
-                else
+                if (reader.TryReadChar_match('?', lint: reader.lint_theme.operators))
                 {
                     var cond = expression;
                     if (!TryParseExpression(reader, caller, false, out var _if))
                         reader.error ??= $"expected expression after ternary operator '?'";
-                    else if (!reader.TryReadChar_match(':'))
+                    else if (!reader.TryReadChar_match(':', lint: reader.lint_theme.operators))
                         reader.error ??= $"expected ternary operator delimiter ':'";
                     else if (!TryParseExpression(reader, caller, false, out var _else))
                         reader.error ??= $"expected second expression after ternary operator ':'";
@@ -38,6 +36,7 @@
                         }
                     }
                 }
+
                 if (TryPipe(reader, caller, ref expression))
                     return true;
             }
@@ -48,9 +47,9 @@
 
         bool TryPipe(in BoaReader reader, in Executor caller, ref ExpressionExecutor expression)
         {
-            if (!reader.TryReadChar_match('|'))
+            if (!reader.TryReadChar_match('|', lint: reader.lint_theme.operators))
                 return true;
-            else if (!reader.TryReadArgument(out string pipe_cont_name, as_function_argument: false))
+            else if (!reader.TryReadArgument(out string pipe_cont_name, lint: reader.lint_theme.contracts, as_function_argument: false))
                 reader.error ??= $"expected command after pipe operator '|'";
             else if (!global_contracts.TryGetValue(pipe_cont_name, out var pipe_cont))
                 reader.error ??= $"can not find command with name '{pipe_cont_name}'";

@@ -24,7 +24,7 @@ namespace _BOA_
                         ExpressionExecutor expr = null;
                         if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe, true, out expr))
                             exe.error ??= $"'{exe.contract.name}' expects an expression";
-                        else if (!exe.reader.TryReadArgument(out string operation_name, true))
+                        else if (!exe.reader.TryReadArgument(out string operation_name, lint: exe.reader.lint_theme.operators, as_function_argument: true))
                             exe.error ??= "missing string operation";
                         else if (!Enum.TryParse(operation_name, true, out Operations op))
                             exe.error ??= $"unknown string operation '{operation_name}'";

@@ -20,17 +20,43 @@ namespace _BOA_
             }
         }
 
+        public readonly LintTheme lint_theme;
         readonly List<LintCursor> lint_cursors = new();
         int last_lint_i;
+        byte last_braquet;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public void LintToThisPosition(in Color color)
+        public Color OpenBraquetLint()
         {
-            if (read_i <= last_lint_i)
-                UnlintAbovePosition(read_i);
-            lint_cursors.Add(new(read_i, color));
-            last_lint_i = read_i;
+            int ind = last_braquet++;
+            return GetBraquetLint(ind);
+        }
+
+        public Color CloseBraquetLint()
+        {
+            int ind = --last_braquet;
+            return GetBraquetLint(ind);
+        }
+
+        Color GetBraquetLint(in int braquet)
+        {
+            return (braquet % 3) switch
+            {
+                0 => lint_theme.bracket_0,
+                1 => lint_theme.bracket_1,
+                2 => lint_theme.bracket_2,
+                _ => LintTheme.lint_default,
+            };
+        }
+
+        public void LintToThisPosition(in Color color) => LintToThisPosition(color, read_i);
+        public void LintToThisPosition(in Color color, in int index)
+        {
+            if (index <= last_lint_i)
+                UnlintAbovePosition(index);
+            lint_cursors.Add(new(index, color));
+            last_lint_i = index;
         }
 
         public void UnlintAbovePosition(in int index)

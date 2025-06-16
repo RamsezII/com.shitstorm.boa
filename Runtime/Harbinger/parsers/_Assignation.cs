@@ -7,9 +7,9 @@
             assignation = null;
             int read_old = reader.read_i;
 
-            if (reader.TryReadArgument(out string varname, as_function_argument: false))
+            if (reader.TryReadArgument(out string varname, lint: reader.lint_theme.variables, as_function_argument: false))
                 if (caller._variables.TryGet(varname, out var variable))
-                    if (reader.TryReadString_matches_out(out string op_name, skippables: BoaReader._empties_, stoppers: " \n\r{}(),;'\"", "=", "+=", "-=", "*=", "/="))
+                    if (reader.TryReadString_matches_out(out string op_name, lint: reader.lint_theme.operators, skippables: BoaReader._empties_, stoppers: " \n\r{}(),;'\"", "=", "+=", "-=", "*=", "/="))
                     {
                         OperatorsM code = op_name switch
                         {

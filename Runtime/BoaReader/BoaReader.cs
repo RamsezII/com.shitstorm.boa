@@ -25,10 +25,11 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static BoaReader ReadScript(in bool strict_syntax, in string script_path) => new BoaReader(strict_syntax, script_path, File.ReadAllLines(script_path));
-        public static BoaReader ReadCommandLines(in bool strict_syntax, params string[] command_lines) => new BoaReader(strict_syntax, "line", command_lines);
-        BoaReader(in bool strict_syntax, in string script_path, in string[] source_lines)
+        public static BoaReader ReadScript(in LintTheme lint_theme, in bool strict_syntax, in string script_path) => new BoaReader(lint_theme, strict_syntax, script_path, File.ReadAllLines(script_path));
+        public static BoaReader ReadCommandLines(in LintTheme lint_theme, in bool strict_syntax, params string[] command_lines) => new BoaReader(lint_theme, strict_syntax, "line", command_lines);
+        BoaReader(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in string[] source_lines)
         {
+            this.lint_theme = lint_theme;
             this.strict_syntax = strict_syntax;
             this.script_path = script_path;
             text = source_lines.Join("\n");

@@ -6,7 +6,7 @@
         {
             expression = null;
             if (TryParseComparison(reader, caller, out var and1))
-                if (reader.TryReadString_match_out(out string op_name, "and"))
+                if (reader.TryReadString_match_out(out string op_name, lint: reader.lint_theme.keywords, match: "and"))
                 {
                     if (TryParseComparison(reader, caller, out var and2))
                     {

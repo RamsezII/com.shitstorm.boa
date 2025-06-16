@@ -22,9 +22,9 @@
                     case UnaryExecutor.Operators.Sub:
                         {
                             int read_old = reader.read_i;
-                            if (reader.TryReadChar_match(unary_operator, skippables: null))
+                            if (reader.TryReadChar_match(unary_operator, reader.lint_theme.operators, skippables: null))
                             {
-                                if (!reader.TryReadArgument(out string varname, false, skippables: null))
+                                if (!reader.TryReadArgument(out string varname, false, reader.lint_theme.variables, skippables: null))
                                     reader.error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
                                 else if (!caller._variables.TryGet(varname, out var variable))
                                     reader.error ??= $"no variable named '{varname}'";
@@ -64,11 +64,11 @@
 
             if (TryParseFactor(reader, caller, out var list))
             {
-                if (reader.TryReadChar_match('['))
+                if (reader.TryReadChar_match('[', lint: reader.OpenBraquetLint()))
                 {
                     if (!TryParseExpression(reader, caller, false, out var index))
                         reader.error ??= $"expected expression inside index accessor";
-                    else if (!reader.TryReadChar_match(']'))
+                    else if (!reader.TryReadChar_match(']', lint: reader.CloseBraquetLint()))
                         reader.error ??= $"expected closing braquet ']'";
                     else
                     {
