@@ -60,7 +60,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadChar_match(in char expected_value, in Color lint, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryReadChar_match(in char expected_value, in Color lint = default, in bool ignore_case = true, in string skippables = _empties_)
         {
             if (TryPeekChar_match(expected_value, ignore_case: ignore_case, skippables: skippables))
             {

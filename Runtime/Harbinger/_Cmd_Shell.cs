@@ -27,7 +27,7 @@ namespace _BOA_
 
                         if (!harbinger.TryParseProgram(reader, out var program))
                         {
-                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(Color.magenta));
+                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
 
                             string error = reader.long_error ?? reader.error ?? $"could not parse command {{ {input_line} }}";
                             if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
@@ -35,7 +35,7 @@ namespace _BOA_
                         }
                         else
                         {
-                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(Color.green));
+                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
 
                             if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                             {

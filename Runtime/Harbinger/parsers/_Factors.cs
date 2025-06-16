@@ -7,7 +7,9 @@
             factor = null;
 
             if (reader.error == null)
-                if (reader.TryReadChar_match('(', lint: reader.OpenBraquetLint()))
+                if (reader.TryReadChar_match('('))
+                {
+                    reader.LintOpeningBraquet();
                     if (!TryParseExpression(reader, caller, false, out factor))
                     {
                         reader.error ??= "expected expression inside factor parenthesis";
@@ -21,6 +23,7 @@
                     }
                     else
                         return true;
+                }
 
             if (reader.error == null)
                 if (TryParseString(reader, out string str))

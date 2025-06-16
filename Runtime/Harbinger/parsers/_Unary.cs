@@ -64,8 +64,9 @@
 
             if (TryParseFactor(reader, caller, out var list))
             {
-                if (reader.TryReadChar_match('[', lint: reader.OpenBraquetLint()))
+                if (reader.TryReadChar_match('['))
                 {
+                    reader.LintOpeningBraquet();
                     if (!TryParseExpression(reader, caller, false, out var index))
                         reader.error ??= $"expected expression inside index accessor";
                     else if (!reader.TryReadChar_match(']', lint: reader.CloseBraquetLint()))

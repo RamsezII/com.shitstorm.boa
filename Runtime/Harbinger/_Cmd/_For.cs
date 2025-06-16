@@ -15,29 +15,33 @@ namespace _BOA_
                 no_semicolon_required: true,
                 args: static exe =>
                 {
-                    if (!exe.reader.TryReadChar_match('(', lint: exe.reader.OpenBraquetLint()))
+                    if (!exe.reader.TryReadChar_match('('))
                         exe.error ??= "expected '(' at the beginning of 'for' instruction";
-                    else if (!exe.harbinger.TryParseInstruction(exe.reader, exe, true, out var instr_init))
-                        exe.error ??= "expected instruction after '(' in 'for' instruction";
                     else
                     {
-                        if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
-                            exe.error ??= "expected expression after first instruction in 'for' instruction";
+                        exe.reader.LintOpeningBraquet();
+                        if (!exe.harbinger.TryParseInstruction(exe.reader, exe, true, out var instr_init))
+                            exe.error ??= "expected instruction after '(' in 'for' instruction";
                         else
                         {
-                            exe.reader.TryReadChar_match(';', lint: exe.reader.lint_theme.command_separators);
-                            if (!exe.harbinger.TryParseInstruction(exe.reader, exe, false, out var instr_loop))
-                                exe.error ??= "expected instruction after second expression in 'for' instruction";
-                            else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
-                                exe.error ??= "expected ')' at the end of 'for' instruction";
-                            else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block))
-                                exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
+                            if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
+                                exe.error ??= "expected expression after first instruction in 'for' instruction";
                             else
                             {
-                                exe.args.Add(instr_init);
-                                exe.args.Add(cond);
-                                exe.args.Add(instr_loop);
-                                exe.args.Add(block);
+                                exe.reader.TryReadChar_match(';', lint: exe.reader.lint_theme.command_separators);
+                                if (!exe.harbinger.TryParseInstruction(exe.reader, exe, false, out var instr_loop))
+                                    exe.error ??= "expected instruction after second expression in 'for' instruction";
+                                else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
+                                    exe.error ??= "expected ')' at the end of 'for' instruction";
+                                else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block))
+                                    exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
+                                else
+                                {
+                                    exe.args.Add(instr_init);
+                                    exe.args.Add(cond);
+                                    exe.args.Add(instr_loop);
+                                    exe.args.Add(block);
+                                }
                             }
                         }
                     }

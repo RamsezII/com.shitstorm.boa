@@ -27,12 +27,14 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Color OpenBraquetLint()
+        public void LintOpeningBraquet() => LintToThisPosition(OpenBraquetLint());
+        Color OpenBraquetLint()
         {
             int ind = last_braquet++;
             return GetBraquetLint(ind);
         }
 
+        public void LintClosingBraquet() => LintToThisPosition(CloseBraquetLint());
         public Color CloseBraquetLint()
         {
             int ind = --last_braquet;
@@ -53,8 +55,12 @@ namespace _BOA_
         public void LintToThisPosition(in Color color) => LintToThisPosition(color, read_i);
         public void LintToThisPosition(in Color color, in int index)
         {
+            if (color.a <= 0)
+                return;
+
             if (index <= last_lint_i)
                 UnlintAbovePosition(index);
+
             lint_cursors.Add(new(index, color));
             last_lint_i = index;
         }

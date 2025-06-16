@@ -14,21 +14,25 @@ namespace _BOA_
                 no_parenthesis: true,
                 args: static exe =>
                 {
-                    if (!exe.reader.TryReadChar_match('(', lint: exe.reader.OpenBraquetLint()))
+                    if (!exe.reader.TryReadChar_match('('))
                         exe.error ??= "expected opening parenthesis '(' for 'if' condition";
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
-                        exe.error ??= "expected expression for 'if' condition";
-                    else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
-                        exe.error ??= "expected closing parenthesis ')' for 'if' condition";
-                    else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block_if))
-                        exe.error ??= "expected block after 'if' condition";
                     else
                     {
-                        exe.args.Add(cond);
-                        exe.args.Add(block_if);
-                        if (exe.reader.TryReadString_match("else", lint: exe.reader.lint_theme.keywords))
-                            if (exe.harbinger.TryParseBlock(exe.reader, exe, out var block_else))
-                                exe.args.Add(block_else);
+                        exe.reader.LintOpeningBraquet();
+                        if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
+                            exe.error ??= "expected expression for 'if' condition";
+                        else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
+                            exe.error ??= "expected closing parenthesis ')' for 'if' condition";
+                        else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block_if))
+                            exe.error ??= "expected block after 'if' condition";
+                        else
+                        {
+                            exe.args.Add(cond);
+                            exe.args.Add(block_if);
+                            if (exe.reader.TryReadString_match("else", lint: exe.reader.lint_theme.keywords))
+                                if (exe.harbinger.TryParseBlock(exe.reader, exe, out var block_else))
+                                    exe.args.Add(block_else);
+                        }
                     }
                 },
                 routine: EIf));

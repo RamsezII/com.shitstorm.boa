@@ -4,8 +4,10 @@
     {
         internal bool TryParseBlock(in BoaReader reader, in Executor caller, out Executor block)
         {
-            if (reader.TryReadChar_match('{', lint: reader.OpenBraquetLint()))
+            if (reader.TryReadChar_match('{'))
             {
+                reader.LintOpeningBraquet();
+
                 BlockExecutor body = new(this, caller);
                 block = body;
 

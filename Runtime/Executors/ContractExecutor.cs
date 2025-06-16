@@ -25,7 +25,10 @@ namespace _BOA_
                 else
                 {
                     bool expects_parenthesis = reader.strict_syntax && contract.function_style_arguments;
-                    bool found_parenthesis = reader.TryReadChar_match('(', lint: reader.OpenBraquetLint());
+                    bool found_parenthesis = reader.TryReadChar_match('(');
+
+                    if (found_parenthesis)
+                        reader.LintOpeningBraquet();
 
                     if (expects_parenthesis && !found_parenthesis)
                     {
