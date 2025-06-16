@@ -57,11 +57,12 @@ namespace _BOA_
                     yield break;
                 }
 
-                Harbinger harbinger = new(null, data => exe.Stdout(data), script_path, strict_syntax);
+                Harbinger harbinger = new(null, data => exe.Stdout(data));
+                BoaReader reader = BoaReader.ReadScript(strict_syntax, script_path);
 
-                if (!harbinger.TryParseScript(out Executor program, out string error, out string error_long) || error != null)
+                if (!harbinger.TryParseProgram(reader, out Executor program) || reader.error != null)
                 {
-                    exe.error = error_long;
+                    exe.error = reader.long_error ?? reader.error;
                     yield break;
                 }
 

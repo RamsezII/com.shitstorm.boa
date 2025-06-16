@@ -95,12 +95,12 @@ namespace _BOA_
                     exe.caller = caller;
 
                     exe.args.Add(null);
-                    var reader = new BoaReader(caller.harbinger.strict_syntax, function.text);
+                    var reader2 = BoaReader.ReadCommandLines(reader.strict_syntax, command_lines: function.text.Split('\n', '\r', StringSplitOptions.None));
 
-                    if (exe.harbinger.TryParseBlock(reader, exe, out var block))
+                    if (exe.harbinger.TryParseBlock(reader2, exe, out var block))
                         exe.args.Add(block);
                     else
-                        exe.error ??= reader.error;
+                        exe.error ??= reader2.error;
                 },
                 routine: ERoutine);
 

@@ -15,13 +15,14 @@ namespace _BOA_
                 {
                     if (exe.reader.TryReadArgument(out string path, true))
                     {
-                        string long_path = Path.Combine(Directory.GetParent(exe.harbinger.script_path).FullName, path);
+                        string long_path = Path.Combine(Directory.GetParent(exe.reader.script_path).FullName, path);
                         if (!File.Exists(long_path))
                             exe.error ??= $"can not find file at path: {long_path}";
                         else
                         {
                             List<Executor> args_exprs = new();
-                            var harbinger = new Harbinger(exe.harbinger, exe.harbinger.stdout, long_path, exe.harbinger.strict_syntax);
+                            var harbinger = new Harbinger(exe.harbinger, exe.harbinger.stdout);
+                            var reader = BoaReader.ReadScript(exe.reader.strict_syntax, long_path);
 
                             while (exe.harbinger.TryParseExpression(exe.reader, exe.caller, true, out var expr))
                             {
@@ -29,7 +30,7 @@ namespace _BOA_
                                 args_exprs.Add(expr);
                             }
 
-                            if (!harbinger.TryParseScript(out var program, out exe.reader.error, out exe.reader.long_error))
+                            if (!harbinger.TryParseProgram(reader, out var program))
                                 exe.error = exe.reader.long_error;
 
                             exe.args.Add(program);

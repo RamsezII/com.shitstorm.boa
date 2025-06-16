@@ -1,6 +1,5 @@
 ﻿using _COBRA_;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace _BOA_
@@ -12,7 +11,7 @@ namespace _BOA_
         {
             Command.static_domain.AddRoutine("harbinger", routine: ERoutine);
 
-            static IEnumerator<CMD_STATUS> ERoutine(Command.Executor cexe)
+            static IEnumerator<CMD_STATUS> ERoutine(Command.Executor cobra_exe)
             {
                 string prefixe = ">";
 
@@ -20,10 +19,52 @@ namespace _BOA_
 
                 while (true)
                 {
-                    if (!string.IsNullOrWhiteSpace(cexe.line.text))
-                        if (cexe.line.TryReadArgument(out string arg, out _, completions: global_contracts.Keys))
-                            if (cexe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
-                                Debug.Log("cmd: " + arg);
+                    if (cobra_exe.line.TryReadArgument(out string arg, out _))
+                        if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                        {
+                            var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
+                            var reader = BoaReader.ReadCommandLines(false, arg);
+
+                            if (!harbinger.TryParseProgram(reader, out var program))
+                                cobra_exe.error ??= reader.long_error ?? reader.error ?? $"could not parse command {{ {arg} }}";
+                            else
+                            {
+                                var routine = program.EExecute();
+                                CMD_STATUS last_status = default;
+
+                                while (true)
+                                {
+                                    harbinger.shell_sig_mask = cobra_exe.line.flags;
+
+                                    if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
+                                        if (!cobra_exe.line.TryReadAll(out harbinger.shell_stdin))
+                                            harbinger.shell_stdin = null;
+
+                                    if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                                    {
+                                    before_movenext:
+                                        if (routine.MoveNext())
+                                            switch (routine.Current.state)
+                                            {
+                                                case Contract.Status.States.WAIT_FOR_STDIN:
+                                                    yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                                                    break;
+
+                                                case Contract.Status.States.ACTION_skip:
+                                                    goto before_movenext;
+
+                                                default:
+                                                    yield return last_status = new CMD_STATUS(progress: routine.Current.progress);
+                                                    break;
+                                            }
+                                        else
+                                            break;
+                                    }
+                                    else
+                                        yield return last_status;
+                                }
+                            }
+                        }
                     yield return shell_status;
                 }
             }

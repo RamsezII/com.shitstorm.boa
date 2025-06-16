@@ -1,12 +1,18 @@
 ﻿using System;
+using System.IO;
 
 namespace _BOA_
 {
     [Serializable]
     public sealed partial class BoaReader
     {
-        public bool strict_syntax;
+        public readonly bool strict_syntax;
+        public readonly string script_path;
+        public readonly string[] source_lines;
         public readonly string text;
+
+        public readonly bool multiline;
+        public readonly int first_line, last_line;
         public int start_i, read_i;
         public string last_arg;
 
@@ -19,14 +25,32 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaReader(in bool strict_syntax, in string text, in int read_i = 0)
+        public static BoaReader ReadScript(in bool strict_syntax, in string script_path) => new BoaReader(strict_syntax, script_path, File.ReadAllLines(script_path));
+        public static BoaReader ReadCommandLines(in bool strict_syntax, params string[] command_lines) => new BoaReader(strict_syntax, "line", command_lines);
+        BoaReader(in bool strict_syntax, in string script_path, in string[] source_lines)
         {
             this.strict_syntax = strict_syntax;
-            this.read_i = read_i;
-            this.text = text;
+            this.script_path = script_path;
+            text = source_lines.Join("\n");
 #if UNITY_EDITOR
             _text_length = text.Length;
 #endif
+
+            first_line = last_line = -1;
+            for (int i = 0; i < source_lines.Length; i++)
+                if (!string.IsNullOrWhiteSpace(source_lines[i]))
+                {
+                    if (first_line == -1)
+                        first_line = i;
+                    last_line = 1 + i;
+                }
+
+            if (first_line > 0 || last_line < source_lines.Length)
+                this.source_lines = source_lines[first_line..last_line];
+            else
+                this.source_lines = source_lines;
+
+            multiline = last_line - first_line > 1;
         }
 
         //----------------------------------------------------------------------------------------------------------

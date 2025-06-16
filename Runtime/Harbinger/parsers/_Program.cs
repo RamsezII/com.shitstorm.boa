@@ -1,24 +1,7 @@
-﻿using System.IO;
-
-namespace _BOA_
+﻿namespace _BOA_
 {
     partial class Harbinger
     {
-        public bool TryParseScript(out Executor executor, out string error, out string long_error)
-        {
-            BoaReader reader = new(strict_syntax, File.ReadAllText(script_path));
-
-            bool success = TryParseProgram(reader, out executor);
-            error = reader.error;
-
-            if (reader.error != null && reader.long_error == null)
-                reader.LocalizeError(script_path, File.ReadAllLines(script_path));
-
-            long_error = reader.long_error;
-
-            return success;
-        }
-
         public bool TryParseProgram(in BoaReader reader, out Executor executor)
         {
             executor = null;
@@ -43,6 +26,7 @@ namespace _BOA_
             return true;
 
         failure:
+            reader.LocalizeError();
             return false;
         }
     }
