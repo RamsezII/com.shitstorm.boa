@@ -5,7 +5,7 @@ namespace _BOA_
 {
     internal sealed class FunctionExecutor : ExpressionExecutor
     {
-        public FunctionExecutor(in Harbinger harbinger, in Executor caller) : base(harbinger, caller)
+        public FunctionExecutor(in Harbinger harbinger, in ScopeNode scope) : base(harbinger, scope)
         {
         }
 

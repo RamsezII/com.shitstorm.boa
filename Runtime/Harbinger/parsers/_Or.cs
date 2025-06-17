@@ -2,15 +2,15 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseOr(in BoaReader reader, in Executor caller, out ExpressionExecutor expression)
+        internal bool TryParseOr(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression)
         {
             expression = null;
-            if (TryParseAnd(reader, caller, out var or1))
+            if (TryParseAnd(reader, scope, out var or1))
                 if (reader.TryReadString_match_out(out string op_name, lint: reader.lint_theme.keywords, match: "or"))
                 {
-                    if (TryParseAnd(reader, caller, out var or2))
+                    if (TryParseAnd(reader, scope, out var or2))
                     {
-                        ContractExecutor exe = new(this, caller, cmd_math_, reader, parse_arguments: false);
+                        ContractExecutor exe = new(this, scope, cmd_math_, reader, parse_arguments: false);
                         exe.args.Add(OperatorsM.or);
                         exe.args.Add(or1);
                         exe.args.Add(or2);

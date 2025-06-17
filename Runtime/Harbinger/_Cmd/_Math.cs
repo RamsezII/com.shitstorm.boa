@@ -18,8 +18,8 @@ namespace _BOA_
                     if (exe.reader.TryReadArgument(out string operator_name, true, lint: exe.reader.lint_theme.operators))
                         if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                             exe.error = $"unknown operator '{operator_name}'";
-                        else if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr1))
-                            if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr2))
+                        else if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr1))
+                            if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr2))
                             {
                                 exe.args.Add(code);
                                 exe.args.Add(expr1);

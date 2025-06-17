@@ -19,18 +19,21 @@ namespace _BOA_
                     else
                     {
                         exe.reader.LintOpeningBraquet();
-                        if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
+                        var sub_scope = new ScopeNode(exe.scope);
+
+                        if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
                             exe.error ??= "expected expression for 'if' condition";
                         else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
                             exe.error ??= "expected closing parenthesis ')' for 'if' condition";
-                        else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block_if))
+                        else if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block_if))
                             exe.error ??= "expected block after 'if' condition";
                         else
                         {
                             exe.args.Add(cond);
                             exe.args.Add(block_if);
+
                             if (exe.reader.TryReadString_match("else", lint: exe.reader.lint_theme.keywords))
-                                if (exe.harbinger.TryParseBlock(exe.reader, exe, out var block_else))
+                                if (exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block_else))
                                     exe.args.Add(block_else);
                         }
                     }

@@ -19,11 +19,13 @@ namespace _BOA_
                     else
                     {
                         exe.reader.LintOpeningBraquet();
-                        if (!exe.harbinger.TryParseExpression(exe.reader, exe, false, out var cond))
+                        var sub_scope = new ScopeNode(exe.scope);
+
+                        if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
                             exe.error ??= "expected expression for 'while' condition";
                         else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
                             exe.error = "expected closing parenthesis ')' for 'while' condition";
-                        else if (!exe.harbinger.TryParseBlock(exe.reader, exe, out var block))
+                        else if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
                             exe.error ??= "expected an instruction, or a block of instructions after 'while' condition";
                         else
                         {

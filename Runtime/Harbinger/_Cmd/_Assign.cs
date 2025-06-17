@@ -21,13 +21,13 @@ namespace _BOA_
                                 exe.error ??= $"unknown operator '{operator_name}'";
                             else
                             {
-                                if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.caller, false, out var expression))
+                                if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expression))
                                     exe.arg_0 = expression;
                                 else
                                     exe.error ??= $"assignation expect an expression";
 
                                 BoaVariable variable = new(null);
-                                exe.caller._variables.Add(varname, variable);
+                                exe.scope.SetVariable(varname, variable);
                                 exe.args.Add(code);
                                 exe.args.Add(variable);
                             }

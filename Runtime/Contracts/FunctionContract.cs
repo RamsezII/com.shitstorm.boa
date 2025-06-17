@@ -5,37 +5,24 @@ namespace _BOA_
 {
     internal sealed class FunctionContract : Contract
     {
-        readonly Executor caller;
-        readonly string text;
-        internal readonly List<string> args_names = new();
-
-        //----------------------------------------------------------------------------------------------------------
-
-        FunctionContract(in string name, in string text, in Executor caller,
+        FunctionContract(
+            in string name,
             in int args_count,
-            in bool function_style_arguments = true,
-            in bool no_semicolon_required = false,
-            in bool no_parenthesis = false,
             in Action<ContractExecutor> args = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
             : base(name,
                   min_args: args_count,
                   max_args: args_count,
-                  function_style_arguments: function_style_arguments,
-                  no_semicolon_required: no_semicolon_required,
-                  no_parenthesis: no_parenthesis,
                   args: args,
                   routine: routine
                   )
         {
-            this.caller = caller;
-            this.text = text;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static bool TryParseFunction(BoaReader reader, Executor caller)
+        public static bool TryParseFunction(Harbinger harbinger, BoaReader reader, ScopeNode scope)
         {
             int read_old = reader.read_i;
             if (!reader.TryReadString_match("func", lint: reader.lint_theme.keywords))
@@ -75,39 +62,42 @@ namespace _BOA_
                 goto failure;
             }
 
-            var func_exe = new FunctionExecutor(caller.harbinger, caller);
+            var func_exe = new FunctionExecutor(harbinger, new ScopeNode(scope));
 
             for (int i = 0; i < args_names.Count; i++)
-                func_exe._variables.Add(args_names[i], null);
+                func_exe.scope.SetVariable(args_names[i], null);
 
             read_old = reader.read_i;
-            if (!caller.harbinger.TryParseBlock(reader, func_exe, out _))
+            if (!harbinger.TryParseBlock(reader, func_exe.scope, out _))
                 goto failure;
+            string block_text = reader.text[read_old..reader.read_i];
 
-            FunctionContract function = null;
-            function = new FunctionContract(func_name,
-                reader.text[read_old..reader.read_i],
-                caller: caller,
-                args_count: args_names.Count,
-                args: exe =>
-                {
-                    for (int i = 0; i < args_names.Count; i++)
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
-                            exe._variables.Add(args_names[i], new BoaVariable(expr));
+            scope.SetFunction(
+                func_name,
+                new FunctionContract(
+                    name: func_name,
+                    args_count: args_names.Count,
+                    args: exe =>
+                    {
+                        var func_scope = new ScopeNode(scope);
 
-                    exe.caller = caller;
+                        for (int i = 0; i < args_names.Count; i++)
+                            if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                                func_scope.SetVariable(args_names[i], new BoaVariable(expr));
+                            else
+                                exe.error ??= $"could not parse expression for arg[{i}] '{args_names[i]}'";
 
-                    exe.args.Add(null);
-                    var reader2 = BoaReader.ReadCommandLines(reader.lint_theme, reader.strict_syntax, command_lines: function.text.Split('\n', '\r', StringSplitOptions.None));
+                        exe.scope = func_scope;
+                        var func_reader = BoaReader.ReadCommandLines(reader.lint_theme, reader.strict_syntax, command_lines: block_text.Split('\n', '\r', StringSplitOptions.None));
 
-                    if (exe.harbinger.TryParseBlock(reader2, exe, out var block))
-                        exe.args.Add(block);
-                    else
-                        exe.error ??= reader2.error;
-                },
-                routine: ERoutine);
-
-            caller._functions.Add(func_name, function);
+                        if (exe.harbinger.TryParseBlock(func_reader, func_scope, out var func_block))
+                            exe.args.Add(func_block);
+                        else
+                            exe.error ??= func_reader.error;
+                    },
+                    routine: ERoutine
+                )
+            );
 
             return true;
 
@@ -119,7 +109,7 @@ namespace _BOA_
                 for (int i = 0; i < args_names.Count; i++)
                 {
                     string arg_name = args_names[i];
-                    BoaVariable bvar = exe._variables.Get(arg_name);
+                    BoaVariable bvar = exe.scope.GetVariable(arg_name);
                     ExpressionExecutor expr = (ExpressionExecutor)bvar.value;
 
                     var expr_routine = expr.EExecute();
@@ -129,8 +119,8 @@ namespace _BOA_
                     bvar.value = expr_routine.Current.output;
                 }
 
-                Executor block = (Executor)exe.args[1];
-                var block_routine = block.EExecute();
+                Executor func_block = (Executor)exe.args[0];
+                var block_routine = func_block.EExecute();
                 while (block_routine.MoveNext())
                     yield return block_routine.Current;
             }

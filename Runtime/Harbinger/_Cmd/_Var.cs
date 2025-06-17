@@ -16,12 +16,12 @@ namespace _BOA_
                         exe.error ??= $"Expected variable name after 'var'.";
                     if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('=', lint: exe.reader.lint_theme.operators))
                         exe.error ??= $"Expected '=' after variable name '{varname}'.";
-                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe, false, out expr))
+                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out expr))
                         exe.error ??= exe.reader.error ?? $"Failed to parse expression after '=' for variable '{varname}'.";
                     else
                     {
                         BoaVariable variable = new(null);
-                        exe.caller._variables.Add(varname, variable);
+                        exe.scope.SetVariable(varname, variable);
                         exe.arg_0 = expr;
                         exe.args.Add(variable);
                     }

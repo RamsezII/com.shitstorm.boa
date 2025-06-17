@@ -2,14 +2,14 @@
 
 namespace _BOA_
 {
-    public class PipeExecutor : ExpressionExecutor
+    internal class PipeExecutor : ExpressionExecutor
     {
         readonly Executor previous;
         readonly ContractExecutor next;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public PipeExecutor(in Harbinger harbinger, in Executor caller, in Executor previous, in ContractExecutor next) : base(harbinger, caller)
+        public PipeExecutor(in Harbinger harbinger, in ScopeNode scope, in Executor previous, in ContractExecutor next) : base(harbinger, scope)
         {
             this.previous = previous;
             this.next = next;
@@ -26,7 +26,7 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
 
-                next.arg_0 = new LiteralExecutor(harbinger, caller, routine.Current.output);
+                next.arg_0 = new LiteralExecutor(harbinger, scope, routine.Current.output);
 
                 routine = next.EExecute();
                 while (routine.MoveNext())

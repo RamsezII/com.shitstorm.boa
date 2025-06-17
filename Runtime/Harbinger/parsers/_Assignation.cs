@@ -2,13 +2,13 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseAssignation(in BoaReader reader, in Executor caller, out ExpressionExecutor assignation)
+        internal bool TryParseAssignation(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor assignation)
         {
             assignation = null;
             int read_old = reader.read_i;
 
             if (reader.TryReadArgument(out string varname, lint: reader.lint_theme.variables, as_function_argument: false))
-                if (caller._variables.TryGet(varname, out var variable))
+                if (scope.TryGetVariable(varname, out var variable))
                     if (reader.TryReadString_matches_out(out string op_name, lint: reader.lint_theme.operators, skippables: BoaReader._empties_, stoppers: " \n\r{}(),;'\"", "=", "+=", "-=", "*=", "/="))
                     {
                         OperatorsM code = op_name switch
@@ -23,9 +23,9 @@
 
                         code |= OperatorsM.assign;
 
-                        if (TryParseExpression(reader, caller, false, out var expr))
+                        if (TryParseExpression(reader, scope, false, out var expr))
                         {
-                            ContractExecutor exe = new(this, caller, cmd_assign_, reader, parse_arguments: false);
+                            ContractExecutor exe = new(this, scope, cmd_assign_, reader, parse_arguments: false);
                             exe.args.Add(code);
                             exe.args.Add(variable);
                             exe.args.Add(expr);

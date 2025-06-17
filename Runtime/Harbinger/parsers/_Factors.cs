@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseFactor(in BoaReader reader, in Executor caller, out ExpressionExecutor factor)
+        internal bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor)
         {
             factor = null;
 
@@ -10,7 +10,7 @@
                 if (reader.TryReadChar_match('('))
                 {
                     reader.LintOpeningBraquet();
-                    if (!TryParseExpression(reader, caller, false, out factor))
+                    if (!TryParseExpression(reader, scope, false, out factor))
                     {
                         reader.error ??= "expected expression inside factor parenthesis";
                         return false;
@@ -28,16 +28,16 @@
             if (reader.error == null)
                 if (TryParseString(reader, out string str))
                 {
-                    factor = new LiteralExecutor(this, caller, literal: str);
+                    factor = new LiteralExecutor(this, scope, literal: str);
                     return true;
                 }
 
             if (reader.error == null)
                 if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
-                    if (caller._functions.TryGet(arg, out var func))
+                    if (scope.TryGetFunction(arg, out var func))
                     {
                         reader.LintToThisPosition(reader.lint_theme.functions);
-                        factor = new ContractExecutor(this, caller, func, reader);
+                        factor = new ContractExecutor(this, scope, func, reader);
                         if (factor.error != null)
                         {
                             reader.error = factor.error;
@@ -48,7 +48,7 @@
                     else if (global_contracts.TryGetValue(arg, out var contract))
                     {
                         reader.LintToThisPosition(reader.lint_theme.contracts);
-                        factor = new ContractExecutor(this, caller, contract, reader);
+                        factor = new ContractExecutor(this, scope, contract, reader);
                         if (factor.error != null)
                         {
                             reader.error = factor.error;
@@ -56,28 +56,28 @@
                         }
                         return true;
                     }
-                    else if (caller._variables.TryGet(arg, out var variable))
+                    else if (scope.TryGetVariable(arg, out var variable))
                     {
                         reader.LintToThisPosition(reader.lint_theme.variables);
-                        factor = new VariableExecutor(this, caller, variable);
+                        factor = new VariableExecutor(this, scope, variable);
                         return true;
                     }
                     else
                         switch (arg.ToLower())
                         {
                             case "true":
-                                factor = new LiteralExecutor(this, caller, literal: true);
+                                factor = new LiteralExecutor(this, scope, literal: true);
                                 return true;
 
                             case "false":
-                                factor = new LiteralExecutor(this, caller, literal: false);
+                                factor = new LiteralExecutor(this, scope, literal: false);
                                 return true;
 
                             default:
                                 if (int.TryParse(arg, out int _int))
-                                    factor = new LiteralExecutor(this, caller, literal: _int);
+                                    factor = new LiteralExecutor(this, scope, literal: _int);
                                 else if (Util.TryParseFloat(arg, out float _float))
-                                    factor = new LiteralExecutor(this, caller, literal: _float);
+                                    factor = new LiteralExecutor(this, scope, literal: _float);
                                 else
                                 {
                                     reader.error ??= $"unrecognized literal : '{arg}'";

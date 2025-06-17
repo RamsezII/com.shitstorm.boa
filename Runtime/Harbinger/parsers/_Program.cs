@@ -2,14 +2,14 @@
 {
     partial class Harbinger
     {
-        public bool TryParseProgram(in BoaReader reader, out Executor executor)
+        public bool TryParseProgram(in BoaReader reader, in ScopeNode scope, out Executor executor)
         {
             executor = null;
 
-            BlockExecutor program = new(this, null);
-            program._variables.Add("_args_", new BoaVariable(args));
+            BlockExecutor program = new(this, new ScopeNode(scope));
+            program.scope.SetVariable("_args_", new BoaVariable(args));
 
-            while (TryParseBlock(reader, program, out var sub_block))
+            while (TryParseBlock(reader, program.scope, out var sub_block))
                 if (sub_block != null)
                     program.stack.Add(sub_block);
 

@@ -9,7 +9,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public SubArrayExecutor(in Harbinger harbinger, in Executor caller, in ExpressionExecutor array, in ExpressionExecutor index) : base(harbinger, caller)
+        public SubArrayExecutor(in Harbinger harbinger, in ScopeNode scope, in ExpressionExecutor array, in ExpressionExecutor index) : base(harbinger, scope)
         {
             expr_list = array;
             expr_access = index;

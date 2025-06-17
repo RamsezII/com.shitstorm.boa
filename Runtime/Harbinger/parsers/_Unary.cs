@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseUnary(in BoaReader reader, in Executor caller, out ExpressionExecutor expression)
+        internal bool TryParseUnary(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression)
         {
             expression = null;
 
@@ -26,11 +26,11 @@
                             {
                                 if (!reader.TryReadArgument(out string varname, false, reader.lint_theme.variables, skippables: null))
                                     reader.error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
-                                else if (!caller._variables.TryGet(varname, out var variable))
+                                else if (!scope.TryGetVariable(varname, out var variable))
                                     reader.error ??= $"no variable named '{varname}'";
                                 else
                                 {
-                                    expression = new IncrementExecutor(this, caller, variable, code switch
+                                    expression = new IncrementExecutor(this, scope, variable, code switch
                                     {
                                         UnaryExecutor.Operators.Add => IncrementExecutor.Operators.AddBefore,
                                         UnaryExecutor.Operators.Sub => IncrementExecutor.Operators.SubBefore,
@@ -50,9 +50,9 @@
                         break;
                 }
 
-                if (TryParseFactor(reader, caller, out var factor))
+                if (TryParseFactor(reader, scope, out var factor))
                 {
-                    expression = new UnaryExecutor(this, caller, factor, code);
+                    expression = new UnaryExecutor(this, scope, factor, code);
                     return true;
                 }
                 else
@@ -62,18 +62,18 @@
                 }
             }
 
-            if (TryParseFactor(reader, caller, out var list))
+            if (TryParseFactor(reader, scope, out var list))
             {
                 if (reader.TryReadChar_match('['))
                 {
                     reader.LintOpeningBraquet();
-                    if (!TryParseExpression(reader, caller, false, out var index))
+                    if (!TryParseExpression(reader, scope, false, out var index))
                         reader.error ??= $"expected expression inside index accessor";
                     else if (!reader.TryReadChar_match(']', lint: reader.CloseBraquetLint()))
                         reader.error ??= $"expected closing braquet ']'";
                     else
                     {
-                        expression = new SubArrayExecutor(this, caller, list, index);
+                        expression = new SubArrayExecutor(this, scope, list, index);
                         if (expression.error != null)
                         {
                             reader.error ??= expression.error;

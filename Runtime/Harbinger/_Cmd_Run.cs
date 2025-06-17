@@ -24,13 +24,13 @@ namespace _BOA_
                             var harbinger = new Harbinger(exe.harbinger, exe.harbinger.stdout);
                             var reader = BoaReader.ReadScript(exe.reader.lint_theme, exe.reader.strict_syntax, long_path);
 
-                            while (exe.harbinger.TryParseExpression(exe.reader, exe.caller, true, out var expr))
+                            while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
                             {
                                 harbinger.args.Add(null);
                                 args_exprs.Add(expr);
                             }
 
-                            if (!harbinger.TryParseProgram(reader, out var program))
+                            if (!harbinger.TryParseProgram(reader, exe.scope, out var program))
                                 exe.error = exe.reader.long_error;
 
                             exe.args.Add(program);

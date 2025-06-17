@@ -2,16 +2,17 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseBlock(in BoaReader reader, in Executor caller, out Executor block)
+        internal bool TryParseBlock(in BoaReader reader, in ScopeNode scope, out Executor block)
         {
             if (reader.TryReadChar_match('{'))
             {
                 reader.LintOpeningBraquet();
 
-                BlockExecutor body = new(this, caller);
+                var sub_scope = new ScopeNode(scope);
+                var body = new BlockExecutor(this, sub_scope);
                 block = body;
 
-                while (TryParseBlock(reader, body, out Executor sub_block))
+                while (TryParseBlock(reader, sub_scope, out Executor sub_block))
                     if (sub_block != null)
                         body.stack.Add(sub_block);
 
@@ -26,7 +27,7 @@
                 else
                     reader.error ??= $"expected closing bracket '}}'";
             }
-            else if (TryParseInstruction(reader, caller, true, out block))
+            else if (TryParseInstruction(reader, scope, true, out block))
                 return true;
 
             return false;

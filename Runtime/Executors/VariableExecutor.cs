@@ -2,13 +2,13 @@
 
 namespace _BOA_
 {
-    public class VariableExecutor : ExpressionExecutor
+    internal class VariableExecutor : ExpressionExecutor
     {
         internal readonly BoaVariable variable;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public VariableExecutor(in Harbinger harbinger, in Executor caller, in BoaVariable variable) : base(harbinger, caller)
+        public VariableExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaVariable variable) : base(harbinger, scope)
         {
             this.variable = variable;
         }

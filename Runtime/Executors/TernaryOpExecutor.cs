@@ -8,7 +8,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public TernaryOpExecutor(in Harbinger harbinger, in Executor caller, in ExpressionExecutor cond, in ExpressionExecutor _if, in ExpressionExecutor _else) : base(harbinger, caller)
+        public TernaryOpExecutor(in Harbinger harbinger, in ScopeNode scope, in ExpressionExecutor cond, in ExpressionExecutor _if, in ExpressionExecutor _else) : base(harbinger, scope)
         {
             this.cond = cond;
             this._if = _if;

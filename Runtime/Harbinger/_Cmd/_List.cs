@@ -13,7 +13,7 @@ namespace _BOA_
                 max_args: 100,
                 args: static exe =>
                 {
-                    while (exe.harbinger.TryParseExpression(exe.reader, exe, true, out var expr))
+                    while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
                         exe.args.Add(expr);
                 },
                 routine: static exe =>

@@ -2,7 +2,7 @@
 
 namespace _BOA_
 {
-    public class IncrementExecutor : ExpressionExecutor
+    internal class IncrementExecutor : ExpressionExecutor
     {
         public enum Operators : byte
         {
@@ -18,7 +18,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public IncrementExecutor(in Harbinger harbinger, in Executor caller, in BoaVariable variable, in Operators code) : base(harbinger, caller)
+        internal IncrementExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaVariable variable, in Operators code) : base(harbinger, scope)
         {
             this.code = code;
             this.variable = variable;
