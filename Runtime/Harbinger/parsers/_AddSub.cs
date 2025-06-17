@@ -8,12 +8,14 @@
             if (TryParseTerm(reader, scope, out var term1))
             {
                 int read_old = reader.read_i;
-                if (reader.TryReadString_matches_out(out string op_symbol, lint: reader.lint_theme.operators, matches: new string[] { "++", "--", }))
+                if (reader.TryReadChar_match_out(out char op_symbol, true, "+-"))
                 {
+                    reader.LintToThisPosition(reader.lint_theme.operators);
+
                     OperatorsM code = op_symbol switch
                     {
-                        "++" => OperatorsM.add,
-                        "--" => OperatorsM.sub,
+                        '+' => OperatorsM.add,
+                        '-' => OperatorsM.sub,
                         _ => 0,
                     };
 
