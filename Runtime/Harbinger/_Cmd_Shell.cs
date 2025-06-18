@@ -26,24 +26,7 @@ namespace _BOA_
                         var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
                         var reader = BoaReader.ReadLines(LintTheme.theme_dark, false, cursor_i: cobra_exe.line.cursor_i, lines: input_line);
 
-                        bool success = harbinger.TryParseProgram(reader, scope, out var program);
-                        if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.TAB))
-                        {
-                            char[] chars = new char[1 + reader.text.Length];
-                            for (int i = 0; i < chars.Length; i++)
-                                if (i == reader.cpl_end)
-                                    chars[i] = '²';
-                                else if (i == reader.cpl_start)
-                                    chars[i] = '°';
-                                else
-                                    chars[i] = ' ';
-                            string str = new(chars);
-
-                            Debug.Log($"{reader.text}\n{str}");
-                            Debug.Log($"{reader.completions.Count} completions: {reader.completions.Join(" ")}");
-                        }
-
-                        if (!success)
+                        if (!harbinger.TryParseProgram(reader, scope, out var program))
                         {
                             cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
 
