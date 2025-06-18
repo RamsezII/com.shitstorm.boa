@@ -29,9 +29,17 @@ namespace _BOA_
                         bool success = harbinger.TryParseProgram(reader, scope, out var program);
                         if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.TAB))
                         {
-                            int left_count = reader.cpl_end - reader.cpl_start - 1;
-                            left_count = Mathf.Max(0, left_count);
-                            Debug.Log($"{reader.text}\n{new string(' ', reader.cpl_start)}^{new string(' ', left_count)}^");
+                            char[] chars = new char[1 + reader.text.Length];
+                            for (int i = 0; i < chars.Length; i++)
+                                if (i == reader.cpl_end)
+                                    chars[i] = '²';
+                                else if (i == reader.cpl_start)
+                                    chars[i] = '°';
+                                else
+                                    chars[i] = ' ';
+                            string str = new(chars);
+
+                            Debug.Log($"{reader.text}\n{str}");
                             Debug.Log($"{reader.completions.Count} completions: {reader.completions.Join(" ")}");
                         }
 

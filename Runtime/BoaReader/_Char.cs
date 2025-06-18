@@ -31,6 +31,7 @@ namespace _BOA_
                 cpl_end = read_i;
             }
 
+        failure:
             next_i = read_i;
             read_i = read_old;
             return false;
@@ -52,39 +53,42 @@ namespace _BOA_
             int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
 
-            while (read_i < text.Length)
+            if (read_i < text.Length)
             {
-                char c = text[read_i];
-
-                if (c == expected_value)
+                while (read_i < text.Length)
                 {
-                    next_i = read_i;
+                    char c = text[read_i];
 
-                    if (read_old <= cursor_i)
+                    if (c == expected_value)
                     {
-                        cpl_start = read_i;
-                        cpl_end = 1 + read_i;
+                        next_i = read_i;
 
-                        if (add_to_completions)
-                            completions.Add(expected_value.ToString());
+                        if (read_old <= cursor_i)
+                        {
+                            cpl_start = read_i;
+                            cpl_end = 1 + read_i;
+
+                            if (add_to_completions)
+                                completions.Add(expected_value.ToString());
+                        }
+
+                        return true;
                     }
 
-                    return true;
+                    if (skippables != null && skippables.Contains(c, ordinal))
+                        ++read_i;
+                    else
+                        break;
                 }
 
-                if (skippables != null && skippables.Contains(c, ordinal))
-                    ++read_i;
-                else
-                    break;
-            }
+                if (read_old <= cursor_i && cursor_i <= read_i)
+                {
+                    cpl_start = Mathf.Min(read_old + 1, read_i);
+                    cpl_end = read_i;
 
-            if (read_old <= cursor_i)
-            {
-                cpl_start = read_i;
-                cpl_end = read_i;
-
-                if (add_to_completions)
-                    completions.Add(expected_value.ToString());
+                    if (add_to_completions)
+                        completions.Add(expected_value.ToString());
+                }
             }
 
             next_i = read_i;
