@@ -50,35 +50,28 @@
                 else if (reader.error != null)
                     return false;
                 else if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
-                    if (scope.TryGetVariable(arg, out var variable))
+                    switch (arg.ToLower())
                     {
-                        reader.LintToThisPosition(reader.lint_theme.variables);
-                        factor = new VariableExecutor(this, scope, variable);
-                        return true;
+                        case "true":
+                            factor = new LiteralExecutor(this, scope, literal: true);
+                            return true;
+
+                        case "false":
+                            factor = new LiteralExecutor(this, scope, literal: false);
+                            return true;
+
+                        default:
+                            if (int.TryParse(arg, out int _int))
+                                factor = new LiteralExecutor(this, scope, literal: _int);
+                            else if (Util.TryParseFloat(arg, out float _float))
+                                factor = new LiteralExecutor(this, scope, literal: _float);
+                            else
+                            {
+                                reader.error ??= $"unrecognized literal : '{arg}'";
+                                return false;
+                            }
+                            return true;
                     }
-                    else
-                        switch (arg.ToLower())
-                        {
-                            case "true":
-                                factor = new LiteralExecutor(this, scope, literal: true);
-                                return true;
-
-                            case "false":
-                                factor = new LiteralExecutor(this, scope, literal: false);
-                                return true;
-
-                            default:
-                                if (int.TryParse(arg, out int _int))
-                                    factor = new LiteralExecutor(this, scope, literal: _int);
-                                else if (Util.TryParseFloat(arg, out float _float))
-                                    factor = new LiteralExecutor(this, scope, literal: _float);
-                                else
-                                {
-                                    reader.error ??= $"unrecognized literal : '{arg}'";
-                                    return false;
-                                }
-                                return true;
-                        }
 
             return false;
         }

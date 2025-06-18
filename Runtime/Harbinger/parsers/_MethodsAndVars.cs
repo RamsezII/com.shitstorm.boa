@@ -12,12 +12,8 @@ namespace _BOA_
                 else
                 {
                     method_exe = new ContractExecutor(this, scope, contract, reader);
-                    if (method_exe.error != null)
-                    {
-                        reader.error = method_exe.error;
-                        return false;
-                    }
-                    return true;
+                    reader.error ??= method_exe.error;
+                    return reader.error == null;
                 }
             else if (reader.TryReadString_matches_out(out string func_name, as_function_argument: false, lint: reader.lint_theme.functions, matches: scope.EFuncNames().ToArray()))
                 if (!scope.TryGetFunction(func_name, out var func_cont))
@@ -25,12 +21,8 @@ namespace _BOA_
                 else
                 {
                     method_exe = new ContractExecutor(this, scope, func_cont, reader);
-                    if (method_exe.error != null)
-                    {
-                        reader.error = method_exe.error;
-                        return false;
-                    }
-                    return true;
+                    reader.error ??= method_exe.error;
+                    return reader.error == null;
                 }
 
             method_exe = null;
@@ -46,7 +38,8 @@ namespace _BOA_
                 {
                     reader.LintToThisPosition(reader.lint_theme.variables);
                     var_exe = new VariableExecutor(this, scope, variable);
-                    return true;
+                    reader.error ??= var_exe.error;
+                    return reader.error == null;
                 }
             var_exe = null;
             return false;

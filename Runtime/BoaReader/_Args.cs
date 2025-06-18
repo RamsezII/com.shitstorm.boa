@@ -34,8 +34,12 @@ namespace _BOA_
 
                     error = $"expected ',' or ')' after argument '{argument}'";
                 }
-                cpl_start = read_old + 1;
-                cpl_end = read_i;
+
+                if (start_i <= cursor_i)
+                {
+                    cpl_start = read_old + 1;
+                    cpl_end = read_i;
+                }
             }
 
             read_i = read_old;

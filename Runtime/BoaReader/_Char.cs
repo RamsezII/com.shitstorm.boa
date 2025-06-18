@@ -58,13 +58,16 @@ namespace _BOA_
 
                 if (c == expected_value)
                 {
-                    cpl_start = read_i;
-                    cpl_end = 1 + read_i;
                     next_i = read_i;
 
-                    if (add_to_completions)
-                        if (IsOnCursor())
+                    if (read_old <= cursor_i)
+                    {
+                        cpl_start = read_i;
+                        cpl_end = 1 + read_i;
+
+                        if (add_to_completions)
                             completions.Add(expected_value.ToString());
+                    }
 
                     return true;
                 }
@@ -75,12 +78,15 @@ namespace _BOA_
                     break;
             }
 
-            if (add_to_completions)
-                if (IsOnCursor())
-                    completions.Add(expected_value.ToString());
+            if (read_old <= cursor_i)
+            {
+                cpl_start = read_i;
+                cpl_end = read_i;
 
-            cpl_start = read_i;
-            cpl_end = read_i;
+                if (add_to_completions)
+                    completions.Add(expected_value.ToString());
+            }
+
             next_i = read_i;
             read_i = read_old;
             return false;
