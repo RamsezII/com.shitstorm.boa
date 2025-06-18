@@ -13,6 +13,8 @@ namespace _BOA_
 
             static IEnumerator<CMD_STATUS> ERoutine(Command.Executor cobra_exe)
             {
+                bool debug = false;
+
                 var scope = new ScopeNode(null);
                 string prefixe = ">";
 
@@ -26,7 +28,26 @@ namespace _BOA_
                         var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
                         var reader = BoaReader.ReadLines(LintTheme.theme_dark, false, cursor_i: cobra_exe.line.cursor_i, lines: input_line);
 
-                        if (!harbinger.TryParseProgram(reader, scope, out var program))
+                        bool success = harbinger.TryParseProgram(reader, scope, out var program);
+
+                        if (debug)
+                            if (cobra_exe.line.HasFlags_any(SIG_FLAGS.TAB | SIG_FLAGS.ALT))
+                            {
+                                char[] chars = new char[1 + reader.text.Length];
+                                for (int i = 0; i < chars.Length; i++)
+                                    if (i == reader.cpl_end)
+                                        chars[i] = '²';
+                                    else if (i == reader.cpl_start)
+                                        chars[i] = '°';
+                                    else
+                                        chars[i] = ' ';
+                                string str = new(chars);
+
+                                Debug.Log($"{reader.text}\n{str}");
+                                Debug.Log($"{reader.completions.Count} completions ({cobra_exe.line.flags}) -> {reader.completions.Join(" ")}");
+                            }
+
+                        if (!success)
                         {
                             cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
 
