@@ -6,7 +6,7 @@ namespace _BOA_
     {
         internal bool TryParseMethod(in BoaReader reader, in ScopeNode scope, out ContractExecutor method_exe)
         {
-            if (reader.TryReadString_matches_out(out string cont_name, lint: reader.lint_theme.contracts, matches: global_contracts.Keys.ToArray()))
+            if (reader.TryReadString_matches_out(out string cont_name, as_function_argument: false, lint: reader.lint_theme.contracts, matches: global_contracts.Keys.ToArray()))
                 if (!global_contracts.TryGetValue(cont_name, out var contract))
                     reader.error ??= $"no contract named '{cont_name}'";
                 else
@@ -19,7 +19,7 @@ namespace _BOA_
                     }
                     return true;
                 }
-            else if (reader.TryReadString_matches_out(out string func_name, lint: reader.lint_theme.functions, matches: scope.EFuncNames().ToArray()))
+            else if (reader.TryReadString_matches_out(out string func_name, as_function_argument: false, lint: reader.lint_theme.functions, matches: scope.EFuncNames().ToArray()))
                 if (!scope.TryGetFunction(func_name, out var func_cont))
                     reader.error ??= $"no function named '{func_name}'";
                 else
@@ -39,7 +39,7 @@ namespace _BOA_
 
         internal bool TryParseVariable(in BoaReader reader, in ScopeNode scope, out VariableExecutor var_exe)
         {
-            if (reader.TryReadString_matches_out(out string var_name, lint: reader.lint_theme.variables, matches: scope.EVarNames().ToArray()))
+            if (reader.TryReadString_matches_out(out string var_name, as_function_argument: false, lint: reader.lint_theme.variables, matches: scope.EVarNames().ToArray()))
                 if (!scope.TryGetVariable(var_name, out var variable))
                     reader.error ??= $"no variable named '{var_name}'";
                 else

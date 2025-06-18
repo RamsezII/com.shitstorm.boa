@@ -25,7 +25,7 @@ namespace _BOA_
         public static bool TryParseFunction(Harbinger harbinger, BoaReader reader, ScopeNode scope)
         {
             int read_old = reader.read_i;
-            if (!reader.TryReadString_match("func", lint: reader.lint_theme.keywords))
+            if (!reader.TryReadString_match("func", as_function_argument: false, lint: reader.lint_theme.keywords))
             {
                 reader.read_i = read_old;
                 goto failure;

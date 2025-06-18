@@ -37,27 +37,29 @@ namespace _BOA_
                     return Executor.EExecute(
                         null, data =>
                         {
-                            if (routine1.Current.output is int i1 && routine2.Current.output is int i2)
+                            object data1 = routine1.Current.output;
+                            object data2 = routine2.Current.output;
+
+                            if (data1 is int int1 && data2 is int int2)
                                 return code switch
                                 {
-                                    OperatorsM.add => i1 + i2,
-                                    OperatorsM.sub => i1 - i2,
-                                    OperatorsM.mul => i1 * i2,
-                                    OperatorsM.div => i1 / i2,
-                                    OperatorsM.div_int => i1 / i2,
-                                    OperatorsM.mod => i1 % i2,
-                                    OperatorsM.eq => i1 == i2,
-                                    OperatorsM.neq => i1 != i2,
-                                    OperatorsM.gt => i1 > i2,
-                                    OperatorsM.lt => i1 < i2,
-                                    OperatorsM.ge => i1 >= i2,
-                                    OperatorsM.le => i1 <= i2,
-                                    OperatorsM.and => i1 & i2,
-                                    OperatorsM.or => i1 | i2,
-                                    OperatorsM.xor => i1 ^ i2,
+                                    OperatorsM.add => int1 + int2,
+                                    OperatorsM.sub => int1 - int2,
+                                    OperatorsM.mul => int1 * int2,
+                                    OperatorsM.div or OperatorsM.div_int => int1 / int2,
+                                    OperatorsM.mod => int1 % int2,
+                                    OperatorsM.eq => int1 == int2,
+                                    OperatorsM.neq => int1 != int2,
+                                    OperatorsM.gt => int1 > int2,
+                                    OperatorsM.lt => int1 < int2,
+                                    OperatorsM.ge => int1 >= int2,
+                                    OperatorsM.le => int1 <= int2,
+                                    OperatorsM.and => int1 & int2,
+                                    OperatorsM.or => int1 | int2,
+                                    OperatorsM.xor => int1 ^ int2,
                                     _ => 0,
                                 };
-                            else if (routine1.Current.output is bool b1 && routine2.Current.output is bool b2)
+                            else if (data1 is bool b1 && data2 is bool b2)
                                 return code switch
                                 {
                                     OperatorsM.and => b1 & b2,
@@ -65,8 +67,14 @@ namespace _BOA_
                                     OperatorsM.xor => b1 ^ b2,
                                     _ => false,
                                 };
-                            else
-                                return default;
+                            else if (data1 is string || data2 is string)
+                            {
+                                if (code == OperatorsM.add)
+                                    return $"{data1}{data2}";
+                            }
+
+                            exe.error ??= $"could not apply operation '{code}' on {data1} and {data2}";
+                            return null;
                         },
                         routine1,
                         routine2

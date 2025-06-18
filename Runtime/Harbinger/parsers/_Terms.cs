@@ -19,7 +19,7 @@
                     _ => 0,
                 };
 
-                if (TryParseUnary(reader, scope, out var expr2))
+                if (TryParseTerm(reader, scope, out var expr2))
                 {
                     ContractExecutor exe = new(this, scope, cmd_math_, reader, parse_arguments: false);
                     exe.args.Add(code);

@@ -32,7 +32,7 @@ namespace _BOA_
                             exe.args.Add(cond);
                             exe.args.Add(block_if);
 
-                            if (exe.reader.TryReadString_match("else", lint: exe.reader.lint_theme.keywords))
+                            if (exe.reader.TryReadString_match("else", as_function_argument: false, lint: exe.reader.lint_theme.keywords))
                                 if (exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block_else))
                                     exe.args.Add(block_else);
                         }

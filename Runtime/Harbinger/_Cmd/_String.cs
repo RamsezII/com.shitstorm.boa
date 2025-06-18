@@ -9,6 +9,7 @@ namespace _BOA_
         {
             enum Operations
             {
+                toString,
                 mirror,
             }
 
@@ -24,12 +25,15 @@ namespace _BOA_
                         ExpressionExecutor expr = null;
                         if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out expr))
                             exe.error ??= $"'{exe.contract.name}' expects an expression";
-                        else if (!exe.reader.TryReadArgument(out string operation_name, lint: exe.reader.lint_theme.operators, as_function_argument: true))
-                            exe.error ??= "missing string operation";
-                        else if (!Enum.TryParse(operation_name, true, out Operations op))
-                            exe.error ??= $"unknown string operation '{operation_name}'";
                         else
                         {
+                            Operations op = 0;
+                            if (exe.reader.TryReadString_matches_out(out string op_name, true, ignore_case: true, lint: exe.reader.lint_theme.operators, matches: Enum.GetNames(typeof(Operations))))
+                            {
+                                exe.error ??= "missing string operation";
+                                if (!Enum.TryParse(op_name, true, out op))
+                                    exe.error ??= $"unknown string operation '{op_name}'";
+                            }
                             exe.arg_0 = expr;
                             exe.args.Add(op);
                         }
@@ -45,7 +49,11 @@ namespace _BOA_
                                     {
                                         case Operations.mirror:
                                             return str.Mirror();
+                                        default:
+                                            return str;
                                     }
+                                else if (op == Operations.toString)
+                                    return $"{data}";
                                 exe.error = $"invalid data type '{data?.GetType()}' for string operation '{op}'";
                                 return data;
                             },

@@ -36,11 +36,11 @@ namespace _BOA_
             return true;
         }
 
-        public bool TryReadString_match(in string match, in Color lint, in bool add_to_completions = true) => TryReadString_matches_out(out _, lint: lint, add_to_completions: add_to_completions, matches: match);
-        public bool TryReadString_match_out(out string value, in string match, in Color lint, in bool add_to_completions = true) => TryReadString_matches_out(out value, lint: lint, add_to_completions: add_to_completions, matches: match);
-        public bool TryReadString_matches_out(out string value, in Color lint, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
+        public bool TryReadString_match(in string match, in bool as_function_argument, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out _, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: match);
+        public bool TryReadString_match_out(out string value, in bool as_function_argument, in string match, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out value, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: match);
+        public bool TryReadString_matches_out(out string value, in bool as_function_argument, in Color lint, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
-            StringComparison ordinal = StringComparison.OrdinalIgnoreCase;
+            StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
             value = null;
 
@@ -51,7 +51,7 @@ namespace _BOA_
                         completions.UnionWith(matches);
 
                 value = string.Empty;
-                while (TryPeekChar_out(out char peek, out int next_i, skippables: null))
+                while (TryPeekChar_out(out char peek, out _, skippables: null))
                 {
                     value += peek;
                     for (int i = 0; i <= matches.Length; ++i)
@@ -67,6 +67,17 @@ namespace _BOA_
                                 {
                                     last_arg = value;
                                     LintToThisPosition(lint);
+
+                                    if (as_function_argument)
+                                        if (TryReadChar_match(',', lint: lint_theme.argument_coma))
+                                            return true;
+
+                                    if (!as_function_argument || !strict_syntax)
+                                        return true;
+
+                                    if (TryPeekChar_match(')', out _))
+                                        return true;
+
                                     return true;
                                 }
                                 break;

@@ -6,9 +6,9 @@
         {
             expression = null;
             if (TryParseAnd(reader, scope, out var or1))
-                if (reader.TryReadString_match_out(out string op_name, lint: reader.lint_theme.keywords, match: "or"))
+                if (reader.TryReadString_match_out(out string op_name, as_function_argument: false, lint: reader.lint_theme.keywords, match: "or"))
                 {
-                    if (TryParseAnd(reader, scope, out var or2))
+                    if (TryParseOr(reader, scope, out var or2))
                     {
                         ContractExecutor exe = new(this, scope, cmd_math_, reader, parse_arguments: false);
                         exe.args.Add(OperatorsM.or);

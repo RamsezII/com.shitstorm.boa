@@ -15,11 +15,9 @@ namespace _BOA_
                 no_semicolon_required: true,
                 args: static exe =>
                 {
-                    //bool got_parenthesis = exe.reader.TryReadChar_match('(');
-
                     if (!exe.reader.TryReadArgument(out string var_name, false, lint: exe.reader.lint_theme.variables))
                         exe.error ??= "specify an item name";
-                    if (!exe.reader.TryReadString_match("in", lint: exe.reader.lint_theme.keywords))
+                    if (!exe.reader.TryReadString_match("in", as_function_argument: false, lint: exe.reader.lint_theme.keywords))
                         exe.error ??= $"expected 'in' keyword";
                     else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expr_list))
                         exe.error ??= "expected expression to iterate through";
