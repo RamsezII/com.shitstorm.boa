@@ -16,7 +16,7 @@
             if (reader.error != null)
                 goto failure;
 
-            if (reader.TryPeekChar_out(out char peek))
+            if (reader.TryPeekChar_out(out char peek, out _))
             {
                 reader.error ??= $"could not parse everything ({nameof(peek)}: '{peek}')";
                 goto failure;

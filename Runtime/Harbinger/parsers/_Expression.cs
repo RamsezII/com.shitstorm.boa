@@ -6,7 +6,7 @@
         {
             if (TryParseAssignation(reader, scope, out expression) || reader.error == null && TryParseOr(reader, scope, out expression))
             {
-                if (allow_argument_syntax && !reader.TryReadChar_match(',', lint: reader.lint_theme.argument_coma) && !reader.TryPeekChar_match(')'))
+                if (allow_argument_syntax && !reader.TryReadChar_match(',', lint: reader.lint_theme.argument_coma) && !reader.TryPeekChar_match(')', out _))
                     if (reader.strict_syntax)
                     {
                         reader.error ??= $"expected ',' or ')' after expression";

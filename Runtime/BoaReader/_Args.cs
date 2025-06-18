@@ -22,7 +22,7 @@ namespace _BOA_
                 if (!as_function_argument || !strict_syntax)
                     goto success;
 
-                if (TryPeekChar_match(')'))
+                if (TryPeekChar_match(')', out _))
                     goto success;
 
                 error = $"expected ',' or ')' after argument '{argument}'";
@@ -36,9 +36,9 @@ namespace _BOA_
             return true;
         }
 
-        public bool TryReadString_match(in string match, in Color lint) => TryReadString_matches_out(out _, lint: lint, matches: match);
-        public bool TryReadString_match_out(out string value, in string match, in Color lint) => TryReadString_matches_out(out value, lint: lint, matches: match);
-        public bool TryReadString_matches_out(out string value, in Color lint, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
+        public bool TryReadString_match(in string match, in Color lint, in bool add_to_completions = true) => TryReadString_matches_out(out _, lint: lint, add_to_completions: add_to_completions, matches: match);
+        public bool TryReadString_match_out(out string value, in string match, in Color lint, in bool add_to_completions = true) => TryReadString_matches_out(out value, lint: lint, add_to_completions: add_to_completions, matches: match);
+        public bool TryReadString_matches_out(out string value, in Color lint, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
         {
             StringComparison ordinal = StringComparison.OrdinalIgnoreCase;
             int read_old = read_i;
@@ -46,8 +46,12 @@ namespace _BOA_
 
             if (skippables == null || HasNext(true, skippables: skippables))
             {
+                if (add_to_completions)
+                    if (IsOnCursor())
+                        completions.UnionWith(matches);
+
                 value = string.Empty;
-                while (TryPeekChar_out(out char peek, skippables: null))
+                while (TryPeekChar_out(out char peek, out int next_i, skippables: null))
                 {
                     value += peek;
                     for (int i = 0; i <= matches.Length; ++i)

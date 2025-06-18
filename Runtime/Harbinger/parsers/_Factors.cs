@@ -33,30 +33,22 @@
                 }
 
             if (reader.error == null)
-                if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
-                    if (scope.TryGetFunction(arg, out var func))
-                    {
-                        reader.LintToThisPosition(reader.lint_theme.functions);
-                        factor = new ContractExecutor(this, scope, func, reader);
-                        if (factor.error != null)
-                        {
-                            reader.error = factor.error;
-                            return false;
-                        }
-                        return true;
-                    }
-                    else if (global_contracts.TryGetValue(arg, out var contract))
-                    {
-                        reader.LintToThisPosition(reader.lint_theme.contracts);
-                        factor = new ContractExecutor(this, scope, contract, reader);
-                        if (factor.error != null)
-                        {
-                            reader.error = factor.error;
-                            return false;
-                        }
-                        return true;
-                    }
-                    else if (scope.TryGetVariable(arg, out var variable))
+                if (TryParseMethod(reader, scope, out var func_exe))
+                {
+                    factor = func_exe;
+                    return true;
+                }
+                else if (reader.error != null)
+                    return false;
+                else if (TryParseVariable(reader, scope, out var var_exe))
+                {
+                    factor = var_exe;
+                    return true;
+                }
+                else if (reader.error != null)
+                    return false;
+                else if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
+                    if (scope.TryGetVariable(arg, out var variable))
                     {
                         reader.LintToThisPosition(reader.lint_theme.variables);
                         factor = new VariableExecutor(this, scope, variable);

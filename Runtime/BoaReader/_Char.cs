@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class BoaReader
     {
-        public bool TryPeekChar_out(out char value, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryPeekChar_out(out char value, out int next_i, in bool ignore_case = true, in string skippables = _empties_)
         {
             int read_old = read_i;
 
@@ -18,8 +19,13 @@ namespace _BOA_
                 if (skippables != null && skippables.Contains(value, ordinal))
                     ++read_i;
                 else
+                {
+                    next_i = read_i;
                     return true;
+                }
             }
+
+            next_i = read_i;
 
             if (read_i > read_old)
                 read_i = read_old;
@@ -29,7 +35,7 @@ namespace _BOA_
 
         public bool TryReadChar_out(out char value, in bool ignore_case = true, in string skippables = _empties_)
         {
-            if (TryPeekChar_out(out value, ignore_case: ignore_case, skippables: skippables))
+            if (TryPeekChar_out(out value, out _, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
                 last_arg = value.ToString();
@@ -38,11 +44,8 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryPeekChar_match(in char expected_value, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_)
+        public bool TryPeekChar_match(in char expected_value, out int next_i, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_)
         {
-            if (add_to_completions)
-                completions.Add(expected_value.ToString());
-
             int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
 
@@ -51,7 +54,15 @@ namespace _BOA_
                 char c = text[read_i];
 
                 if (c == expected_value)
+                {
+                    next_i = read_i;
+
+                    if (add_to_completions)
+                        if (IsOnCursor())
+                            completions.Add(expected_value.ToString());
+
                     return true;
+                }
 
                 if (skippables != null && skippables.Contains(c, ordinal))
                     ++read_i;
@@ -59,16 +70,18 @@ namespace _BOA_
                     break;
             }
 
+            if (add_to_completions)
+                if (IsOnCursor())
+                    completions.Add(expected_value.ToString());
+
+            next_i = read_i;
             read_i = read_old;
             return false;
         }
 
         public bool TryReadChar_match(in char expected_value, in Color lint = default, in bool add_to_completions = true, in bool ignore_case = true, in string skippables = _empties_)
         {
-            if (add_to_completions)
-                completions.Add(expected_value.ToString());
-
-            if (TryPeekChar_match(expected_value, ignore_case: ignore_case, skippables: skippables))
+            if (TryPeekChar_match(expected_value, out _, add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
                 LintToThisPosition(lint);
@@ -80,18 +93,23 @@ namespace _BOA_
 
         public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in bool add_to_completions = true, in string skippables = _empties_)
         {
-            if (add_to_completions)
-                for (int i = 0; i < expected_values.Length; ++i)
-                    completions.Add(expected_values[i].ToString());
-
             int read_old = read_i;
 
-            if (TryPeekChar_out(out value, skippables: skippables) && expected_values.Contains(value, ignore_case.ToOrdinal()))
+            if (TryPeekChar_out(out value, out int next_i, skippables: skippables) && expected_values.Contains(value, ignore_case.ToOrdinal()))
             {
                 ++read_i;
+
+                if (add_to_completions)
+                    if (IsOnCursor(next_i))
+                        completions.UnionWith(expected_values.Select(c => c.ToString()));
+
                 last_arg = value.ToString();
                 return true;
             }
+
+            if (add_to_completions)
+                if (IsOnCursor(next_i))
+                    completions.UnionWith(expected_values.Select(c => c.ToString()));
 
             read_i = read_old;
             return false;

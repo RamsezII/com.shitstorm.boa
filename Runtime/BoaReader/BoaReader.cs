@@ -9,12 +9,12 @@ namespace _BOA_
     {
         public readonly bool strict_syntax;
         public readonly string script_path;
-        public readonly string[] source_lines;
+        public readonly string[] lines;
         public readonly string text;
 
         public readonly bool multiline;
         public readonly int first_line, last_line;
-        public int write_i, start_i, read_i;
+        public int cursor_i, start_i, read_i;
         public string last_arg;
 
 #if UNITY_EDITOR
@@ -23,19 +23,21 @@ namespace _BOA_
 #endif
 
         public string error, long_error;
+        public bool IsOnCursor(in int cursor_i) => cursor_i >= start_i && cursor_i <= read_i;
+        public bool IsOnCursor() => IsOnCursor(cursor_i);
 
-        internal readonly HashSet<string> completions = new(StringComparer.Ordinal);
+        public readonly HashSet<string> completions = new(StringComparer.Ordinal);
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static BoaReader ReadScript(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int write_i = int.MaxValue) => new BoaReader(lint_theme, strict_syntax, script_path, write_i, File.ReadAllLines(script_path));
-        public static BoaReader ReadLines(in LintTheme lint_theme, in bool strict_syntax, in int write_i = int.MaxValue, params string[] lines) => new BoaReader(lint_theme, strict_syntax, "line", write_i, lines);
-        BoaReader(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int write_i, in string[] lines)
+        public static BoaReader ReadScript(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int cursor_i = int.MaxValue) => new BoaReader(lint_theme, strict_syntax, script_path, cursor_i, File.ReadAllLines(script_path));
+        public static BoaReader ReadLines(in LintTheme lint_theme, in bool strict_syntax, in int cursor_i = int.MaxValue, params string[] lines) => new BoaReader(lint_theme, strict_syntax, "line", cursor_i, lines);
+        BoaReader(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int cursor_i, in string[] lines)
         {
             this.lint_theme = lint_theme;
             this.strict_syntax = strict_syntax;
             this.script_path = script_path;
-            this.write_i = write_i;
+            this.cursor_i = cursor_i;
             text = lines.Join("\n");
 #if UNITY_EDITOR
             _text_length = text.Length;
@@ -51,9 +53,9 @@ namespace _BOA_
                 }
 
             if (first_line > 0 || last_line < lines.Length)
-                this.source_lines = lines[first_line..last_line];
+                this.lines = lines[first_line..last_line];
             else
-                this.source_lines = lines;
+                this.lines = lines;
 
             multiline = last_line - first_line > 1;
         }
