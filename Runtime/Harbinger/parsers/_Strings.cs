@@ -1,4 +1,6 @@
-﻿namespace _BOA_
+﻿using UnityEngine;
+
+namespace _BOA_
 {
     partial class Harbinger
     {
@@ -10,6 +12,9 @@
 
             if (reader.HasNext())
             {
+                reader.cpl_start = Mathf.Min(read_old + 1, reader.read_i);
+                reader.cpl_end = reader.read_i;
+
                 char sep = default;
 
                 if (reader.TryReadChar_match('\'', lint: reader.lint_theme.quotes))

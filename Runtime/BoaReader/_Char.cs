@@ -20,16 +20,16 @@ namespace _BOA_
                     ++read_i;
                 else
                 {
+                    cpl_start = read_i;
+                    cpl_end = 1 + read_i;
                     next_i = read_i;
                     return true;
                 }
             }
 
+            cpl_end = read_i;
             next_i = read_i;
-
-            if (read_i > read_old)
-                read_i = read_old;
-
+            read_i = read_old;
             return false;
         }
 
@@ -55,6 +55,8 @@ namespace _BOA_
 
                 if (c == expected_value)
                 {
+                    cpl_start = read_i;
+                    cpl_end = 1 + read_i;
                     next_i = read_i;
 
                     if (add_to_completions)
@@ -74,6 +76,8 @@ namespace _BOA_
                 if (IsOnCursor())
                     completions.Add(expected_value.ToString());
 
+            cpl_start = read_i;
+            cpl_end = read_i;
             next_i = read_i;
             read_i = read_old;
             return false;

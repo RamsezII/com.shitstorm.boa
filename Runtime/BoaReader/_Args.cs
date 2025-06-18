@@ -8,27 +8,38 @@ namespace _BOA_
         public bool TryReadArgument(out string argument, in bool as_function_argument, in Color lint, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
             int read_old = read_i;
-
             error = null;
 
-            if (TryReadArgument(text, out start_i, ref read_i, out argument, skippables: skippables, stoppers: stoppers))
+            if (read_i < text.Length)
             {
-                last_arg = argument;
+                if (TryReadArgument(text, out int start_i, ref read_i, out argument, skippables: skippables, stoppers: stoppers))
+                {
+                    if (start_i <= cursor_i)
+                    {
+                        cpl_start = start_i;
+                        cpl_end = read_i;
+                    }
 
-                if (as_function_argument)
-                    if (TryReadChar_match(',', lint: lint_theme.argument_coma))
+                    last_arg = argument;
+
+                    if (as_function_argument)
+                        if (TryReadChar_match(',', lint: lint_theme.argument_coma))
+                            goto success;
+
+                    if (!as_function_argument || !strict_syntax)
                         goto success;
 
-                if (!as_function_argument || !strict_syntax)
-                    goto success;
+                    if (TryPeekChar_match(')', out _))
+                        goto success;
 
-                if (TryPeekChar_match(')', out _))
-                    goto success;
-
-                error = $"expected ',' or ')' after argument '{argument}'";
+                    error = $"expected ',' or ')' after argument '{argument}'";
+                }
+                cpl_start = read_old + 1;
+                cpl_end = read_i;
             }
 
             read_i = read_old;
+            argument = null;
             return false;
 
         success:

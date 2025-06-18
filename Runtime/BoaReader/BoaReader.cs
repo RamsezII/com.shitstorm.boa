@@ -14,7 +14,7 @@ namespace _BOA_
 
         public readonly bool multiline;
         public readonly int first_line, last_line;
-        public int cursor_i, start_i, read_i;
+        public int cursor_i, cpl_start, read_i, cpl_end;
         public string last_arg;
 
 #if UNITY_EDITOR
@@ -23,7 +23,7 @@ namespace _BOA_
 #endif
 
         public string error, long_error;
-        public bool IsOnCursor(in int cursor_i) => cursor_i >= start_i && cursor_i <= read_i;
+        public bool IsOnCursor(in int cursor_i) => cursor_i >= cpl_start && cursor_i <= read_i;
         public bool IsOnCursor() => IsOnCursor(cursor_i);
 
         public readonly HashSet<string> completions = new(StringComparer.Ordinal);
