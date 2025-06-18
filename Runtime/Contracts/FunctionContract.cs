@@ -88,7 +88,7 @@ namespace _BOA_
                                 exe.error ??= $"could not parse expression for arg[{i}] '{args_names[i]}'";
 
                         exe.scope = func_scope;
-                        var func_reader = BoaReader.ReadCommandLines(reader.lint_theme, reader.strict_syntax, command_lines: block_text.Split('\n', '\r', StringSplitOptions.None));
+                        var func_reader = BoaReader.ReadLines(reader.lint_theme, reader.strict_syntax, lines: block_text.Split('\n', '\r', StringSplitOptions.None));
 
                         if (exe.harbinger.TryParseBlock(func_reader, func_scope, out var func_block))
                             exe.args.Add(func_block);

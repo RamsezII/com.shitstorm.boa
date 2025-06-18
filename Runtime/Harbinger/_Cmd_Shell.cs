@@ -24,7 +24,7 @@ namespace _BOA_
                     if (cobra_exe.line.TryReadAll(out string input_line, lint: false))
                     {
                         var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
-                        var reader = BoaReader.ReadCommandLines(LintTheme.theme_dark, false, input_line);
+                        var reader = BoaReader.ReadLines(LintTheme.theme_dark, false, lines: input_line);
 
                         if (!harbinger.TryParseProgram(reader, scope, out var program))
                         {

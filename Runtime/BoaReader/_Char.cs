@@ -38,8 +38,11 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryPeekChar_match(in char expected_value, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryPeekChar_match(in char expected_value, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_)
         {
+            if (add_to_completions)
+                completions.Add(expected_value.ToString());
+
             int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
 
@@ -60,8 +63,11 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadChar_match(in char expected_value, in Color lint = default, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryReadChar_match(in char expected_value, in Color lint = default, in bool add_to_completions = true, in bool ignore_case = true, in string skippables = _empties_)
         {
+            if (add_to_completions)
+                completions.Add(expected_value.ToString());
+
             if (TryPeekChar_match(expected_value, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
@@ -72,8 +78,12 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in string skippables = _empties_)
+        public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in bool add_to_completions = true, in string skippables = _empties_)
         {
+            if (add_to_completions)
+                for (int i = 0; i < expected_values.Length; ++i)
+                    completions.Add(expected_values[i].ToString());
+
             int read_old = read_i;
 
             if (TryPeekChar_out(out value, skippables: skippables) && expected_values.Contains(value, ignore_case.ToOrdinal()))
