@@ -26,7 +26,11 @@ namespace _BOA_
                         var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
                         var reader = BoaReader.ReadLines(LintTheme.theme_dark, false, cursor_i: cobra_exe.line.cursor_i, lines: input_line);
 
-                        if (!harbinger.TryParseProgram(reader, scope, out var program))
+                        bool success = harbinger.TryParseProgram(reader, scope, out var program);
+                        if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.TAB))
+                            Debug.Log($"{reader.completions.Count} completions: {reader.completions.Join(" ")}");
+
+                        if (!success)
                         {
                             cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
 
@@ -37,10 +41,6 @@ namespace _BOA_
                         else
                         {
                             cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
-
-                            if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.TAB))
-                                Debug.Log($"{reader.completions.Count} completions: {reader.completions.Join(" ")}");
-
                             if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                             {
                                 var routine = program.EExecute();

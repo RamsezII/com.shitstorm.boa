@@ -42,51 +42,43 @@ namespace _BOA_
         {
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
-            value = null;
 
-            if (skippables == null || HasNext(true, skippables: skippables))
+            if (TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))
             {
                 if (add_to_completions)
                     if (IsOnCursor())
                         completions.UnionWith(matches);
 
-                value = string.Empty;
-                while (TryPeekChar_out(out char peek, out _, skippables: null))
-                {
-                    value += peek;
-                    for (int i = 0; i <= matches.Length; ++i)
-                        if (i == matches.Length)
-                            goto out_of_loop;
-                        else
+                for (int match_i = 0; match_i <= matches.Length; ++match_i)
+                    if (match_i == matches.Length)
+                        goto out_of_loop;
+                    else
+                    {
+                        string match = matches[match_i];
+                        if (match.Equals(value, ordinal))
                         {
-                            string match = matches[i];
-                            if (match.StartsWith(value, ordinal))
-                            {
-                                ++read_i;
-                                if (match.Equals(value, ordinal))
-                                {
-                                    last_arg = value;
-                                    LintToThisPosition(lint);
+                            last_arg = value = match;
+                            LintToThisPosition(lint);
 
-                                    if (as_function_argument)
-                                        if (TryReadChar_match(',', lint: lint_theme.argument_coma))
-                                            return true;
-
-                                    if (!as_function_argument || !strict_syntax)
-                                        return true;
-
-                                    if (TryPeekChar_match(')', out _))
-                                        return true;
-
+                            if (as_function_argument)
+                                if (TryReadChar_match(',', lint: lint_theme.argument_coma))
                                     return true;
-                                }
-                                break;
-                            }
-                        }
-                }
-            }
-        out_of_loop:
 
+                            if (!as_function_argument || !strict_syntax)
+                                return true;
+
+                            if (TryPeekChar_match(')', out _))
+                                return true;
+
+                            return true;
+                        }
+                    }
+            }
+            else if (add_to_completions)
+                if (IsOnCursor())
+                    completions.UnionWith(matches);
+
+                out_of_loop:
             read_i = read_old;
             return false;
         }
