@@ -26,11 +26,13 @@
                 }
 
             if (reader.error == null)
-                if (TryParseString(reader, out string str))
+                if (reader.TryParseString(out string str))
                 {
                     factor = new LiteralExecutor(this, scope, literal: str);
                     return true;
                 }
+                else if (reader.error != null)
+                    return false;
 
             if (reader.error == null)
                 if (TryParseMethod(reader, scope, out var func_exe))

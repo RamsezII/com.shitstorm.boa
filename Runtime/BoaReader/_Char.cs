@@ -7,27 +7,30 @@ namespace _BOA_
     {
         public bool TryPeekChar_out(out char value, out int next_i, in bool ignore_case = true, in string skippables = _empties_)
         {
-            int read_old = read_i;
-
             value = default;
+            int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
 
-            while (read_i < text.Length)
+            if (read_i < text.Length)
             {
-                value = text[read_i];
-
-                if (skippables != null && skippables.Contains(value, ordinal))
-                    ++read_i;
-                else
+                while (read_i < text.Length)
                 {
-                    cpl_start = read_i;
-                    cpl_end = 1 + read_i;
-                    next_i = read_i;
-                    return true;
+                    value = text[read_i];
+
+                    if (skippables != null && skippables.Contains(value, ordinal))
+                        ++read_i;
+                    else
+                    {
+                        cpl_start = read_i;
+                        cpl_end = 1 + read_i;
+                        next_i = read_i;
+                        return true;
+                    }
                 }
+                cpl_start = Mathf.Min(read_old + 1, read_i);
+                cpl_end = read_i;
             }
 
-            cpl_end = read_i;
             next_i = read_i;
             read_i = read_old;
             return false;

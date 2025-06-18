@@ -4,10 +4,9 @@ namespace _BOA_
 {
     partial class BoaReader
     {
-        public bool TryParseString(out string value, out string error)
+        public bool TryParseString(out string value)
         {
             int read_old = read_i;
-
             error = null;
 
             if (HasNext())
