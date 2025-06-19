@@ -14,9 +14,9 @@ namespace _BOA_
             static IEnumerator<CMD_STATUS> ERoutine(Command.Executor cobra_exe)
             {
                 bool debug = false;
+                string prefixe = ">";
 
                 var scope = new ScopeNode(null);
-                string prefixe = ">";
 
                 CMD_STATUS shell_status = new(CMD_STATES.WAIT_FOR_STDIN, prefixe: prefixe);
 
@@ -28,7 +28,11 @@ namespace _BOA_
                         var harbinger = new Harbinger(null, data => cobra_exe.Stdout(data));
                         var reader = BoaReader.ReadLines(LintTheme.theme_dark, false, cursor_i: cobra_exe.line.cursor_i, lines: input_line);
 
-                        bool success = harbinger.TryParseProgram(reader, scope, out var program);
+                        ScopeNode scope1 = scope;
+                        if (!cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
+                            scope1 = scope.Dedoublate(null);
+
+                        bool success = harbinger.TryParseProgram(reader, scope1, out var program);
 
                         if (debug)
                             if (cobra_exe.line.HasFlags_any(SIG_FLAGS.TAB | SIG_FLAGS.ALT))

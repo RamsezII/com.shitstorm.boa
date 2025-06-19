@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -41,23 +42,71 @@ namespace _BOA_
         {
             this.value = value;
         }
+
+        //----------------------------------------------------------------------------------------------------------
+
+        public BoaVariable Dedoublate() => new(value);
     }
 
     public sealed class ScopeNode
     {
+        static byte _id;
+        public readonly byte id;
         public readonly ScopeNode parent;
+        HashSet<ScopeNode> children;
 
         Dictionary<string, BoaVariable> _variables;
         Dictionary<string, FunctionContract> _functions;
+
+        public override string ToString() => $"scope[{id}]";
+#if UNITY_EDITOR
+        string _tostring => ToString();
+#endif
+
+        //----------------------------------------------------------------------------------------------------------
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void OnBeforeSceneLoad()
+        {
+            _id = 0;
+        }
 
         //----------------------------------------------------------------------------------------------------------
 
         public ScopeNode(in ScopeNode parent)
         {
+            id = ++_id;
             this.parent = parent;
+
+            if (parent != null)
+                (parent.children ??= new()).Add(this);
         }
 
         //----------------------------------------------------------------------------------------------------------
+
+        public ScopeNode Dedoublate(in ScopeNode parent)
+        {
+            var clone = new ScopeNode(parent);
+
+            if (_variables != null && _variables.Count > 0)
+            {
+                clone._variables = new(StringComparer.Ordinal);
+                foreach (var pair in _variables)
+                    clone._variables[pair.Key] = pair.Value.Dedoublate();
+            }
+
+            if (_functions != null && _functions.Count > 0)
+                clone._functions = new(_functions, StringComparer.Ordinal);
+
+            if (children != null && children.Count > 0)
+            {
+                clone.children = new();
+                foreach (ScopeNode child in children)
+                    clone.children.Add(child.Dedoublate(clone));
+            }
+
+            return clone;
+        }
 
         internal void SetVariable(in string name, in BoaVariable value) => Set(ref _variables, name, value);
         internal BoaVariable GetVariable(in string name) => Get(ref _variables, name);
