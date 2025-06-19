@@ -8,7 +8,7 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        public _COBRA_.SIG_FLAGS shell_sig_mask;
+        public SIG_FLAGS shell_sig_mask;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace _BOA_
                     yield return default;
 
                 string script_path = (string)exe.args[0];
-                script_path = exe.shell.PathCheck(script_path, PathModes.ForceFull);
+                script_path = exe.shell.PathCheck(script_path, _COBRA_.PathModes.ForceFull);
 
                 if (!File.Exists(script_path))
                 {
