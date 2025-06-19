@@ -30,6 +30,7 @@ namespace _BOA_
 
         internal static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
 
+        public readonly Shell shell;
         public readonly Harbinger father;
         public BoaSignal signal;
         public readonly List<object> args = new();
@@ -51,8 +52,9 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Harbinger(in Harbinger father, in Action<object> stdout)
+        public Harbinger(in Shell shell, in Harbinger father, in Action<object> stdout)
         {
+            this.shell = shell;
             this.father = father;
             this.stdout = stdout;
         }

@@ -84,7 +84,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ScopeNode Dedoublate(in ScopeNode parent)
+        public ScopeNode Dedoublate()
         {
             var clone = new ScopeNode(parent);
 
@@ -102,7 +102,7 @@ namespace _BOA_
             {
                 clone.children = new();
                 foreach (ScopeNode child in children)
-                    clone.children.Add(child.Dedoublate(clone));
+                    clone.children.Add(child.Dedoublate());
             }
 
             return clone;

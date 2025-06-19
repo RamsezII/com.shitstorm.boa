@@ -21,7 +21,7 @@ namespace _BOA_
                         else
                         {
                             List<Executor> args_exprs = new();
-                            var harbinger = new Harbinger(exe.harbinger, exe.harbinger.stdout);
+                            var harbinger = new Harbinger(exe.harbinger.shell, exe.harbinger, exe.harbinger.stdout);
                             var reader = BoaReader.ReadScript(exe.reader.lint_theme, exe.reader.strict_syntax, long_path);
 
                             while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))

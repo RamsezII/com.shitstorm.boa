@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public sealed partial class Shell
+    public sealed partial class Shell : MonoBehaviour
     {
         static byte _id;
         public byte id;
@@ -26,6 +26,7 @@ namespace _BOA_
         private void Awake()
         {
             id = ++_id;
+            AwakeWorkDir();
         }
 
         //----------------------------------------------------------------------------------------------------------
