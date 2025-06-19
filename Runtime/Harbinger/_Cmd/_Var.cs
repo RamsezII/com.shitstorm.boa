@@ -21,18 +21,17 @@ namespace _BOA_
                     else
                     {
                         BoaVariable variable = new(null);
-                        exe.scope.SetVariable(varname, variable);
+                        exe.scope.AddVariable(varname, variable);
                         exe.arg_0 = expr;
-                        exe.args.Add(variable);
+                        exe.args.Add(varname);
                     }
                 },
                 routine: static exe =>
                 {
-                    BoaVariable variable = (BoaVariable)exe.args[0];
+                    string var_name = (string)exe.args[0];
                     return Executor.EExecute(
-                        null,
-                        data => variable.value = data,
-                        exe.arg_0.EExecute());
+                        after_execution: data => exe.scope.SetVariable(var_name, new(data)),
+                        stack: exe.arg_0.EExecute());
                 }));
         }
     }

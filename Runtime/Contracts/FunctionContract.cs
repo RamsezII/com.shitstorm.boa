@@ -36,6 +36,11 @@ namespace _BOA_
                 reader.error ??= $"please specify a function name";
                 goto failure;
             }
+            else if (scope.TryGetFunction(func_name, out _))
+            {
+                reader.error ??= $"function named '{func_name}' already defined in this scope";
+                goto failure;
+            }
 
             bool expects_parenthesis = reader.strict_syntax;
             bool found_parenthesis = reader.TryReadChar_match('(');
@@ -65,14 +70,14 @@ namespace _BOA_
             var func_exe = new FunctionExecutor(harbinger, new ScopeNode(scope));
 
             for (int i = 0; i < args_names.Count; i++)
-                func_exe.scope.SetVariable(args_names[i], null);
+                func_exe.scope.AddVariable(args_names[i], null);
 
             read_old = reader.read_i;
             if (!harbinger.TryParseBlock(reader, func_exe.scope, out _))
                 goto failure;
             string block_text = reader.text[read_old..reader.read_i];
 
-            scope.SetFunction(
+            scope.AddFunction(
                 func_name,
                 new FunctionContract(
                     name: func_name,
@@ -83,7 +88,7 @@ namespace _BOA_
 
                         for (int i = 0; i < args_names.Count; i++)
                             if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
-                                func_scope.SetVariable(args_names[i], new BoaVariable(expr));
+                                func_scope.AddVariable(args_names[i], new BoaVariable(expr));
                             else
                                 exe.error ??= $"could not parse expression for arg[{i}] '{args_names[i]}'";
 

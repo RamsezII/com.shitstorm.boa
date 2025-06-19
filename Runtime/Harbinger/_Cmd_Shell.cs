@@ -13,7 +13,7 @@ namespace _BOA_
 
             static IEnumerator<CMD_STATUS> ERoutine(Command.Executor cobra_exe)
             {
-                bool debug = false;
+                bool debug = true;
                 string prefixe = ">";
 
                 var scope = new ScopeNode(null);
