@@ -31,6 +31,7 @@ namespace _BOA_
         internal static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
 
         public readonly Harbinger father;
+        public BoaSignal signal;
         public readonly List<object> args = new();
 
         public string shell_stdin;
