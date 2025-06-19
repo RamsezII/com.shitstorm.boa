@@ -1,21 +1,20 @@
+using System;
 using System.Collections.Generic;
-using _ARK_;
 using UnityEngine;
 
 namespace _BOA_
 {
-    public sealed partial class Shell
+    internal sealed class Janitor : IDisposable
     {
         static byte _id;
         public byte id;
-        public override string ToString() => $"{GetType()}[{id}]";
+        public override string ToString() => $"janitor[{id}]";
 
 #if UNITY_EDITOR
         string ToLog => ToString();
 #endif
 
-        readonly Janitor janitor = new();
-        IEnumerator<Contract.Status> execution;
+        readonly List<(Executor exe, IEnumerator<Contract.Status> routine)> stack = new();
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -27,25 +26,22 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        private void Awake()
+        public Janitor()
         {
             id = ++_id;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        private void Start()
+        public void Dispose()
         {
-            NUCLEOR.delegates.shell_tick += Tick;
-        }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        private void OnDestroy()
-        {
-            NUCLEOR.delegates.shell_tick -= Tick;
-            janitor.Dispose();
-            execution?.Dispose();
+            for (int i = 0; i < stack.Count; ++i)
+            {
+                var (exe, routine) = stack[i];
+                exe.Dispose();
+                routine.Dispose();
+            }
+            stack.Clear();
         }
     }
 }

@@ -8,7 +8,7 @@ namespace _BOA_
     {
         public readonly Harbinger harbinger;
         public string error;
-        public bool disposed;
+        public bool _disposed;
 
         static ushort _id;
         public readonly ushort id;
@@ -28,7 +28,7 @@ namespace _BOA_
 
         protected Executor(in Harbinger harbinger, in ScopeNode scope)
         {
-            id = _id.LoopID();
+            id = _id++;
             this.harbinger = harbinger;
             this.scope = scope;
         }
@@ -62,9 +62,9 @@ namespace _BOA_
 
         public void Dispose()
         {
-            if (disposed)
+            if (_disposed)
                 return;
-            disposed = true;
+            _disposed = true;
             OnDispose();
         }
 
