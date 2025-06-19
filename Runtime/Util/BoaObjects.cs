@@ -92,14 +92,7 @@ namespace _BOA_
             {
                 clone._variables = new(StringComparer.Ordinal);
                 foreach (var pair in _variables)
-                    try
-                    {
-                        clone._variables[pair.Key] = pair.Value?.Dedoublate();
-                    }
-                    catch (Exception e)
-                    {
-                        ;
-                    }
+                    clone._variables[pair.Key] = pair.Value?.Dedoublate();
             }
 
             if (_functions != null && _functions.Count > 0)
