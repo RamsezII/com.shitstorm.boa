@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public sealed partial class Shell
+    public sealed partial class HarbingerShell
     {
         static byte _id;
         public byte id;
