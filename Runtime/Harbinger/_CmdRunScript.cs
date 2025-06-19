@@ -8,7 +8,7 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        public SIG_FLAGS shell_sig_mask;
+        public _COBRA_.SIG_FLAGS shell_sig_mask;
 
         //----------------------------------------------------------------------------------------------------------
 

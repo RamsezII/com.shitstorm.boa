@@ -15,7 +15,7 @@ namespace _BOA_
             AddContract(cmd_assign_ = new("assign",
                 args: static exe =>
                 {
-                    if (exe.reader.TryReadArgument(out string var_name, lint: exe.reader.lint_theme.variables, as_function_argument: false))
+                    if (exe.harbinger.TryParseVariable(exe.reader, exe.scope, out var var_exe))
                         if (exe.reader.TryReadArgument(out string operator_name, lint: exe.reader.lint_theme.operators, as_function_argument: false))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                                 exe.error ??= $"unknown operator '{operator_name}'";
@@ -27,43 +27,38 @@ namespace _BOA_
                                     exe.error ??= $"assignation expect an expression";
 
                                 exe.args.Add(code);
-                                exe.args.Add(var_name);
+                                exe.args.Add(var_exe);
                             }
                 },
                 routine: static exe =>
                 {
                     OperatorsM code = (OperatorsM)exe.args[0];
-                    string var_name = (string)exe.args[1];
+                    VariableExecutor var_exe = (VariableExecutor)exe.args[1];
 
                     return Executor.EExecute(
                         modify_output: data =>
                         {
-                            if (!exe.scope.TryGetVariable(var_name, out var variable))
+                            object value = var_exe.variable.value;
+                            return var_exe.variable.value = (code & ~OperatorsM.assign) switch
                             {
-                                exe.error ??= $"could not find variable named '{var_name}'";
-                                return null;
-                            }
-                            else
-                                return variable.value = (code & ~OperatorsM.assign) switch
-                                {
-                                    OperatorsM.add => (int)variable.value + (int)data,
-                                    OperatorsM.sub => (int)variable.value - (int)data,
-                                    OperatorsM.mul => (int)variable.value * (int)data,
-                                    OperatorsM.div => (int)variable.value / (int)data,
-                                    OperatorsM.div_int => (int)variable.value / (int)data,
-                                    OperatorsM.mod => (int)variable.value % (int)data,
-                                    OperatorsM.not => !(bool)data,
-                                    OperatorsM.eq => Util.Equals2(variable.value, data),
-                                    OperatorsM.neq => !Util.Equals2(variable.value, data),
-                                    OperatorsM.gt => (int)variable.value > (int)data,
-                                    OperatorsM.lt => (int)variable.value < (int)data,
-                                    OperatorsM.ge => (int)variable.value >= (int)data,
-                                    OperatorsM.le => (int)variable.value <= (int)data,
-                                    OperatorsM.and => (bool)variable.value && (bool)data,
-                                    OperatorsM.or => (bool)variable.value || (bool)data,
-                                    OperatorsM.xor => (bool)variable.value != (bool)data,
-                                    _ => data,
-                                };
+                                OperatorsM.add => (int)value + (int)data,
+                                OperatorsM.sub => (int)value - (int)data,
+                                OperatorsM.mul => (int)value * (int)data,
+                                OperatorsM.div => (int)value / (int)data,
+                                OperatorsM.div_int => (int)value / (int)data,
+                                OperatorsM.mod => (int)value % (int)data,
+                                OperatorsM.not => !(bool)data,
+                                OperatorsM.eq => Util.Equals2(value, data),
+                                OperatorsM.neq => !Util.Equals2(value, data),
+                                OperatorsM.gt => (int)value > (int)data,
+                                OperatorsM.lt => (int)value < (int)data,
+                                OperatorsM.ge => (int)value >= (int)data,
+                                OperatorsM.le => (int)value <= (int)data,
+                                OperatorsM.and => (bool)value && (bool)data,
+                                OperatorsM.or => (bool)value || (bool)data,
+                                OperatorsM.xor => (bool)value != (bool)data,
+                                _ => data,
+                            };
                         },
                         stack: exe.arg_0.EExecute()
                     );
