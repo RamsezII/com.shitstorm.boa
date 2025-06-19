@@ -8,7 +8,7 @@ namespace _BOA_
         static readonly BoaSignal sig_tick = new(SIG_FLAGS_new.TICK, null);
 
         readonly ScopeNode scope = new(null);
-        
+
         Harbinger harbinger;
         IEnumerator<Contract.Status> execution;
         readonly Janitor janitor = new();
@@ -21,22 +21,7 @@ namespace _BOA_
         void Tick() => PropagateSignal(sig_tick);
         public void PropagateSignal(in BoaSignal signal)
         {
-            if (execution == null)
-            {
-                bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
-
-                harbinger = new Harbinger(this, null, Stdout);
-
-                var scope = this.scope;
-                if (!submit)
-                    scope = scope.Dedoublate();
-
-                harbinger.TryParseProgram(signal.reader, scope, out var program);
-
-                if (submit)
-                    execution = program.EExecute();
-            }
-            else
+            if (execution != null)
             {
                 harbinger.signal = signal;
                 if (execution.MoveNext())
@@ -47,6 +32,22 @@ namespace _BOA_
                     shell_status.prefixe = GetPrefixe();
                     current_status = shell_status;
                 }
+            }
+            else if (signal.reader != null)
+            {
+                bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
+
+                harbinger = new Harbinger(this, null, Stdout);
+                harbinger.signal = signal;
+
+                var scope = this.scope;
+                if (!submit)
+                    scope = scope.Dedoublate();
+
+                harbinger.TryParseProgram(signal.reader, scope, out var program);
+
+                if (submit)
+                    execution = program.EExecute();
             }
         }
     }
