@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    partial class HarbingerShell
+    partial class Shell
     {
         readonly Queue<object> lines = new();
         [SerializeField] bool stdout_flag;

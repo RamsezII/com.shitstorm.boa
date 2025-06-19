@@ -1,10 +1,9 @@
-using System.Collections.Generic;
 using _ARK_;
 using UnityEngine;
 
 namespace _BOA_
 {
-    public sealed partial class HarbingerShell
+    public sealed partial class Shell
     {
         static byte _id;
         public byte id;
@@ -13,9 +12,6 @@ namespace _BOA_
 #if UNITY_EDITOR
         string ToLog => ToString();
 #endif
-
-        readonly Janitor janitor = new();
-        IEnumerator<Contract.Status> execution;
 
         //----------------------------------------------------------------------------------------------------------
 
