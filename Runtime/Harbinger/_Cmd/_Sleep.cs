@@ -23,6 +23,15 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
 
+                switch (routine.Current.output)
+                {
+                    case float or int:
+                        break;
+                    default:
+                        exe.error ??= $"can not use '{routine.Current.output}' as timer value ({routine.Current.output?.GetType()})";
+                        yield break;
+                }
+
                 float time = routine.Current.output switch
                 {
                     int i => i,

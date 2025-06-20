@@ -28,10 +28,10 @@ namespace _BOA_
 
                 Contract.Status status_last = new(Contract.Status.States.WAIT_FOR_STDIN, prefixe_text: prefixe);
 
-                string stdin;
-                while (!exe.harbinger.TryPullStdin(out stdin))
+                while (!exe.harbinger.signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT))
                     yield return status_last;
 
+                string stdin = exe.harbinger.signal.reader.ReadAll();
                 yield return new(Contract.Status.States.ACTION_skip, output: stdin);
             }
         }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace _BOA_
@@ -10,6 +11,7 @@ namespace _BOA_
         readonly ScopeNode scope = new(null);
 
         Harbinger harbinger;
+        Executor program;
         IEnumerator<Contract.Status> execution;
         readonly Janitor janitor = new();
 
@@ -24,7 +26,24 @@ namespace _BOA_
             if (execution != null)
             {
                 harbinger.signal = signal;
-                if (execution.MoveNext())
+                bool next = execution.MoveNext();
+
+                if (program.error != null)
+                {
+                    if (on_error == null)
+                        Debug.LogWarning(program.error);
+                    else
+                        on_error(program.error);
+
+                    program.Dispose();
+                    program = null;
+
+                    harbinger = null;
+
+                    execution.Dispose();
+                    execution = null;
+                }
+                else if (next)
                     current_status = execution.Current;
                 else
                 {
@@ -47,7 +66,7 @@ namespace _BOA_
                     if (!submit)
                         scope = scope.Dedoublate();
 
-                    if (!harbinger.TryParseProgram(signal.reader, scope, out var program))
+                    if (!harbinger.TryParseProgram(signal.reader, scope, out program))
                     {
                         if (submit)
                         {
