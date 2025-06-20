@@ -10,6 +10,7 @@ namespace _BOA_
         const byte max_lines = 250;
         public string stdout_text, stdout_lint;
         public Action on_stdout;
+        public Action<string> on_error;
 
         //--------------------------------------------------------------------------------------------------------------
 

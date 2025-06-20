@@ -47,9 +47,22 @@ namespace _BOA_
                     if (!submit)
                         scope = scope.Dedoublate();
 
-                    harbinger.TryParseProgram(signal.reader, scope, out var program);
+                    if (!harbinger.TryParseProgram(signal.reader, scope, out var program))
+                    {
+                        if (submit)
+                        {
+                            signal.reader.LocalizeError();
+                            string error = signal.reader.long_error ?? signal.reader.error ?? program.error;
 
-                    if (submit)
+                            if (error != null)
+                                if (on_error == null)
+                                    Debug.LogWarning(error);
+                                else
+                                    on_error(error);
+                        }
+                        harbinger = null;
+                    }
+                    else if (submit)
                         execution = program.EExecute();
                     else
                         harbinger = null;

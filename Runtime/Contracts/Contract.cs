@@ -18,6 +18,8 @@ namespace _BOA_
                 DAEMON,
             }
 
+            static byte _id;
+            public readonly byte id;
             public readonly States state;
             public string prefixe_text, prefixe_lint;
             [Range(0, 1)] public float progress;
@@ -27,6 +29,7 @@ namespace _BOA_
 
             public Status(in States state, in string prefixe_text = default, in string prefixe_lint = default, in float progress = default, in object output = default)
             {
+                id = _id++;
                 this.state = state;
                 this.prefixe_text = prefixe_text;
                 this.prefixe_lint = prefixe_lint ?? prefixe_text;

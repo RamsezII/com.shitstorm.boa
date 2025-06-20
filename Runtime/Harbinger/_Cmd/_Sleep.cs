@@ -23,7 +23,13 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
 
-                float time = (float)routine.Current.output;
+                float time = routine.Current.output switch
+                {
+                    int i => i,
+                    float f => f,
+                    _ => 0,
+                };
+
                 float timer = 0;
 
                 while (timer < time)
