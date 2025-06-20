@@ -1,44 +1,47 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 namespace _BOA_
 {
     partial class Shell
     {
-        readonly Queue<(string, string)> lines = new();
-        [SerializeField] bool stdout_flag;
+        readonly Queue<(string text, string lint)> lines = new();
         const byte max_lines = 250;
+        public string stdout_text, stdout_lint;
+        public Action on_stdout;
 
         //--------------------------------------------------------------------------------------------------------------
 
-        void Stdout(object data) => AddLine(data, null);
-        public void AddLine(in object line, in string lint)
+        public void AddLine(object data, string lint = null)
         {
+            if (data == null)
+                return;
+
+            if (data is not string str)
+                str = data.ToString();
+            lint ??= str;
+
+            StringBuilder sb_text = new(), sb_lint = new();
+
             lock (lines)
             {
                 while (lines.Count >= max_lines)
                     lines.Dequeue();
-                string str = line?.ToString();
-                lines.Enqueue((str, lint ?? str));
-                stdout_flag = true;
-            }
-        }
 
-        public bool PullStdout(out string stdout)
-        {
-            lock (lines)
-                if (stdout_flag)
+                lines.Enqueue((str, lint));
+
+                foreach (var (line_text, line_lint) in lines)
                 {
-                    stdout_flag = false;
-                    StringBuilder sb = new();
-                    foreach (object line in lines)
-                        sb.AppendLine(line?.ToString());
-                    stdout = sb.ToString();
-                    return true;
+                    sb_text.AppendLine(line_text);
+                    sb_lint.AppendLine(line_lint);
                 }
-            stdout = null;
-            return false;
+            }
+
+            stdout_text = sb_text.ToString();
+            stdout_lint = sb_lint.ToString();
+
+            on_stdout?.Invoke();
         }
     }
 }

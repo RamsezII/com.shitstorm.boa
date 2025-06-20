@@ -56,7 +56,8 @@ namespace _BOA_
         {
             this.shell = shell;
             this.father = father;
-            this.stdout = stdout;
+            this.stdout += data => this.shell.AddLine(data);
+            this.stdout += stdout;
         }
 
         //----------------------------------------------------------------------------------------------------------

@@ -25,9 +25,13 @@ namespace _BOA_
             {
                 harbinger.signal = signal;
                 if (execution.MoveNext())
+                {
                     current_status = execution.Current;
+                    shell_status.prefixe = execution.Current.prefixe;
+                }
                 else
                 {
+                    harbinger = null;
                     execution = null;
                     shell_status.prefixe = GetPrefixe();
                     current_status = shell_status;
@@ -37,7 +41,7 @@ namespace _BOA_
             {
                 bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
 
-                harbinger = new Harbinger(this, null, Stdout);
+                harbinger = new Harbinger(this, null, null);
                 harbinger.signal = signal;
 
                 var scope = this.scope;
@@ -48,6 +52,8 @@ namespace _BOA_
 
                 if (submit)
                     execution = program.EExecute();
+                else
+                    harbinger = null;
             }
         }
     }

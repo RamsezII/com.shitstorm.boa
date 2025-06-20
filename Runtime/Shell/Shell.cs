@@ -1,3 +1,4 @@
+using System;
 using _ARK_;
 using UnityEngine;
 
@@ -14,6 +15,7 @@ namespace _BOA_
 #if UNITY_EDITOR
         string ToLog => ToString();
 #endif
+        public Action<string, string> stdout;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -36,6 +38,7 @@ namespace _BOA_
         private void Start()
         {
             NUCLEOR.delegates.shell_tick += Tick;
+            current_status = new Contract.Status(Contract.Status.States.WAIT_FOR_STDIN, GetPrefixe());
         }
 
         //----------------------------------------------------------------------------------------------------------
