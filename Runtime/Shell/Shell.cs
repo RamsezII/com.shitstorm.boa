@@ -6,6 +6,8 @@ namespace _BOA_
     public sealed partial class Shell : MonoBehaviour
     {
         static byte _id;
+
+        public LintTheme lint_theme;
         public byte id;
         public override string ToString() => $"{GetType()}[{id}]";
 

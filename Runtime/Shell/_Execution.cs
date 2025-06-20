@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace _BOA_
 {
-    public sealed partial class Shell : MonoBehaviour
+    partial class Shell
     {
         static readonly BoaSignal sig_tick = new(SIG_FLAGS_new.TICK, null);
 
