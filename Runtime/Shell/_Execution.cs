@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.PackageManager;
 using UnityEngine;
 
 namespace _BOA_
@@ -13,7 +12,6 @@ namespace _BOA_
         Harbinger harbinger;
         Executor program;
         IEnumerator<Contract.Status> execution;
-        readonly Janitor janitor = new();
 
         [SerializeField] Contract.Status shell_status;
         public Contract.Status current_status;

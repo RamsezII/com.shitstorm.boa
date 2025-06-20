@@ -1,47 +1,49 @@
+﻿using _ARK_;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace _BOA_
 {
-    internal sealed class Janitor : IDisposable
+    public sealed partial class Janitor : IDisposable
     {
-        static byte _id;
-        public byte id;
-        public override string ToString() => $"janitor[{id}]";
+        static readonly BoaSignal sig_tick = new(SIG_FLAGS_new.TICK, null);
 
-#if UNITY_EDITOR
-        string ToLog => ToString();
-#endif
-
-        readonly List<(Executor exe, IEnumerator<Contract.Status> routine)> stack = new();
+        readonly Executor program;
+        public readonly IEnumerator<Contract.Status> execution;
+        public string error;
+        public bool _disposed;
 
         //----------------------------------------------------------------------------------------------------------
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void OnAfterSceneLoad()
+        public Janitor(in Executor program)
         {
-            _id = 0;
+            this.program = program;
+            program.janitor = this;
+            execution = program.EExecute();
+            NUCLEOR.delegates.shell_tick += Tick;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Janitor()
+        public void Tick() => PropagateSignal(sig_tick);
+        public void PropagateSignal(in BoaSignal signal)
         {
-            id = ++_id;
+            program.harbinger.signal = signal;
+            if (!execution.MoveNext())
+                Dispose();
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         public void Dispose()
         {
-            for (int i = 0; i < stack.Count; ++i)
-            {
-                var (exe, routine) = stack[i];
-                exe.Dispose();
-                routine.Dispose();
-            }
-            stack.Clear();
+            NUCLEOR.delegates.shell_tick -= Tick;
+
+            if (_disposed)
+                return;
+            _disposed = true;
+
+            execution.Dispose();
         }
     }
 }

@@ -46,7 +46,6 @@ namespace _BOA_
         private void OnDestroy()
         {
             NUCLEOR.delegates.shell_tick -= Tick;
-            janitor.Dispose();
             execution?.Dispose();
         }
     }
