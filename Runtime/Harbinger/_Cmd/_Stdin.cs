@@ -26,7 +26,7 @@ namespace _BOA_
 
                 string prefixe = routine.Current.output.IterateThroughData_str().FirstOrDefault();
 
-                Contract.Status status_last = new(Contract.Status.States.WAIT_FOR_STDIN, prefixe: prefixe);
+                Contract.Status status_last = new(Contract.Status.States.WAIT_FOR_STDIN, prefixe_text: prefixe);
 
                 string stdin;
                 while (!exe.harbinger.TryPullStdin(out stdin))

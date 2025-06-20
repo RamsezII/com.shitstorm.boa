@@ -38,7 +38,7 @@ namespace _BOA_
         private void Start()
         {
             NUCLEOR.delegates.shell_tick += Tick;
-            current_status = new Contract.Status(Contract.Status.States.WAIT_FOR_STDIN, GetPrefixe());
+            ApplyShellPrefixe();
         }
 
         //----------------------------------------------------------------------------------------------------------

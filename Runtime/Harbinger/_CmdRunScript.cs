@@ -86,7 +86,7 @@ namespace _BOA_
                                 switch (routine.Current.state)
                                 {
                                     case Contract.Status.States.WAIT_FOR_STDIN:
-                                        yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe);
+                                        yield return last_status = new CMD_STATUS(CMD_STATES.WAIT_FOR_STDIN, prefixe: routine.Current.prefixe_lint);
                                         break;
 
                                     case Contract.Status.States.ACTION_skip:

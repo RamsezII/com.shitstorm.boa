@@ -19,16 +19,17 @@ namespace _BOA_
             }
 
             public readonly States state;
-            public string prefixe;
+            public string prefixe_text, prefixe_lint;
             [Range(0, 1)] public float progress;
             public object output;
 
             //----------------------------------------------------------------------------------------------------------
 
-            public Status(in States state, in string prefixe = default, in float progress = default, in object output = default)
+            public Status(in States state, in string prefixe_text = default, in string prefixe_lint = default, in float progress = default, in object output = default)
             {
                 this.state = state;
-                this.prefixe = prefixe;
+                this.prefixe_text = prefixe_text;
+                this.prefixe_lint = prefixe_lint ?? prefixe_text;
                 this.progress = progress;
                 this.output = output;
             }

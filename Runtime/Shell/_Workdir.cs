@@ -29,7 +29,14 @@ namespace _BOA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public string GetPrefixe(in string user_name = null, in string cmd_path = null)
+        void ApplyShellPrefixe()
+        {
+            var (prefixe_text, prefixe_lint) = GetPrefixe();
+            shell_status = new Contract.Status(Contract.Status.States.WAIT_FOR_STDIN, prefixe_text: prefixe_text, prefixe_lint: prefixe_lint);
+            current_status = shell_status;
+        }
+
+        public (string text, string lint) GetPrefixe(in string user_name = null, in string cmd_path = null)
         {
             string referent_dir = PathCheck(Shell.referent_dir, PathModes.ForceFull);
             string working_dir = this.working_dir = PathCheck(this.working_dir, PathModes.ForceFull);
@@ -41,7 +48,7 @@ namespace _BOA_
 
             working_dir = working_dir.Replace("\\", "/");
 
-            return $"{(user_name ?? ArkMachine.user_name.Value).SetColor("#73CC26")}:{(cmd_path ?? working_dir).SetColor("#73B2D9")}$";
+            return ($"{user_name ?? ArkMachine.user_name.Value}:{cmd_path ?? working_dir}$ ", $"{(user_name ?? ArkMachine.user_name.Value).SetColor("#73CC26")}:{(cmd_path ?? working_dir).SetColor("#73B2D9")}$ ");
         }
 
         public string PathCheck(in string path, in PathModes path_mode) => PathCheck(path, path_mode, out _, out _);

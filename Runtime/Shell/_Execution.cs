@@ -25,35 +25,35 @@ namespace _BOA_
             {
                 harbinger.signal = signal;
                 if (execution.MoveNext())
-                {
                     current_status = execution.Current;
-                    shell_status.prefixe = execution.Current.prefixe;
-                }
                 else
                 {
                     harbinger = null;
                     execution = null;
-                    shell_status.prefixe = GetPrefixe();
-                    current_status = shell_status;
+                    ApplyShellPrefixe();
                 }
             }
-            else if (signal.reader != null)
+            else
             {
-                bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
+                current_status = shell_status;
+                if (signal != null && signal.reader != null)
+                {
+                    bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
 
-                harbinger = new Harbinger(this, null, null);
-                harbinger.signal = signal;
+                    harbinger = new Harbinger(this, null, null);
+                    harbinger.signal = signal;
 
-                var scope = this.scope;
-                if (!submit)
-                    scope = scope.Dedoublate();
+                    var scope = this.scope;
+                    if (!submit)
+                        scope = scope.Dedoublate();
 
-                harbinger.TryParseProgram(signal.reader, scope, out var program);
+                    harbinger.TryParseProgram(signal.reader, scope, out var program);
 
-                if (submit)
-                    execution = program.EExecute();
-                else
-                    harbinger = null;
+                    if (submit)
+                        execution = program.EExecute();
+                    else
+                        harbinger = null;
+                }
             }
         }
     }
