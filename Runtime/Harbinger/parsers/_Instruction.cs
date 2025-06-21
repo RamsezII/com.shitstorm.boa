@@ -24,7 +24,7 @@
                         if (!reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
                             if (check_semicolon && reader.strict_syntax)
                             {
-                                reader.sig_error ??= $"missing ';' at the end of instruction";
+                                reader.Stderr($"missing ';' at the end of instruction.");
                                 return false;
                             }
 

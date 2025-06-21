@@ -30,6 +30,7 @@ namespace _BOA_
             bracket_1 = Color.rebeccaPurple,
             bracket_2 = Color.navyBlue,
             literal = Color.limeGreen,
+            constants = Color.deepSkyBlue,
             strings = Color.yellowNice,
             quotes = Color.orange
             ;

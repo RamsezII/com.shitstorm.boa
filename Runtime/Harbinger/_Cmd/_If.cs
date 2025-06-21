@@ -15,18 +15,18 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar_match('('))
-                        exe.reader.sig_error ??= "expected opening parenthesis '(' for 'if' condition";
+                        exe.reader.Stderr("expected opening parenthesis '(' for 'if' condition.");
                     else
                     {
                         exe.reader.LintOpeningBraquet();
                         var sub_scope = new ScopeNode(exe.scope, true);
 
                         if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
-                            exe.reader.sig_error ??= "expected expression for 'if' condition";
+                            exe.reader.Stderr("expected expression for 'if' condition.");
                         else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
-                            exe.reader.sig_error ??= "expected closing parenthesis ')' for 'if' condition";
+                            exe.reader.Stderr("expected closing parenthesis ')' for 'if' condition.");
                         else if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block_if))
-                            exe.reader.sig_error ??= "expected block after 'if' condition";
+                            exe.reader.Stderr("expected block after 'if' condition.");
                         else
                         {
                             exe.args.Add(cond);

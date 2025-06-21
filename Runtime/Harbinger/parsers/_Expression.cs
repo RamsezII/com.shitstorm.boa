@@ -9,7 +9,7 @@
                 if (allow_argument_syntax && !reader.TryReadChar_match(',', lint: reader.lint_theme.argument_coma) && !reader.TryPeekChar_match(')', out _))
                     if (reader.strict_syntax)
                     {
-                        reader.sig_error ??= $"expected ',' or ')' after expression";
+                        reader.Stderr($"expected ',' or ')' after expression.");
                         if (expression is ContractExecutor cont)
                             reader.sig_error += $" ('{cont.contract.name}')";
                         else
@@ -21,11 +21,11 @@
                 {
                     var cond = expression;
                     if (!TryParseExpression(reader, scope, false, out var _if))
-                        reader.sig_error ??= $"expected expression after ternary operator '?'";
+                        reader.Stderr($"expected expression after ternary operator '?'.");
                     else if (!reader.TryReadChar_match(':', lint: reader.lint_theme.operators))
-                        reader.sig_error ??= $"expected ternary operator delimiter ':'";
+                        reader.Stderr($"expected ternary operator delimiter ':'.");
                     else if (!TryParseExpression(reader, scope, false, out var _else))
-                        reader.sig_error ??= $"expected second expression after ternary operator ':'";
+                        reader.Stderr($"expected second expression after ternary operator ':'.");
                     else
                     {
                         expression = new TernaryOpExecutor(this, scope, cond, _if, _else);
@@ -47,9 +47,9 @@
             if (!reader.TryReadChar_match('|', lint: reader.lint_theme.operators))
                 return true;
             else if (!reader.TryReadArgument(out string pipe_cont_name, lint: reader.lint_theme.contracts, as_function_argument: false))
-                reader.sig_error ??= $"expected command after pipe operator '|'";
+                reader.Stderr($"expected command after pipe operator '|'.");
             else if (!global_contracts.TryGetValue(pipe_cont_name, out var pipe_cont))
-                reader.sig_error ??= $"can not find command with name '{pipe_cont_name}'";
+                reader.Stderr($"can not find command with name '{pipe_cont_name}'.");
             else
             {
                 expression.pipe_next = new ContractExecutor(this, scope, pipe_cont, reader, pipe_previous: expression);
@@ -60,7 +60,7 @@
 
                 if (!TryPipe(reader, scope, ref expression) || reader.sig_error != null)
                 {
-                    reader.sig_error ??= $"could not parse pipe statement";
+                    reader.Stderr($"could not parse pipe statement.");
                     return false;
                 }
 

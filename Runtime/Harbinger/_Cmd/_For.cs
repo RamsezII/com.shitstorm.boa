@@ -16,26 +16,26 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadChar_match('('))
-                        exe.reader.sig_error ??= "expected '(' at the beginning of 'for' instruction";
+                        exe.reader.Stderr("expected '(' at the beginning of 'for' instruction.");
                     else
                     {
                         exe.reader.LintOpeningBraquet();
                         ScopeNode sub_scope = new ScopeNode(exe.scope, true);
                         if (!exe.harbinger.TryParseInstruction(exe.reader, sub_scope, true, out var instr_init))
-                            exe.reader.sig_error ??= "expected instruction after '(' in 'for' instruction";
+                            exe.reader.Stderr("expected instruction after '(' in 'for' instruction.");
                         else
                         {
                             if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
-                                exe.reader.sig_error ??= "expected expression after first instruction in 'for' instruction";
+                                exe.reader.Stderr("expected expression after first instruction in 'for' instruction.");
                             else
                             {
                                 exe.reader.TryReadChar_match(';', lint: exe.reader.lint_theme.command_separators);
                                 if (!exe.harbinger.TryParseInstruction(exe.reader, sub_scope, false, out var instr_loop))
-                                    exe.reader.sig_error ??= "expected instruction after second expression in 'for' instruction";
+                                    exe.reader.Stderr("expected instruction after second expression in 'for' instruction.");
                                 else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
-                                    exe.reader.sig_error ??= "expected ')' at the end of 'for' instruction";
+                                    exe.reader.Stderr("expected ')' at the end of 'for' instruction.");
                                 else if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
-                                    exe.reader.sig_error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
+                                    exe.reader.Stderr("expected instruction (or block of instructions) after ')' in 'for' instruction.");
                                 else
                                 {
                                     exe.args.Add(instr_init);

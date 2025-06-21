@@ -25,9 +25,9 @@
                             if (reader.TryReadChar_match(unary_operator, reader.lint_theme.operators, skippables: null))
                             {
                                 if (!reader.TryReadArgument(out string var_name, false, reader.lint_theme.variables, skippables: null))
-                                    reader.sig_error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
+                                    reader.Stderr($"expected variable after increment operator '{unary_operator}{unary_operator}'.");
                                 else if (!scope.TryGetVariable(var_name, out _))
-                                    reader.sig_error ??= $"no variable named '{var_name}'";
+                                    reader.Stderr($"no variable named '{var_name}'.");
                                 else
                                 {
                                     expression = new IncrementExecutor(this, scope, var_name, code switch
@@ -52,7 +52,7 @@
                 }
                 else
                 {
-                    reader.sig_error ??= $"expected factor after '{unary_operator}'";
+                    reader.Stderr($"expected factor after '{unary_operator}'.");
                     return false;
                 }
             }
@@ -63,9 +63,9 @@
                 {
                     reader.LintOpeningBraquet();
                     if (!TryParseExpression(reader, scope, false, out var index))
-                        reader.sig_error ??= $"expected expression inside index accessor";
+                        reader.Stderr($"expected expression inside index accessor.");
                     else if (!reader.TryReadChar_match(']', lint: reader.CloseBraquetLint()))
-                        reader.sig_error ??= $"expected closing braquet ']'";
+                        reader.Stderr($"expected closing braquet ']'.");
                     else
                     {
                         expression = new SubArrayExecutor(this, scope, list, index);

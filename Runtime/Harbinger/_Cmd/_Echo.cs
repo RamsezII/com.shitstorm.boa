@@ -15,7 +15,7 @@ namespace _BOA_
                         if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
                             exe.arg_0 = expr;
                         else
-                            exe.reader.sig_error ??= $"expected expression";
+                            exe.reader.Stderr($"'echo' expected expression.");
                 },
                 routine: static exe =>
                 {

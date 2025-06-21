@@ -12,12 +12,12 @@
                     reader.LintOpeningBraquet();
                     if (!TryParseExpression(reader, scope, false, out factor))
                     {
-                        reader.sig_error ??= "expected expression inside factor parenthesis";
+                        reader.Stderr("expected expression inside factor parenthesis.");
                         return false;
                     }
                     else if (!reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
-                        reader.sig_error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
+                        reader.Stderr($"expected closing parenthesis ')' after factor {factor.ToLog}.");
                         --reader.read_i;
                         return false;
                     }
@@ -26,9 +26,9 @@
                 }
 
             if (reader.sig_error == null)
-                if (TryParseString(reader, scope, out string str))
+                if (TryParseString(reader, scope, out var str))
                 {
-                    factor = new LiteralExecutor(this, scope, literal: str);
+                    factor = str;
                     return true;
                 }
                 else if (reader.sig_error != null)
@@ -53,10 +53,12 @@
                     switch (arg.ToLower())
                     {
                         case "true":
+                            reader.LintToThisPosition(reader.lint_theme.constants);
                             factor = new LiteralExecutor(this, scope, literal: true);
                             return true;
 
                         case "false":
+                            reader.LintToThisPosition(reader.lint_theme.constants);
                             factor = new LiteralExecutor(this, scope, literal: false);
                             return true;
 
@@ -67,9 +69,10 @@
                                 factor = new LiteralExecutor(this, scope, literal: _float);
                             else
                             {
-                                reader.sig_error ??= $"unrecognized literal : '{arg}'";
+                                reader.Stderr($"unrecognized literal : '{arg}'.");
                                 return false;
                             }
+                            reader.LintToThisPosition(reader.lint_theme.literal);
                             return true;
                     }
 

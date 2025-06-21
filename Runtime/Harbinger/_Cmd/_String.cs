@@ -24,15 +24,15 @@ namespace _BOA_
                     {
                         ExpressionExecutor expr = null;
                         if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out expr))
-                            exe.reader.sig_error ??= $"'{exe.contract.name}' expects an expression";
+                            exe.reader.Stderr($"'{exe.contract.name}' expects an expression.");
                         else
                         {
                             Operations op = 0;
                             if (exe.reader.TryReadString_matches_out(out string op_name, true, ignore_case: true, lint: exe.reader.lint_theme.operators, matches: Enum.GetNames(typeof(Operations))))
                             {
-                                exe.reader.sig_error ??= "missing string operation";
+                                exe.reader.Stderr("missing string operation.");
                                 if (!Enum.TryParse(op_name, true, out op))
-                                    exe.reader.sig_error ??= $"unknown string operation '{op_name}'";
+                                    exe.reader.Stderr($"unknown string operation '{op_name}'.");
                             }
                             exe.arg_0 = expr;
                             exe.args.Add(op);

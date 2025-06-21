@@ -4,7 +4,7 @@
     {
         public bool TryParsePath(in BoaReader reader, in ScopeNode scope, out string path)
         {
-            if (TryParseString(reader, scope, out path))
+            if (reader.TryParseString(out path))
             {
                 if ((signal.flags & SIG_FLAGS_new.TAB) != 0)
                     path = shell.PathCheck(path, PathModes.TryMaintain);
@@ -12,7 +12,7 @@
             }
             else
             {
-                reader.sig_error ??= $"could not parse path '{path}'.";
+                reader.Stderr($"could not parse path '{path}'.");
                 return false;
             }
         }

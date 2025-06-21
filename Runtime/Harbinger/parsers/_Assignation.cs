@@ -44,7 +44,7 @@
                     }
                     else
                     {
-                        reader.sig_error ??= $"expected expression after '{op_name}' operator";
+                        reader.Stderr($"expected expression after '{op_name}' operator.");
                         return false;
                     }
                 }

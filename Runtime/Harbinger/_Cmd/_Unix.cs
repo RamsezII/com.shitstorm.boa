@@ -15,7 +15,7 @@ namespace _BOA_
                     if (exe.harbinger.TryParsePath(exe.reader, exe.scope, out string path))
                         exe.arg_0 = new LiteralExecutor(exe.harbinger, exe.scope, path);
                     else
-                        exe.reader.sig_error ??= $"expected path string.";
+                        exe.reader.Stderr($"expected path string.");
                 },
                 routine: static exe =>
                 {

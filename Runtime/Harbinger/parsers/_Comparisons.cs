@@ -31,7 +31,7 @@
                     }
                     else
                     {
-                        reader.sig_error ??= $"expected expression after '{op_char}' operator";
+                        reader.Stderr($"expected expression after '{op_char}' operator.");
                         return false;
                     }
                 }

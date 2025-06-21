@@ -18,7 +18,7 @@
 
             if (reader.TryPeekChar_out(out char peek, out _))
             {
-                reader.sig_error ??= $"could not parse everything ({nameof(peek)}: '{peek}')";
+                reader.Stderr($"could not parse everything ({nameof(peek)}: '{peek}').");
                 goto failure;
             }
 

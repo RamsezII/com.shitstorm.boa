@@ -33,12 +33,12 @@ namespace _BOA_
 
             if (!reader.TryReadArgument(out string func_name, lint: reader.lint_theme.functions, as_function_argument: false))
             {
-                reader.sig_error ??= $"please specify a function name";
+                reader.Stderr($"please specify a function name.");
                 goto failure;
             }
             else if (scope.TryGetFunction(func_name, out _))
             {
-                reader.sig_error ??= $"function named '{func_name}' already defined in this scope";
+                reader.Stderr($"function named '{func_name}' already defined in this scope.");
                 goto failure;
             }
 
@@ -50,7 +50,7 @@ namespace _BOA_
 
             if (expects_parenthesis && !found_parenthesis)
             {
-                reader.sig_error ??= $"'{func_name}' expected opening parenthesis '('";
+                reader.Stderr($"'{func_name}' expected opening parenthesis '('.");
                 goto failure;
             }
 
@@ -63,7 +63,7 @@ namespace _BOA_
 
             if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
             {
-                reader.sig_error ??= $"'{func_name}' expected closing parenthesis ')'";
+                reader.Stderr($"'{func_name}' expected closing parenthesis ')'.");
                 goto failure;
             }
 
@@ -90,7 +90,7 @@ namespace _BOA_
                             if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
                                 func_scope.AddVariable(args_names[i], new BoaVariable(expr));
                             else
-                                exe.reader.sig_error ??= $"could not parse expression for arg[{i}] '{args_names[i]}'";
+                                exe.reader.Stderr($"could not parse expression for arg[{i}] '{args_names[i]}'.");
 
                         exe.scope = func_scope;
                         var func_reader = BoaReader.ReadLines(reader.lint_theme, reader.strict_syntax, lines: block_text.Split('\n', '\r', StringSplitOptions.None));
@@ -98,7 +98,7 @@ namespace _BOA_
                         if (exe.harbinger.TryParseBlock(func_reader, func_scope, out var func_block))
                             exe.args.Add(func_block);
                         else
-                            exe.reader.sig_error ??= func_reader.sig_error;
+                            exe.reader.Stderr(func_reader.sig_error);
                     },
                     routine: ERoutine
                 )

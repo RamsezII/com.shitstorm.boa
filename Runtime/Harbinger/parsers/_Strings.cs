@@ -1,78 +1,99 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class Harbinger
     {
-        public bool TryParseString(in BoaReader reader, in ScopeNode scope, out string value)
+        public bool TryParseString(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor executor)
         {
+            executor = null;
             int read_old = reader.read_i;
-            reader.sig_error = null;
 
-            if (reader.HasNext())
-            {
-                reader.cpl_start = Mathf.Min(read_old + 1, reader.read_i);
-                reader.cpl_end = reader.read_i;
+            char sep = default;
 
-                char sep = default;
+            if (reader.TryReadChar_match('\'', lint: reader.lint_theme.quotes))
+                sep = '\'';
+            else if (reader.TryReadChar_match('"', lint: reader.lint_theme.quotes))
+                sep = '"';
 
-                if (reader.TryReadChar_match('\'', lint: reader.lint_theme.quotes))
-                    sep = '\'';
-                else if (reader.TryReadChar_match('"', lint: reader.lint_theme.quotes))
-                    sep = '"';
+            if (sep == default)
+                return false;
 
-                if (sep != default)
+            reader.cpl_start = Mathf.Min(read_old + 1, reader.read_i - 1);
+            reader.cpl_end = reader.read_i - 1;
+
+            List<Executor> stack = new();
+            string value = string.Empty;
+            int start_i = reader.read_i;
+            reader.LintToThisPosition(reader.lint_theme.quotes);
+
+            while (reader.TryReadChar_out(out char c, skippables: null))
+                switch (c)
                 {
-                    value = string.Empty;
-                    int start_i = reader.read_i;
-                    reader.LintToThisPosition(reader.lint_theme.quotes);
+                    case '\\':
+                        ++reader.read_i;
+                        break;
 
-                    while (reader.TryReadChar_out(out char c, skippables: null))
-                        switch (c)
+                    case '\'' or '"' when c == sep:
                         {
-                            case '\\':
-                                ++reader.read_i;
-                                break;
+                            reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
+                            reader.LintToThisPosition(reader.lint_theme.quotes);
 
-                            case '\'' or '"' when c == sep:
-                                reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
-                                reader.LintToThisPosition(reader.lint_theme.quotes);
-                                reader.last_arg = value;
-                                return true;
+                            reader.last_arg = value;
+                            reader.cpl_end = reader.read_i - 1;
 
-                            case '{':
-                                if (!TryParseExpression(reader, scope, false, out var expr))
-                                {
-                                    reader.sig_error ??= $"expected expression";
-                                    value = null;
-                                    return false;
-                                }
-                                if (!reader.TryReadChar_match('}'))
-                                {
-                                    reader.sig_error ??= $"expected closing braquet '}}'.";
-                                    value = null;
-                                    return false;
-                                }
-                                break;
+                            if (value.Length > 0)
+                                stack.Add(new LiteralExecutor(this, scope, value));
 
-                            default:
-                                value += c;
-                                break;
+                            if (stack.Count > 0)
+                                executor = new StringExecutor(this, scope, stack);
                         }
+                        return true;
 
-                    if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
-                    {
-                        value = value[..err_index];
-                        reader.read_i = start_i + err_index;
-                    }
+                    case '{':
+                        {
+                            reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
+                            reader.LintToThisPosition(reader.lint_theme.quotes);
 
-                    reader.sig_error ??= $"string error: expected closing quote '{sep}'";
-                    return false;
+                            if (value.Length > 0)
+                            {
+                                stack.Add(new LiteralExecutor(this, scope, value));
+                                value = string.Empty;
+                            }
+
+                            if (!TryParseExpression(reader, scope, false, out var expr))
+                            {
+                                reader.Stderr($"expected expression after '{{'.");
+                                return false;
+                            }
+
+                            if (!reader.TryReadChar_match('}'))
+                            {
+                                reader.Stderr($"expected closing braquet '}}'.");
+                                return false;
+                            }
+
+                            reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
+                            reader.LintToThisPosition(reader.lint_theme.quotes);
+
+                            stack.Add(expr);
+                        }
+                        break;
+
+                    default:
+                        value += c;
+                        break;
                 }
-            }
 
-            value = null;
-            reader.read_i = read_old;
+            if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
+                reader.read_i = start_i + err_index;
+            else
+                reader.read_i = read_old;
+
+            reader.LintToThisPosition(reader.lint_theme.quotes);
+
+            reader.Stderr($"string error: expected closing quote '{sep}'.");
             return false;
         }
     }

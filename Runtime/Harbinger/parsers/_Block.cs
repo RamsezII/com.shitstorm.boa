@@ -25,7 +25,7 @@
                 if (reader.TryReadChar_match('}', lint: reader.CloseBraquetLint()))
                     return true;
                 else
-                    reader.sig_error ??= $"expected closing bracket '}}'";
+                    reader.Stderr($"expected closing bracket '}}'.");
             }
             else if (TryParseInstruction(reader, scope, true, out block))
                 return true;
