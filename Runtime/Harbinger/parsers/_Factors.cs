@@ -42,7 +42,7 @@
                 }
                 else if (reader.sig_error != null)
                     return false;
-                else if (TryParseVariable(reader, scope, out var var_exe))
+                else if (TryParseVariable(reader, scope, out _, out var var_exe))
                 {
                     factor = var_exe;
                     return true;

@@ -70,8 +70,56 @@ namespace _BOA_
                                 };
                             else if (data1 is string || data2 is string)
                             {
-                                if (code == OperatorsM.add)
-                                    return $"{data1}{data2}";
+                                if (data1 is not string str1)
+                                    str1 = data1?.ToString() ?? string.Empty;
+
+                                if (data2 is not string str2)
+                                    str2 = data2?.ToString() ?? string.Empty;
+
+                                switch (code)
+                                {
+                                    case OperatorsM.add:
+                                        return $"{str1}{str1}";
+
+                                    case OperatorsM.assign:
+                                        break;
+
+                                    case OperatorsM.sub:
+                                        break;
+
+                                    case OperatorsM.mul:
+                                        break;
+
+                                    case OperatorsM.mod:
+                                        break;
+
+                                    case OperatorsM.eq:
+                                        return str1.Equals(str2, StringComparison.Ordinal);
+
+                                    case OperatorsM.neq:
+                                        return !str1.Equals(str2, StringComparison.Ordinal);
+
+                                    case OperatorsM.gt:
+                                        break;
+
+                                    case OperatorsM.lt:
+                                        break;
+
+                                    case OperatorsM.ge:
+                                        break;
+
+                                    case OperatorsM.le:
+                                        break;
+
+                                    case OperatorsM.and:
+                                        break;
+
+                                    case OperatorsM.or:
+                                        break;
+
+                                    case OperatorsM.xor:
+                                        break;
+                                }
                             }
 
                             exe.harbinger.Stderr($"could not apply operation '{code}' on {data1} and {data2}");

@@ -7,7 +7,7 @@
             assignation = null;
             int read_old = reader.read_i;
 
-            if (TryParseVariable(reader, scope, out var var_exe))
+            if (TryParseVariable(reader, scope, out string var_name, out _))
                 if (reader.TryReadString_matches_out(
                     out string op_name,
                     as_function_argument: false,
@@ -16,16 +16,18 @@
                     add_to_completions: true,
                     skippables: BoaReader._empties_,
                     stoppers: " \n\r{}(),;'\"",
-                    "=", "+=", "-=", "*=", "/=")
+                    "=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
                     )
                 {
                     OperatorsM code = op_name switch
                     {
-                        "==" => OperatorsM.eq,
                         "+=" => OperatorsM.add,
                         "-=" => OperatorsM.sub,
                         "*=" => OperatorsM.mul,
                         "/=" => OperatorsM.div,
+                        "&=" => OperatorsM.and,
+                        "|=" => OperatorsM.or,
+                        "^=" => OperatorsM.xor,
                         _ => OperatorsM.unknown,
                     };
 
@@ -35,7 +37,7 @@
                     {
                         ContractExecutor exe = new(this, scope, cmd_assign_, reader, parse_arguments: false);
                         exe.args.Add(code);
-                        exe.args.Add(var_exe);
+                        exe.args.Add(var_name);
                         exe.arg_0 = expr;
                         assignation = exe;
                         return true;

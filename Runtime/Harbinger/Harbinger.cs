@@ -35,7 +35,6 @@ namespace _BOA_
         public BoaSignal signal;
         public readonly List<object> args = new();
         public string _stderr;
-        public string shell_stdin;
         public Action<object> stdout;
 
         //----------------------------------------------------------------------------------------------------------
@@ -62,15 +61,6 @@ namespace _BOA_
         }
 
         //----------------------------------------------------------------------------------------------------------
-
-        public bool TryPullStdin(out string stdin)
-        {
-            if (Util.TryPullValue(ref shell_stdin, out stdin))
-                return true;
-            else if (father != null && father.TryPullStdin(out stdin))
-                return true;
-            return false;
-        }
 
         public void Stderr(in string error)
         {

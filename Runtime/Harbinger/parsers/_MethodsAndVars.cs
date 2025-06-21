@@ -27,9 +27,9 @@ namespace _BOA_
             return false;
         }
 
-        internal bool TryParseVariable(in BoaReader reader, in ScopeNode scope, out VariableExecutor var_exe)
+        internal bool TryParseVariable(in BoaReader reader, in ScopeNode scope, out string var_name, out VariableExecutor var_exe)
         {
-            if (reader.TryReadString_matches_out(out string var_name, as_function_argument: false, lint: reader.lint_theme.variables, matches: scope.EVarNames().ToArray()))
+            if (reader.TryReadString_matches_out(out var_name, as_function_argument: false, lint: reader.lint_theme.variables, matches: scope.EVarNames().ToArray()))
                 if (!scope.TryGetVariable(var_name, out _))
                     reader.sig_error ??= $"no variable named '{var_name}'";
                 else

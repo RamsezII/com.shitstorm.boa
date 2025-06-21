@@ -70,11 +70,6 @@ namespace _BOA_
                                 while (true)
                                 {
                                     harbinger.shell_sig_mask = cobra_exe.line.flags;
-
-                                    if (last_status.state == CMD_STATES.WAIT_FOR_STDIN)
-                                        if (!cobra_exe.line.TryReadAll(out harbinger.shell_stdin))
-                                            harbinger.shell_stdin = null;
-
                                     if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.TICK) || last_status.state == CMD_STATES.WAIT_FOR_STDIN && cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                                     {
                                     before_movenext:
