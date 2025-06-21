@@ -44,6 +44,8 @@ namespace _BOA_
         DOWN = 1 << SIG_ENUM._down,
         LEFT = 1 << SIG_ENUM._left,
 
+        CHANGE = CPL | LINT,
+
         UP_DOWN = UP | DOWN,
         LEFT_RIGHT = LEFT | RIGHT,
 
