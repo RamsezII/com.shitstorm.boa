@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -30,6 +31,7 @@ namespace _BOA_
                     lines.Dequeue();
 
                 lines.Enqueue((str, lint));
+                Debug.Log(lint, this);
 
                 foreach (var (line_text, line_lint) in lines)
                 {
