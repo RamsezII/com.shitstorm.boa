@@ -16,18 +16,18 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadArgument(out string var_name, false, lint: exe.reader.lint_theme.variables))
-                        exe.error ??= "specify an item name";
+                        exe.reader.sig_error ??= "specify an item name";
                     if (!exe.reader.TryReadString_match("in", as_function_argument: false, lint: exe.reader.lint_theme.keywords))
-                        exe.error ??= $"expected 'in' keyword";
+                        exe.reader.sig_error ??= $"expected 'in' keyword";
                     else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expr_list))
-                        exe.error ??= "expected expression to iterate through";
+                        exe.reader.sig_error ??= "expected expression to iterate through";
                     else
                     {
                         var sub_scope = new ScopeNode(exe.scope);
                         sub_scope.AddVariable(var_name, new BoaVariable(null));
 
                         if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
-                            exe.error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
+                            exe.reader.sig_error ??= "expected instruction (or block of instructions) after ')' in 'for' instruction";
                         else
                         {
                             exe.args.Add(sub_scope);

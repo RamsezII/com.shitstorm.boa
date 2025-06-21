@@ -26,12 +26,13 @@ namespace _BOA_
                 harbinger.signal = signal;
                 bool next = execution.MoveNext();
 
-                if (program.error != null)
+                if (harbinger.executionnal_error != null)
                 {
+                    AddLine(harbinger.executionnal_error, harbinger.executionnal_error.SetColor(Color.orange));
                     if (on_error == null)
-                        Debug.LogWarning(program.error);
+                        Debug.LogWarning(harbinger.executionnal_error);
                     else
-                        on_error(program.error);
+                        on_error(harbinger.executionnal_error);
 
                     program.Dispose();
                     program = null;
@@ -69,7 +70,7 @@ namespace _BOA_
                         if (submit)
                         {
                             signal.reader.LocalizeError();
-                            string error = signal.reader.long_error ?? signal.reader.error ?? program.error;
+                            string error = signal.reader.sig_long_error ?? signal.reader.sig_error;
 
                             if (error != null)
                                 if (on_error == null)

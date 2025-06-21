@@ -24,15 +24,15 @@ namespace _BOA_
                     {
                         ExpressionExecutor expr = null;
                         if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out expr))
-                            exe.error ??= $"'{exe.contract.name}' expects an expression";
+                            exe.reader.sig_error ??= $"'{exe.contract.name}' expects an expression";
                         else
                         {
                             Operations op = 0;
                             if (exe.reader.TryReadString_matches_out(out string op_name, true, ignore_case: true, lint: exe.reader.lint_theme.operators, matches: Enum.GetNames(typeof(Operations))))
                             {
-                                exe.error ??= "missing string operation";
+                                exe.reader.sig_error ??= "missing string operation";
                                 if (!Enum.TryParse(op_name, true, out op))
-                                    exe.error ??= $"unknown string operation '{op_name}'";
+                                    exe.reader.sig_error ??= $"unknown string operation '{op_name}'";
                             }
                             exe.arg_0 = expr;
                             exe.args.Add(op);
@@ -54,7 +54,7 @@ namespace _BOA_
                                     }
                                 else if (op == Operations.toString)
                                     return $"{data}";
-                                exe.error = $"invalid data type '{data?.GetType()}' for string operation '{op}'";
+                                exe.harbinger.executionnal_error ??= $"invalid data type '{data?.GetType()}' for string operation '{op}'";
                                 return data;
                             },
                             exe.arg_0.EExecute());

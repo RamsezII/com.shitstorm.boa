@@ -18,13 +18,13 @@ namespace _BOA_
                     if (exe.harbinger.TryParseVariable(exe.reader, exe.scope, out var var_exe))
                         if (exe.reader.TryReadArgument(out string operator_name, lint: exe.reader.lint_theme.operators, as_function_argument: false))
                             if (!Enum.TryParse(operator_name, true, out OperatorsM code))
-                                exe.error ??= $"unknown operator '{operator_name}'";
+                                exe.reader.sig_error ??= $"unknown operator '{operator_name}'";
                             else
                             {
                                 if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expression))
                                     exe.arg_0 = expression;
                                 else
-                                    exe.error ??= $"assignation expect an expression";
+                                    exe.reader.sig_error ??= $"assignation expect an expression";
 
                                 exe.args.Add(code);
                                 exe.args.Add(var_exe);

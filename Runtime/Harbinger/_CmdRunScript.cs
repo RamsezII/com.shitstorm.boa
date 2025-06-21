@@ -60,9 +60,9 @@ namespace _BOA_
                 Harbinger harbinger = new(null, null, data => exe.Stdout(data));
                 BoaReader reader = BoaReader.ReadScript(LintTheme.theme_dark, strict_syntax, script_path);
 
-                if (!harbinger.TryParseProgram(reader, null, out Executor program) || reader.error != null)
+                if (!harbinger.TryParseProgram(reader, null, out Executor program) || reader.sig_error != null)
                 {
-                    exe.error = reader.long_error ?? reader.error;
+                    exe.error = reader.sig_long_error ?? reader.sig_error;
                     yield break;
                 }
 

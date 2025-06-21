@@ -17,7 +17,7 @@ namespace _BOA_
                 {
                     if (exe.reader.TryReadArgument(out string operator_name, true, lint: exe.reader.lint_theme.operators))
                         if (!Enum.TryParse(operator_name, true, out OperatorsM code))
-                            exe.error = $"unknown operator '{operator_name}'";
+                            exe.reader.sig_error = $"unknown operator '{operator_name}'";
                         else if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr1))
                             if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr2))
                             {
@@ -73,7 +73,7 @@ namespace _BOA_
                                     return $"{data1}{data2}";
                             }
 
-                            exe.error ??= $"could not apply operation '{code}' on {data1} and {data2}";
+                            exe.harbinger.executionnal_error ??= $"could not apply operation '{code}' on {data1} and {data2}";
                             return null;
                         },
                         routine1,

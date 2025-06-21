@@ -31,7 +31,7 @@
                     }
                     else
                     {
-                        reader.error ??= $"expected expression after '{op_char}' operator";
+                        reader.sig_error ??= $"expected expression after '{op_char}' operator";
                         return false;
                     }
                 }

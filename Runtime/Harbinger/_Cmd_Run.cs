@@ -17,7 +17,7 @@ namespace _BOA_
                     {
                         string long_path = Path.Combine(Directory.GetParent(exe.reader.script_path).FullName, path);
                         if (!File.Exists(long_path))
-                            exe.error ??= $"can not find file at path: {long_path}";
+                            exe.reader.sig_error ??= $"can not find file at path: {long_path}";
                         else
                         {
                             List<Executor> args_exprs = new();
@@ -31,7 +31,7 @@ namespace _BOA_
                             }
 
                             if (!harbinger.TryParseProgram(reader, exe.scope, out var program))
-                                exe.error = exe.reader.long_error;
+                                exe.reader.sig_error = exe.reader.sig_long_error;
 
                             exe.args.Add(program);
                             exe.args.Add(args_exprs);

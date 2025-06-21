@@ -42,7 +42,7 @@
                     }
                     else
                     {
-                        reader.error ??= $"expected expression after '{op_name}' operator";
+                        reader.sig_error ??= $"expected expression after '{op_name}' operator";
                         return false;
                     }
                 }

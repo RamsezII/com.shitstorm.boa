@@ -19,7 +19,7 @@ namespace _BOA_
             for (int i = 0; i < stack.Count; i++)
             {
                 var exe = stack[i];
-                var routine = exe.EExecute();
+                using var routine = exe.EExecute();
                 while (routine.MoveNext())
                     yield return routine.Current;
             }

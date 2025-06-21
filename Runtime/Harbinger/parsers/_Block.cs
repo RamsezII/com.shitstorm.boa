@@ -16,7 +16,7 @@
                     if (sub_block != null)
                         body.stack.Add(sub_block);
 
-                if (reader.error != null)
+                if (reader.sig_error != null)
                 {
                     block = null;
                     return false;
@@ -25,7 +25,7 @@
                 if (reader.TryReadChar_match('}', lint: reader.CloseBraquetLint()))
                     return true;
                 else
-                    reader.error ??= $"expected closing bracket '}}'";
+                    reader.sig_error ??= $"expected closing bracket '}}'";
             }
             else if (TryParseInstruction(reader, scope, true, out block))
                 return true;

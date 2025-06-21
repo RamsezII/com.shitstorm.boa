@@ -18,18 +18,18 @@ namespace _BOA_
                     if (multiline)
                     {
                         if (false)
-                            long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}|\n{spaces}└──> {error}";
+                            sig_long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}|\n{spaces}└──> {sig_error}";
                         else
-                            long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}└──> {error}";
+                            sig_long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}└──> {sig_error}";
                     }
                     else
-                        long_error = $"{line}\n{new string(' ', read_i - char_count)}└──> {error}";
+                        sig_long_error = $"{line}\n{new string(' ', read_i - char_count)}└──> {sig_error}";
 
                     return;
                 }
                 char_count += eol_lenth + line.Length;
             }
-            long_error = $"\n{error}";
+            sig_long_error = $"\n{sig_error}";
         }
     }
 }

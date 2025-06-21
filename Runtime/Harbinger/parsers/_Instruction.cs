@@ -15,7 +15,7 @@
             }
             else if (FunctionContract.TryParseFunction(this, reader, scope))
                 return true;
-            else if (reader.error != null)
+            else if (reader.sig_error != null)
                 return false;
             else if (TryParseExpression(reader, scope, false, out var expr))
             {
@@ -24,7 +24,7 @@
                         if (!reader.TryReadChar_match(';', lint: reader.lint_theme.command_separators))
                             if (check_semicolon && reader.strict_syntax)
                             {
-                                reader.error ??= $"missing ';' at the end of instruction";
+                                reader.sig_error ??= $"missing ';' at the end of instruction";
                                 return false;
                             }
 

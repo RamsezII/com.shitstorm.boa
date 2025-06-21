@@ -30,7 +30,7 @@
                     }
                     else
                     {
-                        reader.error ??= $"expected expression after '{op_symbol}' operator";
+                        reader.sig_error ??= $"expected expression after '{op_symbol}' operator";
                         return false;
                     }
                 }

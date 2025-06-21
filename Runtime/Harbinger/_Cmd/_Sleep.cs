@@ -28,7 +28,7 @@ namespace _BOA_
                     case float or int:
                         break;
                     default:
-                        exe.error ??= $"can not use '{routine.Current.output}' as timer value ({routine.Current.output?.GetType()})";
+                        exe.harbinger.executionnal_error ??= $"can not use '{routine.Current.output}' as timer value (expected {typeof(int)} or {typeof(float)}, got {routine.Current.output?.GetType()})";
                         yield break;
                 }
 

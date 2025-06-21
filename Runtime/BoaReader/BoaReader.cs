@@ -22,7 +22,7 @@ namespace _BOA_
         string toLog => text[..read_i] + "°" + text[read_i..];
 #endif
 
-        public string error, long_error;
+        public string sig_error, sig_long_error;
         public bool IsOnCursor(in int cursor_i) => cursor_i >= cpl_start && cursor_i <= read_i;
         public bool IsOnCursor() => IsOnCursor(cursor_i);
 

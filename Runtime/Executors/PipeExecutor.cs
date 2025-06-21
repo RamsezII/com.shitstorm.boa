@@ -19,23 +19,15 @@ namespace _BOA_
 
         internal override IEnumerator<Contract.Status> EExecute()
         {
-            IEnumerator<Contract.Status> routine = null;
-            try
-            {
-                routine = previous.EExecute();
-                while (routine.MoveNext())
-                    yield return routine.Current;
+            using var routine1 = previous.EExecute();
+            while (routine1.MoveNext())
+                yield return routine1.Current;
 
-                next.arg_0 = new LiteralExecutor(harbinger, scope, routine.Current.output);
+            next.arg_0 = new LiteralExecutor(harbinger, scope, routine1.Current.output);
 
-                routine = next.EExecute();
-                while (routine.MoveNext())
-                    yield return routine.Current;
-            }
-            finally
-            {
-                routine.Dispose();
-            }
+            using var routine2 = next.EExecute();
+            while (routine2.MoveNext())
+                yield return routine2.Current;
         }
     }
 }

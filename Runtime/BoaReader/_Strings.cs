@@ -7,7 +7,7 @@ namespace _BOA_
         public bool TryParseString(out string value)
         {
             int read_old = read_i;
-            error = null;
+            sig_error = null;
 
             if (HasNext())
             {
@@ -51,7 +51,7 @@ namespace _BOA_
                         read_i = start_i + err_index;
                     }
 
-                    error ??= $"string error: expected closing quote '{sep}'";
+                    sig_error ??= $"string error: expected closing quote '{sep}'";
                     return false;
                 }
             }

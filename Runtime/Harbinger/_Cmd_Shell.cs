@@ -55,7 +55,7 @@ namespace _BOA_
                         {
                             cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
 
-                            string error = reader.long_error ?? reader.error ?? $"could not parse command {{ {input_line} }}";
+                            string error = reader.sig_long_error ?? reader.sig_error ?? $"could not parse command {{ {input_line} }}";
                             if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                                 cobra_exe.Stdout(error, error.SetColor(Color.orange));
                         }

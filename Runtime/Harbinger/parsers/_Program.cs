@@ -13,12 +13,12 @@
                 if (sub_block != null)
                     program.stack.Add(sub_block);
 
-            if (reader.error != null)
+            if (reader.sig_error != null)
                 goto failure;
 
             if (reader.TryPeekChar_out(out char peek, out _))
             {
-                reader.error ??= $"could not parse everything ({nameof(peek)}: '{peek}')";
+                reader.sig_error ??= $"could not parse everything ({nameof(peek)}: '{peek}')";
                 goto failure;
             }
 

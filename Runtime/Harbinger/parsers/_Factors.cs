@@ -6,18 +6,18 @@
         {
             factor = null;
 
-            if (reader.error == null)
+            if (reader.sig_error == null)
                 if (reader.TryReadChar_match('('))
                 {
                     reader.LintOpeningBraquet();
                     if (!TryParseExpression(reader, scope, false, out factor))
                     {
-                        reader.error ??= "expected expression inside factor parenthesis";
+                        reader.sig_error ??= "expected expression inside factor parenthesis";
                         return false;
                     }
                     else if (!reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
-                        reader.error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
+                        reader.sig_error ??= $"expected closing parenthesis ')' after factor {factor.ToLog}";
                         --reader.read_i;
                         return false;
                     }
@@ -25,29 +25,29 @@
                         return true;
                 }
 
-            if (reader.error == null)
+            if (reader.sig_error == null)
                 if (reader.TryParseString(out string str))
                 {
                     factor = new LiteralExecutor(this, scope, literal: str);
                     return true;
                 }
-                else if (reader.error != null)
+                else if (reader.sig_error != null)
                     return false;
 
-            if (reader.error == null)
+            if (reader.sig_error == null)
                 if (TryParseMethod(reader, scope, out var func_exe))
                 {
                     factor = func_exe;
                     return true;
                 }
-                else if (reader.error != null)
+                else if (reader.sig_error != null)
                     return false;
                 else if (TryParseVariable(reader, scope, out var var_exe))
                 {
                     factor = var_exe;
                     return true;
                 }
-                else if (reader.error != null)
+                else if (reader.sig_error != null)
                     return false;
                 else if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
                     switch (arg.ToLower())
@@ -67,7 +67,7 @@
                                 factor = new LiteralExecutor(this, scope, literal: _float);
                             else
                             {
-                                reader.error ??= $"unrecognized literal : '{arg}'";
+                                reader.sig_error ??= $"unrecognized literal : '{arg}'";
                                 return false;
                             }
                             return true;

@@ -34,7 +34,7 @@ namespace _BOA_
         public readonly Harbinger father;
         public BoaSignal signal;
         public readonly List<object> args = new();
-
+        public string executionnal_error;
         public string shell_stdin;
         public Action<object> stdout;
 

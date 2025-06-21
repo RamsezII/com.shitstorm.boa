@@ -4,16 +4,16 @@
     {
         internal bool TryParseExpression(in BoaReader reader, in ScopeNode scope, in bool allow_argument_syntax, out ExpressionExecutor expression)
         {
-            if (TryParseAssignation(reader, scope, out expression) || reader.error == null && TryParseOr(reader, scope, out expression))
+            if (TryParseAssignation(reader, scope, out expression) || reader.sig_error == null && TryParseOr(reader, scope, out expression))
             {
                 if (allow_argument_syntax && !reader.TryReadChar_match(',', lint: reader.lint_theme.argument_coma) && !reader.TryPeekChar_match(')', out _))
                     if (reader.strict_syntax)
                     {
-                        reader.error ??= $"expected ',' or ')' after expression";
+                        reader.sig_error ??= $"expected ',' or ')' after expression";
                         if (expression is ContractExecutor cont)
-                            reader.error += $" ('{cont.contract.name}')";
+                            reader.sig_error += $" ('{cont.contract.name}')";
                         else
-                            reader.error += $" ('{expression.GetType()}')";
+                            reader.sig_error += $" ('{expression.GetType()}')";
                         goto failure;
                     }
 
@@ -21,19 +21,16 @@
                 {
                     var cond = expression;
                     if (!TryParseExpression(reader, scope, false, out var _if))
-                        reader.error ??= $"expected expression after ternary operator '?'";
+                        reader.sig_error ??= $"expected expression after ternary operator '?'";
                     else if (!reader.TryReadChar_match(':', lint: reader.lint_theme.operators))
-                        reader.error ??= $"expected ternary operator delimiter ':'";
+                        reader.sig_error ??= $"expected ternary operator delimiter ':'";
                     else if (!TryParseExpression(reader, scope, false, out var _else))
-                        reader.error ??= $"expected second expression after ternary operator ':'";
+                        reader.sig_error ??= $"expected second expression after ternary operator ':'";
                     else
                     {
                         expression = new TernaryOpExecutor(this, scope, cond, _if, _else);
-                        if (expression.error != null)
-                        {
-                            reader.error ??= expression.error;
+                        if (reader.sig_error != null)
                             return false;
-                        }
                     }
                 }
 
@@ -50,23 +47,20 @@
             if (!reader.TryReadChar_match('|', lint: reader.lint_theme.operators))
                 return true;
             else if (!reader.TryReadArgument(out string pipe_cont_name, lint: reader.lint_theme.contracts, as_function_argument: false))
-                reader.error ??= $"expected command after pipe operator '|'";
+                reader.sig_error ??= $"expected command after pipe operator '|'";
             else if (!global_contracts.TryGetValue(pipe_cont_name, out var pipe_cont))
-                reader.error ??= $"can not find command with name '{pipe_cont_name}'";
+                reader.sig_error ??= $"can not find command with name '{pipe_cont_name}'";
             else
             {
                 expression.pipe_next = new ContractExecutor(this, scope, pipe_cont, reader, pipe_previous: expression);
-                if (expression.pipe_next.error != null)
-                {
-                    reader.error ??= expression.pipe_next.error;
+                if (reader.sig_error != null)
                     return false;
-                }
 
                 expression = new PipeExecutor(this, scope, expression, expression.pipe_next);
 
-                if (!TryPipe(reader, scope, ref expression) || reader.error != null)
+                if (!TryPipe(reader, scope, ref expression) || reader.sig_error != null)
                 {
-                    reader.error ??= $"could not parse pipe statement";
+                    reader.sig_error ??= $"could not parse pipe statement";
                     return false;
                 }
 
