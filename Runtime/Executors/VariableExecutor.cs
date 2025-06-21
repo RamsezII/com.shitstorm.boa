@@ -4,20 +4,23 @@ namespace _BOA_
 {
     internal class VariableExecutor : ExpressionExecutor
     {
-        internal readonly BoaVariable variable;
+        internal readonly string var_name;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public VariableExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaVariable variable) : base(harbinger, scope)
+        public VariableExecutor(in Harbinger harbinger, in ScopeNode scope, in string var_name) : base(harbinger, scope)
         {
-            this.variable = variable;
+            this.var_name = var_name;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         internal override IEnumerator<Contract.Status> EExecute()
         {
-            yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: variable.value);
+            if (scope.TryGetVariable(var_name, out var variable))
+                yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: variable.value);
+            else
+                harbinger.Stderr($"couldnt not find variable '{var_name}'");
         }
     }
 }

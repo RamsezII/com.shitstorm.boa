@@ -19,7 +19,7 @@ namespace _BOA_
                     else
                     {
                         exe.reader.LintOpeningBraquet();
-                        var sub_scope = new ScopeNode(exe.scope);
+                        var sub_scope = new ScopeNode(exe.scope, true);
 
                         if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
                             exe.reader.sig_error ??= "expected expression for 'if' condition";

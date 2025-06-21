@@ -6,7 +6,7 @@
         {
             executor = null;
 
-            BlockExecutor program = new(this, scope ?? new ScopeNode(null));
+            BlockExecutor program = new(this, scope ?? new ScopeNode(null, true));
             program.scope.SetVariable("_args_", new BoaVariable(args));
 
             while (TryParseBlock(reader, program.scope, out var sub_block))

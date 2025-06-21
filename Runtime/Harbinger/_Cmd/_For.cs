@@ -20,7 +20,7 @@ namespace _BOA_
                     else
                     {
                         exe.reader.LintOpeningBraquet();
-                        ScopeNode sub_scope = new ScopeNode(exe.scope);
+                        ScopeNode sub_scope = new ScopeNode(exe.scope, true);
                         if (!exe.harbinger.TryParseInstruction(exe.reader, sub_scope, true, out var instr_init))
                             exe.reader.sig_error ??= "expected instruction after '(' in 'for' instruction";
                         else

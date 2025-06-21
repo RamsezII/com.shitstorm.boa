@@ -73,20 +73,24 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public ScopeNode(in ScopeNode parent)
+        public ScopeNode(in ScopeNode parent, in bool populate_parent)
         {
+            if (this == parent)
+                throw new ArgumentException($"{GetType()}.{nameof(this.parent)} can not be itself", nameof(parent));
+
             id = ++_id;
             this.parent = parent;
 
-            if (parent != null)
-                (parent.children ??= new()).Add(this);
+            if (populate_parent)
+                if (parent != null)
+                    (parent.children ??= new()).Add(this);
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         public ScopeNode Dedoublate()
         {
-            var clone = new ScopeNode(parent);
+            var clone = new ScopeNode(parent, false);
 
             if (_variables != null && _variables.Count > 0)
             {

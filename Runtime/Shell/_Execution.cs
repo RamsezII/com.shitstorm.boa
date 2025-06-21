@@ -7,7 +7,7 @@ namespace _BOA_
     {
         static readonly BoaSignal sig_tick = new(SIG_FLAGS_new.TICK, null);
 
-        readonly ScopeNode scope = new(null);
+        readonly ScopeNode scope = new(null, false);
 
         Harbinger harbinger;
         Executor program;
@@ -24,6 +24,8 @@ namespace _BOA_
             if (execution != null)
             {
                 harbinger.signal = signal;
+
+            before_tick:
                 bool next = execution.MoveNext();
 
                 if (harbinger.TryPullError(out string error))
@@ -39,7 +41,11 @@ namespace _BOA_
                     execution = null;
                 }
                 else if (next)
+                {
+                    if (execution.Current.state == Contract.Status.States.ACTION_skip)
+                        goto before_tick;
                     current_status = execution.Current;
+                }
                 else
                 {
                     harbinger = null;

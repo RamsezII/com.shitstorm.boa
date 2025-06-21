@@ -23,7 +23,7 @@ namespace _BOA_
                         exe.reader.sig_error ??= "expected expression to iterate through";
                     else
                     {
-                        var sub_scope = new ScopeNode(exe.scope);
+                        var sub_scope = new ScopeNode(exe.scope, true);
                         sub_scope.AddVariable(var_name, new BoaVariable(null));
 
                         if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))

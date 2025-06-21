@@ -67,7 +67,7 @@ namespace _BOA_
                 goto failure;
             }
 
-            var func_exe = new FunctionExecutor(harbinger, new ScopeNode(scope));
+            var func_exe = new FunctionExecutor(harbinger, new ScopeNode(scope, false));
 
             for (int i = 0; i < args_names.Count; i++)
                 func_exe.scope.AddVariable(args_names[i], null);
@@ -84,7 +84,7 @@ namespace _BOA_
                     args_count: args_names.Count,
                     args: exe =>
                     {
-                        var func_scope = new ScopeNode(scope);
+                        var func_scope = new ScopeNode(scope, false);
 
                         for (int i = 0; i < args_names.Count; i++)
                             if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))

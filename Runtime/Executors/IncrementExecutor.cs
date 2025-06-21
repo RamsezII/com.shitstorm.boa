@@ -14,20 +14,26 @@ namespace _BOA_
         }
 
         readonly Operators code;
-        readonly BoaVariable variable;
+        readonly string var_name;
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal IncrementExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaVariable variable, in Operators code) : base(harbinger, scope)
+        internal IncrementExecutor(in Harbinger harbinger, in ScopeNode scope, in string var_name, in Operators code) : base(harbinger, scope)
         {
             this.code = code;
-            this.variable = variable;
+            this.var_name = var_name;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
         internal override IEnumerator<Contract.Status> EExecute()
         {
+            if (!scope.TryGetVariable(var_name, out var variable))
+            {
+                harbinger.Stderr($"Could not find variable '{var_name}'.");
+                yield break;
+            }
+
             switch (code)
             {
                 case Operators.AddBefore:

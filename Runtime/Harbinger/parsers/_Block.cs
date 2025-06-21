@@ -8,7 +8,7 @@
             {
                 reader.LintOpeningBraquet();
 
-                var sub_scope = new ScopeNode(scope);
+                var sub_scope = new ScopeNode(scope, true);
                 var body = new BlockExecutor(this, sub_scope);
                 block = body;
 

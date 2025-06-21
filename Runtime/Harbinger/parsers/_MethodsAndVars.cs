@@ -30,12 +30,12 @@ namespace _BOA_
         internal bool TryParseVariable(in BoaReader reader, in ScopeNode scope, out VariableExecutor var_exe)
         {
             if (reader.TryReadString_matches_out(out string var_name, as_function_argument: false, lint: reader.lint_theme.variables, matches: scope.EVarNames().ToArray()))
-                if (!scope.TryGetVariable(var_name, out var variable))
+                if (!scope.TryGetVariable(var_name, out _))
                     reader.sig_error ??= $"no variable named '{var_name}'";
                 else
                 {
                     reader.LintToThisPosition(reader.lint_theme.variables);
-                    var_exe = new VariableExecutor(this, scope, variable);
+                    var_exe = new VariableExecutor(this, scope, var_name);
                     return reader.sig_error == null;
                 }
             var_exe = null;

@@ -16,7 +16,7 @@ namespace _BOA_
                 bool debug = true;
                 string prefixe = ">";
 
-                var scope = new ScopeNode(null);
+                var scope = new ScopeNode(null, true);
 
                 CMD_STATUS shell_status = new(CMD_STATES.WAIT_FOR_STDIN, prefixe: prefixe);
 

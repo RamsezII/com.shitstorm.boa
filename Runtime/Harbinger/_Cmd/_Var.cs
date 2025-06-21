@@ -30,7 +30,10 @@ namespace _BOA_
                 {
                     string var_name = (string)exe.args[0];
                     return Executor.EExecute(
-                        after_execution: data => exe.scope.SetVariable(var_name, new(data)),
+                        after_execution: data =>
+                        {
+                            exe.scope.SetVariable(var_name, new(data));
+                        },
                         stack: exe.arg_0.EExecute());
                 }));
         }

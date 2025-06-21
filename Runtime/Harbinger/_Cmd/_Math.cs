@@ -35,7 +35,8 @@ namespace _BOA_
                     var routine2 = expr2.EExecute();
 
                     return Executor.EExecute(
-                        null, data =>
+                        after_execution: null,
+                        modify_output: data =>
                         {
                             object data1 = routine1.Current.output;
                             object data2 = routine2.Current.output;

@@ -24,13 +24,13 @@
                             int read_old = reader.read_i;
                             if (reader.TryReadChar_match(unary_operator, reader.lint_theme.operators, skippables: null))
                             {
-                                if (!reader.TryReadArgument(out string varname, false, reader.lint_theme.variables, skippables: null))
+                                if (!reader.TryReadArgument(out string var_name, false, reader.lint_theme.variables, skippables: null))
                                     reader.sig_error ??= $"expected variable after increment operator '{unary_operator}{unary_operator}'";
-                                else if (!scope.TryGetVariable(varname, out var variable))
-                                    reader.sig_error ??= $"no variable named '{varname}'";
+                                else if (!scope.TryGetVariable(var_name, out _))
+                                    reader.sig_error ??= $"no variable named '{var_name}'";
                                 else
                                 {
-                                    expression = new IncrementExecutor(this, scope, variable, code switch
+                                    expression = new IncrementExecutor(this, scope, var_name, code switch
                                     {
                                         UnaryExecutor.Operators.Add => IncrementExecutor.Operators.AddBefore,
                                         UnaryExecutor.Operators.Sub => IncrementExecutor.Operators.SubBefore,
