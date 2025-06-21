@@ -26,7 +26,7 @@
                 }
 
             if (reader.sig_error == null)
-                if (reader.TryParseString(out string str))
+                if (TryParseString(reader, scope, out string str))
                 {
                     factor = new LiteralExecutor(this, scope, literal: str);
                     return true;
