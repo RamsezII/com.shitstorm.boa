@@ -10,7 +10,7 @@
                 int read_old = reader.read_i;
                 if (reader.TryReadChar_matches_out(out char op_symbol, true, "+-"))
                 {
-                    reader.LintToThisPosition(reader.lint_theme.operators);
+                    reader.LintToThisPosition(reader.lint_theme.operators, true);
 
                     OperatorsM code = op_symbol switch
                     {

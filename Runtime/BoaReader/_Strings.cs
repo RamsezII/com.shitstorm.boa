@@ -24,7 +24,7 @@ namespace _BOA_
                 {
                     value = string.Empty;
                     int start_i = read_i;
-                    LintToThisPosition(lint_theme.quotes);
+                    LintToThisPosition(lint_theme.quotes, false);
 
                     while (TryReadChar_out(out char c, skippables: null))
                         switch (c)
@@ -34,8 +34,8 @@ namespace _BOA_
                                 break;
 
                             case '\'' or '"' when c == sep:
-                                LintToThisPosition(lint_theme.strings, read_i - 1);
-                                LintToThisPosition(lint_theme.quotes);
+                                LintToThisPosition(lint_theme.strings, false, read_i - 1);
+                                LintToThisPosition(lint_theme.quotes, false);
                                 last_arg = value;
                                 return true;
 

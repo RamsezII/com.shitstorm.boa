@@ -83,7 +83,7 @@ namespace _BOA_
             return false;
 
         success:
-            LintToThisPosition(lint);
+            LintToThisPosition(lint, true);
             return true;
         }
 
@@ -109,7 +109,7 @@ namespace _BOA_
                         if (match.Equals(value, ordinal))
                         {
                             last_arg = value = match;
-                            LintToThisPosition(lint);
+                            LintToThisPosition(lint, true);
 
                             if (as_function_argument)
                                 if (TryReadChar_match(',', lint: lint_theme.argument_coma))

@@ -31,8 +31,8 @@ namespace _BOA_
             bracket_2 = Color.navyBlue,
             literal = Color.limeGreen,
             constants = Color.deepSkyBlue,
-            strings = Color.yellowNice,
-            quotes = Color.orange
+            strings = Color.orange,
+            quotes = Color.yellowNice
             ;
 
         //----------------------------------------------------------------------------------------------------------

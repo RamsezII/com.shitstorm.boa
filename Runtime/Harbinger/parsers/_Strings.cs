@@ -26,19 +26,21 @@ namespace _BOA_
             List<Executor> stack = new();
             string value = string.Empty;
             int start_i = reader.read_i;
-            reader.LintToThisPosition(reader.lint_theme.quotes);
+            reader.LintToThisPosition(reader.lint_theme.quotes, true);
 
             while (reader.TryReadChar_out(out char c, skippables: null))
                 switch (c)
                 {
                     case '\\':
+                        reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
                         ++reader.read_i;
+                        reader.LintToThisPosition(reader.lint_theme.quotes, false);
                         break;
 
                     case '\'' or '"' when c == sep:
                         {
-                            reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
-                            reader.LintToThisPosition(reader.lint_theme.quotes);
+                            reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
+                            reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
                             reader.last_arg = value;
                             reader.cpl_end = reader.read_i - 1;
@@ -53,8 +55,8 @@ namespace _BOA_
 
                     case '{':
                         {
-                            reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
-                            reader.LintToThisPosition(reader.lint_theme.quotes);
+                            reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
+                            reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
                             if (value.Length > 0)
                             {
@@ -74,8 +76,8 @@ namespace _BOA_
                                 return false;
                             }
 
-                            reader.LintToThisPosition(reader.lint_theme.strings, reader.read_i - 1);
-                            reader.LintToThisPosition(reader.lint_theme.quotes);
+                            reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
+                            reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
                             stack.Add(expr);
                         }
@@ -91,7 +93,7 @@ namespace _BOA_
             else
                 reader.read_i = read_old;
 
-            reader.LintToThisPosition(reader.lint_theme.quotes);
+            reader.LintToThisPosition(reader.lint_theme.quotes, false);
 
             reader.Stderr($"string error: expected closing quote '{sep}'.");
             return false;

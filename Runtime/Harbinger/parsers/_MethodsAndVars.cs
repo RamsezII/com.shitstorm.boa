@@ -34,7 +34,7 @@ namespace _BOA_
                     reader.Stderr($"no variable named '{var_name}'.");
                 else
                 {
-                    reader.LintToThisPosition(reader.lint_theme.variables);
+                    reader.LintToThisPosition(reader.lint_theme.variables, true);
                     var_exe = new VariableExecutor(this, scope, var_name);
                     return reader.sig_error == null;
                 }

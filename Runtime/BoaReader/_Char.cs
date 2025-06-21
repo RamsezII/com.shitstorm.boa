@@ -101,7 +101,7 @@ namespace _BOA_
             if (TryPeekChar_match(expected_value, out _, add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: skippables))
             {
                 ++read_i;
-                LintToThisPosition(lint);
+                LintToThisPosition(lint, true);
                 last_arg = expected_value.ToString();
                 return true;
             }

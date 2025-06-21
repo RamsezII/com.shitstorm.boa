@@ -53,12 +53,12 @@
                     switch (arg.ToLower())
                     {
                         case "true":
-                            reader.LintToThisPosition(reader.lint_theme.constants);
+                            reader.LintToThisPosition(reader.lint_theme.constants, true);
                             factor = new LiteralExecutor(this, scope, literal: true);
                             return true;
 
                         case "false":
-                            reader.LintToThisPosition(reader.lint_theme.constants);
+                            reader.LintToThisPosition(reader.lint_theme.constants, true);
                             factor = new LiteralExecutor(this, scope, literal: false);
                             return true;
 
@@ -72,7 +72,7 @@
                                 reader.Stderr($"unrecognized literal : '{arg}'.");
                                 return false;
                             }
-                            reader.LintToThisPosition(reader.lint_theme.literal);
+                            reader.LintToThisPosition(reader.lint_theme.literal, true);
                             return true;
                     }
 

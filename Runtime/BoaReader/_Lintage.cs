@@ -27,14 +27,14 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public void LintOpeningBraquet() => LintToThisPosition(OpenBraquetLint());
+        public void LintOpeningBraquet() => LintToThisPosition(OpenBraquetLint(), true);
         Color OpenBraquetLint()
         {
             int ind = last_braquet++;
             return GetBraquetLint(ind);
         }
 
-        public void LintClosingBraquet() => LintToThisPosition(CloseBraquetLint());
+        public void LintClosingBraquet() => LintToThisPosition(CloseBraquetLint(), true);
         public Color CloseBraquetLint()
         {
             int ind = --last_braquet;
@@ -52,16 +52,29 @@ namespace _BOA_
             };
         }
 
-        public void LintToThisPosition(in Color color) => LintToThisPosition(color, read_i);
-        public void LintToThisPosition(in Color color, in int index)
+        public bool Remains() => Remains(read_i);
+        public bool Remains(in int index)
+        {
+            if (lint_cursors.Count == 0)
+                return false;
+            return lint_cursors[^1].index < index;
+        }
+
+        public void LintToThisPosition(in Color color, in bool replace) => LintToThisPosition(color, replace, read_i);
+        public void LintToThisPosition(in Color color, in bool replace, in int index)
         {
             if (color.a <= 0)
                 return;
 
-            if (index <= last_lint_i)
-                UnlintAbovePosition(index);
+            if (replace)
+            {
+                if (index <= last_lint_i)
+                    UnlintAbovePosition(index);
+                lint_cursors.Add(new(index, color));
+            }
+            else if (Remains(index))
+                lint_cursors.Add(new(index, color));
 
-            lint_cursors.Add(new(index, color));
             last_lint_i = index;
         }
 
