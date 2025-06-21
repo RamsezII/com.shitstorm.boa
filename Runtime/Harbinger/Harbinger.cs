@@ -62,10 +62,11 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public void Stderr(in string error)
+        public void Stderr(string error)
         {
+            error += "\n\n" + Util.GetStackTrace().GetFrame(1).ToString();
             _stderr ??= error;
-            Debug.LogWarning(_stderr);
+            Debug.LogWarning(error);
         }
 
         public bool TryPullError(out string error)

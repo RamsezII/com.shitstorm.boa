@@ -16,6 +16,8 @@ namespace _BOA_
         [SerializeField] Contract.Status shell_status;
         public Contract.Status current_status;
 
+        const byte maximum_instant_ticks = 100;
+
         //----------------------------------------------------------------------------------------------------------
 
         void Tick() => PropagateSignal(sig_tick);
@@ -25,6 +27,7 @@ namespace _BOA_
             {
                 harbinger.signal = signal;
 
+                int ticks = 0;
             before_tick:
                 bool next = execution.MoveNext();
 
@@ -43,7 +46,8 @@ namespace _BOA_
                 else if (next)
                 {
                     if (execution.Current.state == Contract.Status.States.ACTION_skip)
-                        goto before_tick;
+                        if (ticks++ < maximum_instant_ticks)
+                            goto before_tick;
                     current_status = execution.Current;
                 }
                 else
