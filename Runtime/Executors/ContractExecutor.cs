@@ -53,9 +53,6 @@ namespace _BOA_
 
         internal override IEnumerator<Contract.Status> EExecute()
         {
-            if (contract.action != null)
-                yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: contract.action(this));
-
             if (contract.routine != null)
             {
                 using var routine = contract.routine(this);
@@ -63,6 +60,11 @@ namespace _BOA_
                     while (routine.MoveNext())
                         yield return routine.Current;
             }
+
+            contract.action?.Invoke(this);
+
+            if (contract.function != null)
+                yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: contract.function(this));
         }
     }
 }
