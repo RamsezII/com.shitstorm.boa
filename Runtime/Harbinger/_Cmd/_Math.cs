@@ -73,7 +73,7 @@ namespace _BOA_
                                     return $"{data1}{data2}";
                             }
 
-                            exe.harbinger.executionnal_error ??= $"could not apply operation '{code}' on {data1} and {data2}";
+                            exe.harbinger.Stderr($"could not apply operation '{code}' on {data1} and {data2}");
                             return null;
                         },
                         routine1,

@@ -7,7 +7,7 @@ namespace _BOA_
     public class Contract
     {
         [Serializable]
-        public struct Status
+        public struct Status : IEquatable<Status>
         {
             public enum States
             {
@@ -36,6 +36,10 @@ namespace _BOA_
                 this.progress = progress;
                 this.output = output;
             }
+
+            //----------------------------------------------------------------------------------------------------------
+
+            public readonly bool Equals(Status other) => id == other.id && state == other.state && progress == other.progress;
         }
 
         public readonly string name;

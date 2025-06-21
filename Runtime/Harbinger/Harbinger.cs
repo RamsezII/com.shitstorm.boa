@@ -34,7 +34,7 @@ namespace _BOA_
         public readonly Harbinger father;
         public BoaSignal signal;
         public readonly List<object> args = new();
-        public string executionnal_error;
+        public string _stderr;
         public string shell_stdin;
         public Action<object> stdout;
 
@@ -70,6 +70,25 @@ namespace _BOA_
             else if (father != null && father.TryPullStdin(out stdin))
                 return true;
             return false;
+        }
+
+        public void Stderr(in string error)
+        {
+            _stderr ??= error;
+            Debug.LogWarning(_stderr);
+        }
+
+        public bool TryPullError(out string error)
+        {
+            if (_stderr == null)
+            {
+                error = null;
+                return false;
+            }
+
+            error = _stderr;
+            _stderr = null;
+            return true;
         }
     }
 }

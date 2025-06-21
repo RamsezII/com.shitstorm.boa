@@ -54,7 +54,7 @@ namespace _BOA_
                                     }
                                 else if (op == Operations.toString)
                                     return $"{data}";
-                                exe.harbinger.executionnal_error ??= $"invalid data type '{data?.GetType()}' for string operation '{op}'";
+                                exe.harbinger.Stderr($"invalid data type '{data?.GetType()}' for string operation '{op}'");
                                 return data;
                             },
                             exe.arg_0.EExecute());

@@ -32,18 +32,18 @@ namespace _BOA_
 
                     if (expects_parenthesis && !found_parenthesis)
                     {
-                        harbinger.executionnal_error ??= $"'{contract.name}' expected opening parenthesis '('";
+                        harbinger.Stderr($"'{contract.name}' expected opening parenthesis '('");
                         return;
                     }
 
                     contract.args?.Invoke(this);
 
-                    if (harbinger.executionnal_error != null)
+                    if (harbinger._stderr != null)
                         return;
 
                     if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
-                        harbinger.executionnal_error ??= $"'{contract.name}' expected closing parenthesis ')'";
+                        harbinger.Stderr($"'{contract.name}' expected closing parenthesis ')'");
                         return;
                     }
                 }
