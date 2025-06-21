@@ -31,7 +31,7 @@ namespace _BOA_
             {
                 id = _id++;
                 this.state = state;
-                this.prefixe_text = prefixe_text;
+                this.prefixe_text = prefixe_text ?? string.Empty;
                 this.prefixe_lint = prefixe_lint ?? prefixe_text;
                 this.progress = progress;
                 this.output = output;
