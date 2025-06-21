@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -7,6 +8,7 @@ namespace _BOA_
         public readonly Contract contract;
         public readonly BoaReader reader;
         public Executor arg_0;
+        public readonly Dictionary<string, object> opts = new(StringComparer.Ordinal);
         public readonly List<object> args = new();
         public readonly ExpressionExecutor pipe_previous;
         public override string ToLog => $"'{base.ToLog}[{contract?.name}]'";
@@ -20,6 +22,9 @@ namespace _BOA_
             this.pipe_previous = pipe_previous;
 
             if (parse_arguments)
+            {
+                contract.opts?.Invoke(this);
+
                 if (contract.no_parenthesis)
                     contract.args?.Invoke(this);
                 else
@@ -47,6 +52,7 @@ namespace _BOA_
                         return;
                     }
                 }
+            }
         }
 
         //----------------------------------------------------------------------------------------------------------

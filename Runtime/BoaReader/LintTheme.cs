@@ -18,6 +18,8 @@ namespace _BOA_
 
         public Color
             argument_coma = Color.lightPink,
+            flags = Color.beige,
+            options = Color.bisque,
             operators = Color.lightGray,
             contracts = Color.darkSlateBlue,
             functions = Color.deepSkyBlue,

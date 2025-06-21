@@ -33,7 +33,6 @@ namespace _BOA_
                     {
                         var paths = type switch
                         {
-                            FS_TYPES.FILE => parent.EnumerateFiles(),
                             FS_TYPES.DIRECTORY => parent.EnumerateDirectories(),
                             _ => parent.EnumerateFileSystemInfos(),
                         };
