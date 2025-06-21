@@ -100,8 +100,8 @@ namespace _BOA_
                 if (lint_cursors[i].index >= start)
                 {
                     LintCursor cursor = lint_cursors[i];
-                    int index_left = last_lint;
-                    sb.Append(text[index_left..cursor.index].SetColor(cursor.color));
+                    if (cursor.index > last_lint && cursor.index <= text.Length)
+                        sb.Append(text[last_lint..cursor.index].SetColor(cursor.color));
                     last_lint = cursor.index;
                 }
 

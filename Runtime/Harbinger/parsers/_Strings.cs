@@ -26,7 +26,6 @@ namespace _BOA_
             List<Executor> stack = new();
             string value = string.Empty;
             int start_i = reader.read_i;
-            reader.LintToThisPosition(reader.lint_theme.quotes, true);
 
             while (reader.TryReadChar_out(out char c, skippables: null))
                 switch (c)
