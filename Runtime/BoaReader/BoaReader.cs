@@ -34,7 +34,7 @@ namespace _BOA_
         public static BoaReader ReadLines(in LintTheme lint_theme, in bool strict_syntax, in int cursor_i = int.MaxValue, params string[] lines) => new BoaReader(lint_theme, strict_syntax, "line", cursor_i, lines);
         BoaReader(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int cursor_i, in string[] lines)
         {
-            this.lint_theme = lint_theme;
+            this.lint_theme = lint_theme ?? LintTheme.theme_dark;
             this.strict_syntax = strict_syntax;
             this.script_path = script_path;
             this.cursor_i = cursor_i;

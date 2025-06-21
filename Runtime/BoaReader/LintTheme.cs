@@ -4,7 +4,7 @@ namespace _BOA_
 {
     public sealed class LintTheme
     {
-        public static LintTheme
+        public static readonly LintTheme
             theme_dark = new()
             {
 
