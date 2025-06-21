@@ -22,7 +22,7 @@ namespace _BOA_
             contracts = Color.darkSlateBlue,
             functions = Color.deepSkyBlue,
             variables = Color.mediumPurple,
-            paths = Color.lightYellow,
+            paths = Color.ivory,
             comments = Color.darkOliveGreen,
             command_separators = Color.softYellow,
             keywords = Color.magenta,
