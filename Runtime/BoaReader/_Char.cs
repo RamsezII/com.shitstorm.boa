@@ -108,7 +108,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in bool add_to_completions = false, in string skippables = _empties_)
+        public bool TryReadChar_matches_out(out char value, in bool ignore_case, in string expected_values, in bool add_to_completions = false, in string skippables = _empties_)
         {
             int read_old = read_i;
 

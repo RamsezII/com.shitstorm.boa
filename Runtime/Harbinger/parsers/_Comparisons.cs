@@ -7,7 +7,7 @@
             expression = null;
             if (TryParseAddSub(reader, scope, out var addsub1))
             {
-                if (reader.TryReadChar_match_out(out char op_char, true, "<>="))
+                if (reader.TryReadChar_matches_out(out char op_char, true, "<>="))
                 {
                     OperatorsM code = op_char switch
                     {

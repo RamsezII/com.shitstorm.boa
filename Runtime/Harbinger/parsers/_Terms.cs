@@ -9,7 +9,7 @@
             if (!TryParseUnary(reader, scope, out var expr1))
                 return false;
 
-            if (reader.TryReadChar_match_out(out char op_char, true, "*/%"))
+            if (reader.TryReadChar_matches_out(out char op_char, true, "*/%"))
             {
                 OperatorsM code = op_char switch
                 {

@@ -51,6 +51,8 @@ namespace _BOA_
             return ($"{user_name ?? ArkMachine.user_name.Value}:{cmd_path ?? working_dir}$ ", $"{(user_name ?? ArkMachine.user_name.Value).SetColor("#73CC26")}:{(cmd_path ?? working_dir).SetColor("#73B2D9")}$ ");
         }
 
+        internal void ChangeWorkdir(in string path) => working_dir = PathCheck(path, PathModes.ForceFull);
+
         public string PathCheck(in string path, in PathModes path_mode) => PathCheck(path, path_mode, out _, out _);
         public string PathCheck(in string path, in PathModes path_mode, out bool was_rooted, out bool is_local_to_shell)
         {

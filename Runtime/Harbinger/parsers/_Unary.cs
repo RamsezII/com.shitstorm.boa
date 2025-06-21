@@ -6,7 +6,7 @@
         {
             expression = null;
 
-            if (reader.TryReadChar_match_out(out char unary_operator, true, "+-!"))
+            if (reader.TryReadChar_matches_out(out char unary_operator, true, "+-!"))
             {
                 UnaryExecutor.Operators code = unary_operator switch
                 {

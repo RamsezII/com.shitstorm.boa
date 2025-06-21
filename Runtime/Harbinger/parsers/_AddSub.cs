@@ -8,7 +8,7 @@
             if (TryParseTerm(reader, scope, out var term1))
             {
                 int read_old = reader.read_i;
-                if (reader.TryReadChar_match_out(out char op_symbol, true, "+-"))
+                if (reader.TryReadChar_matches_out(out char op_symbol, true, "+-"))
                 {
                     reader.LintToThisPosition(reader.lint_theme.operators);
 
