@@ -44,7 +44,9 @@ namespace _BOA_
 
                     string join = fsis.Select(x => exe.harbinger.shell.PathCheck(x, PathModes.TryLocal)).Join("\n");
 
-                    if (exe.pipe_next == null)
+                    if (string.IsNullOrWhiteSpace(join))
+                        join = string.Empty;
+                    else if (exe.pipe_next == null)
                         exe.harbinger.shell.AddLine(join);
 
                     return join;
