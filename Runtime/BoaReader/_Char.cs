@@ -48,7 +48,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryPeekChar_match(in char expected_value, out int next_i, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_)
+        public bool TryPeekChar_match(in char expected_value, out int next_i, in bool ignore_case = true, in bool add_to_completions = false, in string skippables = _empties_)
         {
             int read_old = read_i;
             var ordinal = ignore_case.ToOrdinal();
@@ -96,7 +96,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadChar_match(in char expected_value, in Color lint = default, in bool add_to_completions = true, in bool ignore_case = true, in string skippables = _empties_)
+        public bool TryReadChar_match(in char expected_value, in Color lint = default, in bool add_to_completions = false, in bool ignore_case = true, in string skippables = _empties_)
         {
             if (TryPeekChar_match(expected_value, out _, add_to_completions: add_to_completions, ignore_case: ignore_case, skippables: skippables))
             {
@@ -108,7 +108,7 @@ namespace _BOA_
             return false;
         }
 
-        public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in bool add_to_completions = true, in string skippables = _empties_)
+        public bool TryReadChar_match_out(out char value, in bool ignore_case, in string expected_values, in bool add_to_completions = false, in string skippables = _empties_)
         {
             int read_old = read_i;
 
