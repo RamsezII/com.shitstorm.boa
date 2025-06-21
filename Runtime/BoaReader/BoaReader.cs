@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 namespace _BOA_
 {
@@ -23,7 +22,7 @@ namespace _BOA_
         string toLog => text[..read_i] + "°" + text[read_i..];
 #endif
 
-        public string sig_error, sig_long_error;
+        public string sig_error, err_trace, sig_long_error;
         public bool IsOnCursor(in int cursor_i) => cursor_i >= cpl_start && cursor_i <= read_i;
         public bool IsOnCursor() => IsOnCursor(cursor_i);
 
@@ -68,6 +67,7 @@ namespace _BOA_
         public void Stderr(in string error)
         {
             sig_error ??= error;
+            err_trace = Util.GetStackTrace().GetFrame(1).ToString();
         }
     }
 }

@@ -24,6 +24,7 @@ namespace _BOA_
                     }
                     else
                         sig_long_error = $"{line}\n{new string(' ', read_i - char_count)}└──> {sig_error}";
+                    sig_long_error += "\n\n" + err_trace;
 
                     return;
                 }
