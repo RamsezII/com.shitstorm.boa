@@ -17,9 +17,11 @@ namespace _BOA_
         public static readonly Color lint_default = Color.white;
 
         public Color
+            argument = Color.deepPink,
             argument_coma = Color.lightPink,
             flags = Color.beige,
             options = Color.bisque,
+            option_args = Color.sandyBrown,
             operators = Color.lightGray,
             contracts = Color.darkSlateBlue,
             functions = Color.deepSkyBlue,

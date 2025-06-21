@@ -5,9 +5,9 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        public bool TryParsePath(in BoaReader reader, in FS_TYPES type, out string path)
+        public bool TryParsePath(in BoaReader reader, in FS_TYPES type, in bool read_as_argument, out string path)
         {
-            if (reader.TryParseString(out path))
+            if (reader.TryParseString(out path, read_as_argument))
             {
                 reader.LintToThisPosition(reader.lint_theme.paths, true);
                 goto success;
@@ -27,7 +27,7 @@ namespace _BOA_
             string long_path = shell.PathCheck(path, PathModes.ForceFull, out bool is_rooted, out bool is_local_to_shell);
             DirectoryInfo parent = Directory.GetParent(long_path);
 
-            if (parent.Exists)
+            if (parent != null && parent.Exists)
                 if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
                     if (reader.IsOnCursor())
                     {

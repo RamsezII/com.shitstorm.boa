@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Linq.Expressions;
+using UnityEngine;
 
 namespace _BOA_
 {
     partial class BoaReader
     {
-        public bool TryParseString(out string value)
+        public bool TryParseString(out string value, in bool read_as_argument)
         {
             int read_old = read_i;
 
@@ -34,9 +35,18 @@ namespace _BOA_
                                 break;
 
                             case '\'' or '"' when c == sep:
-                                LintToThisPosition(lint_theme.strings, false, read_i - 1);
-                                LintToThisPosition(lint_theme.quotes, false);
-                                last_arg = value;
+                                {
+                                    LintToThisPosition(lint_theme.strings, false, read_i - 1);
+                                    LintToThisPosition(lint_theme.quotes, false);
+                                    last_arg = value;
+
+                                    if (read_as_argument && !TryReadChar_match(',', lint: lint_theme.argument_coma) && !TryPeekChar_match(')', out _))
+                                        if (strict_syntax)
+                                        {
+                                            Stderr($"expected ',' or ')' after expression.");
+                                            goto failure;
+                                        }
+                                }
                                 return true;
 
                             default:
@@ -44,6 +54,7 @@ namespace _BOA_
                                 break;
                         }
 
+                    failure:
                     if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
                     {
                         value = value[..err_index];

@@ -12,7 +12,7 @@ namespace _BOA_
             AddContract(new("cat",
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.FILE, out string path))
+                    if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.FILE, true, out string path))
                     {
                         path = exe.harbinger.shell.PathCheck(path, PathModes.ForceFull);
                         exe.arg_0 = new LiteralExecutor(exe.harbinger, exe.scope, path);

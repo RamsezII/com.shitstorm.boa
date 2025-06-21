@@ -13,7 +13,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, out string path))
+                    if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, true, out string path))
                         exe.arg_0 = new LiteralExecutor(exe.harbinger, exe.scope, path);
                     else
                         exe.reader.Stderr($"expected path string.");
