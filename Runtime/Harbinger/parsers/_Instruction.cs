@@ -29,6 +29,7 @@
                             }
 
                 instruction = expr;
+                instruction.MarkAsInstructionOutput();
                 return true;
             }
 

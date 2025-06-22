@@ -17,6 +17,8 @@ namespace _BOA_
         public ScopeNode scope;
         public BoaSignal signal;
 
+        internal bool is_instruction_output;
+
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -35,6 +37,11 @@ namespace _BOA_
         }
 
         //----------------------------------------------------------------------------------------------------------
+
+        internal virtual void MarkAsInstructionOutput()
+        {
+            is_instruction_output = true;
+        }
 
         internal abstract IEnumerator<Contract.Status> EExecute();
         public static IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null, Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)

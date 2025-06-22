@@ -19,7 +19,8 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    if (exe.pipe_next == null)
+                    //if (exe.pipe_next == null)
+                    if (exe.is_instruction_output)
                         return Executor.EExecute(
                             after_execution: exe.harbinger.stdout,
                             modify_output: null,

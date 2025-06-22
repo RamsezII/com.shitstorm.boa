@@ -14,14 +14,25 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        internal override void MarkAsInstructionOutput()
+        {
+            base.MarkAsInstructionOutput();
+            if (stack.Count > 0)
+                stack[^1].MarkAsInstructionOutput();
+        }
+
         internal override IEnumerator<Contract.Status> EExecute()
         {
             for (int i = 0; i < stack.Count; i++)
             {
                 var exe = stack[i];
+
                 using var routine = exe.EExecute();
                 while (routine.MoveNext())
                     yield return routine.Current;
+
+                if (exe.is_instruction_output)
+                    exe.harbinger.shell.AddLine(routine.Current.output);
             }
         }
 

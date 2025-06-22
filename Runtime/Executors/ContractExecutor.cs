@@ -57,6 +57,12 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        internal override void MarkAsInstructionOutput()
+        {
+            if (contract.outputs_if_end_of_instruction)
+                base.MarkAsInstructionOutput();
+        }
+
         internal override IEnumerator<Contract.Status> EExecute()
         {
             if (contract.routine != null)
