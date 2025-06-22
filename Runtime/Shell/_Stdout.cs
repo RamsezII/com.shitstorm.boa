@@ -21,6 +21,10 @@ namespace _BOA_
 
             if (data is not string str)
                 str = data.ToString();
+
+            if (string.IsNullOrWhiteSpace(str))
+                return;
+
             lint ??= str;
 
             StringBuilder sb_text = new(), sb_lint = new();
