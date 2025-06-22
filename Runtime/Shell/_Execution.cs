@@ -23,89 +23,76 @@ namespace _BOA_
         void Tick() => PropagateSignal(sig_tick);
         public void PropagateSignal(in BoaSignal signal)
         {
-            try
+            if (execution != null)
             {
-                if (execution != null)
+                harbinger.signal = signal;
+
+                int ticks = 0;
+            before_tick:
+                bool next = execution.MoveNext();
+
+                if (harbinger.TryPullError(out string error))
                 {
-                    harbinger.signal = signal;
+                    AddLine(error, error.SetColor(Color.orange));
 
-                    int ticks = 0;
-                before_tick:
-                    bool next = execution.MoveNext();
+                    program.Dispose();
+                    program = null;
 
-                    if (harbinger.TryPullError(out string error))
-                    {
-                        AddLine(error, error.SetColor(Color.orange));
+                    harbinger = null;
 
-                        program.Dispose();
-                        program = null;
-
-                        harbinger = null;
-
-                        execution.Dispose();
-                        execution = null;
-                    }
-                    else if (next)
-                    {
-                        if (execution.Current.state == Contract.Status.States.ACTION_skip)
-                            if (ticks++ < maximum_instant_ticks)
-                                goto before_tick;
-                            else
-                                Debug.LogWarning($"{ToLog} reached the loop limit ({maximum_instant_ticks} ticks), waiting one frame.", this);
-                        current_status = execution.Current;
-                    }
-                    else
-                    {
-                        harbinger = null;
-                        execution = null;
-                        ApplyShellPrefixe();
-                    }
+                    execution.Dispose();
+                    execution = null;
+                }
+                else if (next)
+                {
+                    if (execution.Current.state == Contract.Status.States.ACTION_skip)
+                        if (ticks++ < maximum_instant_ticks)
+                            goto before_tick;
+                        else
+                            Debug.LogWarning($"{ToLog} reached the loop limit ({maximum_instant_ticks} ticks), waiting one frame.", this);
+                    current_status = execution.Current;
                 }
                 else
                 {
-                    current_status = shell_status;
-                    if (signal != null && signal.reader != null)
-                    {
-                        bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
-
-                        harbinger = new Harbinger(this, null, null);
-                        harbinger.signal = signal;
-
-                        var scope = this.scope;
-                        if (!submit)
-                            scope = scope.Dedoublate();
-
-                        if (!harbinger.TryParseProgram(signal.reader, scope, out program))
-                        {
-                            if (submit)
-                            {
-                                signal.reader.LocalizeError();
-                                string error = signal.reader.sig_long_error ?? signal.reader.sig_error;
-
-                                if (error != null)
-                                {
-                                    Debug.LogWarning(error, this);
-                                    AddLine(error, error.SetColor(Color.orange));
-                                }
-                            }
-                            harbinger = null;
-                        }
-                        else if (submit)
-                            execution = program.EExecute();
-                        else
-                            harbinger = null;
-                    }
+                    harbinger = null;
+                    execution = null;
+                    ApplyShellPrefixe();
                 }
             }
-            catch (System.Exception e)
+            else
             {
-                string error = e.TrimmedMessage();
-                var trace = Util.GetStackTrace();
-                var frame = trace.GetFrame(1);
-                string _trace = frame.ToString();
-                string lint = $"{error.SetColor(Color.red)}\n{_trace.SetColor(Color.darkRed)}";
-                AddLine($"{error}\n{_trace}", lint);
-                throw e;
+                current_status = shell_status;
+                if (signal != null && signal.reader != null)
+                {
+                    bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
+
+                    harbinger = new Harbinger(this, null, null);
+                    harbinger.signal = signal;
+
+                    var scope = this.scope;
+                    if (!submit)
+                        scope = scope.Dedoublate();
+
+                    if (!harbinger.TryParseProgram(signal.reader, scope, out program))
+                    {
+                        if (submit)
+                        {
+                            signal.reader.LocalizeError();
+                            string error = signal.reader.sig_long_error ?? signal.reader.sig_error;
+
+                            if (error != null)
+                            {
+                                Debug.LogWarning(error, this);
+                                AddLine(error, error.SetColor(Color.orange));
+                            }
+                        }
+                        harbinger = null;
+                    }
+                    else if (submit)
+                        execution = program.EExecute();
+                    else
+                        harbinger = null;
+                }
             }
         }
     }
