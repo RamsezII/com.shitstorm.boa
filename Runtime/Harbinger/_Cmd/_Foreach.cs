@@ -51,12 +51,11 @@ namespace _BOA_
                     yield return routine_list.Current;
 
                 BoaVariable variable = exe.scope.GetVariable(var_name);
-                List<object> list = (List<object>)routine_list.Current.output;
+                var list = routine_list.Current.output.IterateThroughData();
 
-                for (int i = 0; i < list.Count; i++)
+                foreach (var item in list)
                 {
-                    variable.value = list[i];
-
+                    variable.value = item;
                     var routine_block = block.EExecute();
                     while (routine_block.MoveNext())
                         yield return routine_block.Current;

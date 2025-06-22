@@ -79,7 +79,7 @@ namespace _BOA_
                                 switch (code)
                                 {
                                     case OperatorsM.add:
-                                        return $"{str1}{str1}";
+                                        return $"{str1}{str2}";
 
                                     case OperatorsM.assign:
                                         break;
