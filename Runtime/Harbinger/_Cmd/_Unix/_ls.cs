@@ -11,6 +11,7 @@ namespace _BOA_
         static void InitCmd_Unix_ls()
         {
             AddContract(new("ls",
+                outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
                     if (exe.reader.TryReadString_matches_out(out string flag, false, lint: exe.reader.lint_theme.flags, matches: new string[] { "f", "d", }))
@@ -46,8 +47,6 @@ namespace _BOA_
 
                     if (string.IsNullOrWhiteSpace(join))
                         join = string.Empty;
-                    else if (exe.pipe_next == null)
-                        exe.harbinger.shell.AddLine(join);
 
                     return join;
                 }));

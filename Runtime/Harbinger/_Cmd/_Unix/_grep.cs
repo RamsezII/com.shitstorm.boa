@@ -11,6 +11,7 @@ namespace _BOA_
         {
             AddContract(new("grep",
                 min_args: 1,
+                outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {
                     if (exe.pipe_previous == null)

@@ -10,6 +10,7 @@ namespace _BOA_
         static void InitCmd_Unix_cat()
         {
             AddContract(new("cat",
+                outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {
                     if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.FILE, true, out string path))

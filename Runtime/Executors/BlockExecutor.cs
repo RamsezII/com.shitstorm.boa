@@ -21,6 +21,14 @@ namespace _BOA_
                 stack[^1].MarkAsInstructionOutput();
         }
 
+        internal override bool IsMarkedAsOutput()
+        {
+            if (base.IsMarkedAsOutput())
+                if (stack.Count > 0)
+                    return stack[^1].IsMarkedAsOutput();
+            return false;
+        }
+
         internal override IEnumerator<Contract.Status> EExecute()
         {
             for (int i = 0; i < stack.Count; i++)

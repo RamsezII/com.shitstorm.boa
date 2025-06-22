@@ -9,6 +9,7 @@ namespace _BOA_
         {
             AddContract(new("echo",
                 min_args: 1,
+                outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {
                     if (exe.pipe_previous == null)
@@ -20,7 +21,8 @@ namespace _BOA_
                 routine: static exe =>
                 {
                     //if (exe.pipe_next == null)
-                    if (exe.is_instruction_output)
+                    //if (exe.is_instruction_output)
+                    if (false)
                         return Executor.EExecute(
                             after_execution: exe.harbinger.stdout,
                             modify_output: null,

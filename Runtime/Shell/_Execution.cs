@@ -34,14 +34,7 @@ namespace _BOA_
                 if (harbinger.TryPullError(out string error))
                 {
                     AddLine(error, error.SetColor(Color.orange));
-
-                    program.Dispose();
-                    program = null;
-
-                    harbinger = null;
-
-                    execution.Dispose();
-                    execution = null;
+                    Clean();
                 }
                 else if (next)
                 {
@@ -54,9 +47,21 @@ namespace _BOA_
                 }
                 else
                 {
-                    harbinger = null;
-                    execution = null;
+                    if (program.IsMarkedAsOutput())
+                        AddLine(execution.Current.output);
+                    Clean();
                     ApplyShellPrefixe();
+                }
+
+                void Clean()
+                {
+                    execution.Dispose();
+                    execution = null;
+
+                    program.Dispose();
+                    program = null;
+
+                    harbinger = null;
                 }
             }
             else
