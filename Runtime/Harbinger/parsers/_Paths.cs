@@ -45,11 +45,11 @@ namespace _BOA_
                     try
                     {
                         string long_path = shell.PathCheck(path, PathModes.ForceFull, false, out bool is_rooted, out bool is_local_to_shell);
+                        if (long_path[^1] == '/')
+                            long_path = long_path[..^1];
 
                         PathModes path_mode = is_rooted ? PathModes.ForceFull : PathModes.TryLocal;
                         DirectoryInfo parent = Directory.GetParent(long_path);
-                        if (long_path[^1] == '/')
-                            parent = parent.Parent;
 
                         if (parent != null)
                         {
