@@ -29,28 +29,31 @@ namespace _BOA_
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     path = shell.working_dir;
-                    reader.completion_l = shell.PathCheck(Directory.GetParent(path).FullName, PathModes.TryLocal);
+                    reader.completion_l = shell.PathCheck(Directory.GetParent(path).FullName, PathModes.TryLocal, true);
 
                     string path_r;
                     if (type == FS_TYPES.DIRECTORY)
                         path_r = Directory.EnumerateDirectories(path).FirstOrDefault();
                     else
                         path_r = Directory.EnumerateFileSystemEntries(path).FirstOrDefault();
-                    reader.completion_r = shell.PathCheck(path_r, PathModes.TryLocal);
+                    reader.completion_r = shell.PathCheck(path_r, PathModes.TryLocal, true);
 
-                    path = ".";
-                    reader.completions_v.Add(".");
+                    path = "./";
+                    reader.completions_v.Add(path);
                 }
                 else
                     try
                     {
-                        string long_path = shell.PathCheck(path, PathModes.ForceFull, out bool is_rooted, out bool is_local_to_shell);
+                        string long_path = shell.PathCheck(path, PathModes.ForceFull, false, out bool is_rooted, out bool is_local_to_shell);
 
+                        PathModes path_mode = is_rooted ? PathModes.ForceFull : PathModes.TryLocal;
                         DirectoryInfo parent = Directory.GetParent(long_path);
+                        if (long_path[^1] == '/')
+                            parent = parent.Parent;
 
                         if (parent != null)
                         {
-                            reader.completion_l = shell.PathCheck(parent.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
+                            reader.completion_l = shell.PathCheck(parent.FullName, path_mode, true);
 
                             if (parent.Exists)
                             {
@@ -62,7 +65,7 @@ namespace _BOA_
                                         path_r = current.EnumerateDirectories().FirstOrDefault().FullName;
                                     else
                                         path_r = current.EnumerateFileSystemInfos().FirstOrDefault().FullName;
-                                    reader.completion_r = shell.PathCheck(path_r, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
+                                    reader.completion_r = shell.PathCheck(path_r, path_mode, true);
                                 }
 
                                 if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
@@ -74,7 +77,7 @@ namespace _BOA_
                                     };
 
                                     foreach (var fsi in paths)
-                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal).QuoteStringSafely());
+                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, path_mode, true).QuoteStringSafely());
                                 }
                             }
                         }

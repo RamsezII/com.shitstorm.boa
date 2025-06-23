@@ -43,7 +43,7 @@ namespace _BOA_
                         _ => Directory.EnumerateFileSystemEntries(exe.harbinger.shell.working_dir, pattern),
                     };
 
-                    string join = fsis.Select(x => exe.harbinger.shell.PathCheck(x, PathModes.TryLocal)).Join("\n");
+                    string join = fsis.Select(x => exe.harbinger.shell.PathCheck(x, PathModes.TryLocal, false)).Join("\n");
 
                     if (string.IsNullOrWhiteSpace(join))
                         join = string.Empty;

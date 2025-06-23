@@ -24,7 +24,7 @@ namespace _BOA_
                         after_execution: data =>
                         {
                             string path = data is string str ? str : data.ToString();
-                            path = exe.harbinger.shell.PathCheck(path, PathModes.ForceFull);
+                            path = exe.harbinger.shell.PathCheck(path, PathModes.ForceFull, false);
 
                             if (Directory.Exists(path))
                                 exe.harbinger.shell.ChangeWorkdir(path);

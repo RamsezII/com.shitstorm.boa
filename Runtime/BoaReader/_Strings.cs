@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace _BOA_
 {
@@ -40,7 +39,10 @@ namespace _BOA_
                                 {
                                     LintToThisPosition(lint_theme.strings, false, read_i - 1);
                                     LintToThisPosition(lint_theme.quotes, false);
+
                                     last_arg = value;
+                                    cpl_start = start_i - 1;
+                                    cpl_end = read_i;
 
                                     if (read_as_argument && !TryReadChar_match(',', lint: lint_theme.argument_coma) && !TryPeekChar_match(')', out _))
                                         if (strict_syntax)
@@ -48,8 +50,6 @@ namespace _BOA_
                                             Stderr($"expected ',' or ')' after expression.");
                                             goto failure;
                                         }
-                                    cpl_start = start_i - 1;
-                                    cpl_end = read_i;
                                 }
                                 return true;
 
