@@ -28,6 +28,7 @@ namespace _BOA_
 
         public readonly HashSet<string> completions_v = new(StringComparer.Ordinal);
         public string completion_l, completion_r;
+        internal bool stop_completing;
 
         //----------------------------------------------------------------------------------------------------------
 

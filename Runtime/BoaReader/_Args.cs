@@ -97,7 +97,7 @@ namespace _BOA_
 
             if (TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))
             {
-                if (add_to_completions)
+                if (add_to_completions && !stop_completing)
                     if (IsOnCursor())
                         completions_v.UnionWith(matches);
 
@@ -126,7 +126,7 @@ namespace _BOA_
                         }
                     }
             }
-            else if (add_to_completions)
+            else if (add_to_completions && !stop_completing)
                 if (IsOnCursor())
                     completions_v.UnionWith(matches);
 

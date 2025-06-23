@@ -56,21 +56,31 @@ namespace _BOA_
         public string PathCheck(in string path, in PathModes path_mode) => PathCheck(path, path_mode, out _, out _);
         public string PathCheck(in string path, in PathModes path_mode, out bool was_rooted, out bool is_local_to_shell)
         {
+            bool empty = string.IsNullOrWhiteSpace(path);
+
             try
             {
-                if (string.IsNullOrWhiteSpace(path))
+                string result_path = path;
+
+                if (empty)
                     was_rooted = false;
                 else
                     was_rooted = Path.IsPathRooted(path);
 
-                string result_path = path;
+                is_local_to_shell = false;
 
                 if (!was_rooted)
-                    result_path = Path.GetFullPath(Path.Combine(working_dir, result_path));
-
-                result_path = result_path.Replace("\\", "/");
-
-                is_local_to_shell = result_path.Contains(working_dir);
+                    if (empty)
+                    {
+                        result_path = working_dir;
+                        is_local_to_shell = true;
+                    }
+                    else
+                    {
+                        result_path = Path.GetFullPath(Path.Combine(working_dir, result_path));
+                        result_path = result_path.Replace("\\", "/");
+                        is_local_to_shell = result_path.Contains(working_dir);
+                    }
 
                 switch (path_mode)
                 {

@@ -68,7 +68,7 @@ namespace _BOA_
                             cpl_start = read_i;
                             cpl_end = 1 + read_i;
 
-                            if (add_to_completions)
+                            if (add_to_completions && !stop_completing)
                                 completions_v.Add(expected_value.ToString());
                         }
 
@@ -86,7 +86,7 @@ namespace _BOA_
                     cpl_start = Mathf.Min(read_old + 1, read_i);
                     cpl_end = read_i;
 
-                    if (add_to_completions)
+                    if (add_to_completions && !stop_completing)
                         completions_v.Add(expected_value.ToString());
                 }
             }
@@ -116,7 +116,7 @@ namespace _BOA_
             {
                 ++read_i;
 
-                if (add_to_completions)
+                if (add_to_completions && !stop_completing)
                     if (IsOnCursor(next_i))
                         completions_v.UnionWith(expected_values.Select(c => c.ToString()));
 
@@ -124,7 +124,7 @@ namespace _BOA_
                 return true;
             }
 
-            if (add_to_completions)
+            if (add_to_completions && !stop_completing)
                 if (IsOnCursor(next_i))
                     completions_v.UnionWith(expected_values.Select(c => c.ToString()));
 

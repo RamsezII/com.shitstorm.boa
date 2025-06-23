@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 namespace _BOA_
 {
@@ -11,68 +10,90 @@ namespace _BOA_
         public bool TryParsePath(in BoaReader reader, in FS_TYPES type, in bool read_as_argument, out string path)
         {
             if (reader.TryParseString(out path, read_as_argument))
-            {
                 reader.LintToThisPosition(reader.lint_theme.paths, true);
-                goto success;
-            }
-            else if (reader.TryReadArgument(out path, false, reader.lint_theme.paths, stoppers: BoaReader._stoppers_paths))
-                goto success;
+            else if (reader.sig_error == null)
+                reader.TryReadArgument(out path, false, reader.lint_theme.paths, stoppers: BoaReader._stoppers_paths);
 
-            failure:
-            path = null;
-            reader.Stderr($"could not parse path '{path}'.");
-            return false;
-
-        success:
             if (reader.sig_error != null)
                 goto failure;
 
-            if (reader.IsOnCursor())
+            int read_old = reader.read_i;
+            reader.HasNext();
+            if (!reader.IsOnCursor())
+                reader.read_i = read_old;
+            else
             {
+                reader.stop_completing = true;
                 reader.completion_l = reader.completion_r = null;
 
-                try
+                if (string.IsNullOrWhiteSpace(path))
                 {
-                    string long_path = shell.PathCheck(path, PathModes.ForceFull, out bool is_rooted, out bool is_local_to_shell);
-                    DirectoryInfo parent = Directory.GetParent(long_path);
+                    path = shell.working_dir;
+                    reader.completion_l = shell.PathCheck(Directory.GetParent(path).FullName, PathModes.TryLocal);
 
-                    if (parent != null)
+                    string path_r;
+                    if (type == FS_TYPES.DIRECTORY)
+                        path_r = Directory.EnumerateDirectories(path).FirstOrDefault();
+                    else
+                        path_r = Directory.EnumerateFileSystemEntries(path).FirstOrDefault();
+                    reader.completion_r = shell.PathCheck(path_r, PathModes.TryLocal);
+
+                    path = ".";
+                    reader.completions_v.Add(".");
+                }
+                else
+                    try
                     {
-                        reader.completion_l = shell.PathCheck(parent.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
+                        string long_path = shell.PathCheck(path, PathModes.ForceFull, out bool is_rooted, out bool is_local_to_shell);
 
-                        if (parent.Exists)
+                        DirectoryInfo parent = Directory.GetParent(long_path);
+
+                        if (parent != null)
                         {
-                            string path_r;
+                            reader.completion_l = shell.PathCheck(parent.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
 
-                            if (type == FS_TYPES.DIRECTORY)
-                                path_r = parent.EnumerateDirectories().FirstOrDefault().FullName;
-                            else
-                                path_r = parent.EnumerateFileSystemInfos().FirstOrDefault().FullName;
-
-                            if (path_r != null)
-                                reader.completion_r = shell.PathCheck(path_r, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
-
-                            if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
+                            if (parent.Exists)
                             {
-                                var paths = type switch
+                                DirectoryInfo current = new(long_path);
+                                if (current != null && current.Exists)
                                 {
-                                    FS_TYPES.DIRECTORY => parent.EnumerateDirectories(),
-                                    _ => parent.EnumerateFileSystemInfos(),
-                                };
+                                    string path_r;
+                                    if (type == FS_TYPES.DIRECTORY)
+                                        path_r = current.EnumerateDirectories().FirstOrDefault().FullName;
+                                    else
+                                        path_r = current.EnumerateFileSystemInfos().FirstOrDefault().FullName;
+                                    reader.completion_r = shell.PathCheck(path_r, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
+                                }
 
-                                foreach (var fsi in paths)
-                                    reader.completions_v.Add(shell.PathCheck(fsi.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal));
+                                if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
+                                {
+                                    var paths = type switch
+                                    {
+                                        FS_TYPES.DIRECTORY => parent.EnumerateDirectories(),
+                                        _ => parent.EnumerateFileSystemInfos(),
+                                    };
+
+                                    foreach (var fsi in paths)
+                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal).QuoteStringSafely());
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    //Debug.LogException(e);
-                }
+                    //catch (Exception e)
+                    //{
+                    //    Debug.LogException(e);
+                    //}
+                    catch
+                    {
+                    }
             }
 
             return true;
+
+        failure:
+            path = null;
+            reader.Stderr($"could not parse path '{path}'.");
+            return false;
         }
     }
 }

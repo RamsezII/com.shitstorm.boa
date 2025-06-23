@@ -28,13 +28,15 @@ namespace _BOA_
                     LintToThisPosition(lint_theme.quotes, false);
 
                     while (TryReadChar_out(out char c, skippables: null))
+                    {
+                        bool flag_escape = false;
                         switch (c)
                         {
                             case '\\':
-                                ++read_i;
+                                flag_escape = true;
                                 break;
 
-                            case '\'' or '"' when c == sep:
+                            case '\'' or '"' when !flag_escape && c == sep:
                                 {
                                     LintToThisPosition(lint_theme.strings, false, read_i - 1);
                                     LintToThisPosition(lint_theme.quotes, false);
@@ -46,6 +48,8 @@ namespace _BOA_
                                             Stderr($"expected ',' or ')' after expression.");
                                             goto failure;
                                         }
+                                    cpl_start = start_i - 1;
+                                    cpl_end = read_i;
                                 }
                                 return true;
 
@@ -53,8 +57,9 @@ namespace _BOA_
                                 value += c;
                                 break;
                         }
+                    }
 
-                    failure:
+                failure:
                     if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
                     {
                         value = value[..err_index];

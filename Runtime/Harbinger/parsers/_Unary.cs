@@ -45,9 +45,9 @@
                         break;
                 }
 
-                if (TryParseFactor(reader, scope, out var factor))
+                if (TryParseFactor(reader, scope, out expression))
                 {
-                    expression = new UnaryExecutor(this, scope, factor, code);
+                    expression = new UnaryExecutor(this, scope, expression, code);
                     return true;
                 }
                 else
