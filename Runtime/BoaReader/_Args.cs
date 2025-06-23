@@ -99,7 +99,7 @@ namespace _BOA_
             {
                 if (add_to_completions)
                     if (IsOnCursor())
-                        completions.UnionWith(matches);
+                        completions_v.UnionWith(matches);
 
                 for (int match_i = 0; match_i <= matches.Length; ++match_i)
                     if (match_i == matches.Length)
@@ -128,7 +128,7 @@ namespace _BOA_
             }
             else if (add_to_completions)
                 if (IsOnCursor())
-                    completions.UnionWith(matches);
+                    completions_v.UnionWith(matches);
 
                 out_of_loop:
             read_i = read_old;

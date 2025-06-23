@@ -48,7 +48,7 @@ namespace _BOA_
                                 string str = new(chars);
 
                                 Debug.Log($"{reader.text}\n{str}");
-                                Debug.Log($"{reader.completions.Count} completions ({cobra_exe.line.flags}) -> {reader.completions.Join(" ")}");
+                                Debug.Log($"{reader.completions_v.Count} completions ({cobra_exe.line.flags}) -> {reader.completions_v.Join(" ")}");
                             }
 
                         if (!success)

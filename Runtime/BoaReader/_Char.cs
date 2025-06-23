@@ -69,7 +69,7 @@ namespace _BOA_
                             cpl_end = 1 + read_i;
 
                             if (add_to_completions)
-                                completions.Add(expected_value.ToString());
+                                completions_v.Add(expected_value.ToString());
                         }
 
                         return true;
@@ -87,7 +87,7 @@ namespace _BOA_
                     cpl_end = read_i;
 
                     if (add_to_completions)
-                        completions.Add(expected_value.ToString());
+                        completions_v.Add(expected_value.ToString());
                 }
             }
 
@@ -118,7 +118,7 @@ namespace _BOA_
 
                 if (add_to_completions)
                     if (IsOnCursor(next_i))
-                        completions.UnionWith(expected_values.Select(c => c.ToString()));
+                        completions_v.UnionWith(expected_values.Select(c => c.ToString()));
 
                 last_arg = value.ToString();
                 return true;
@@ -126,7 +126,7 @@ namespace _BOA_
 
             if (add_to_completions)
                 if (IsOnCursor(next_i))
-                    completions.UnionWith(expected_values.Select(c => c.ToString()));
+                    completions_v.UnionWith(expected_values.Select(c => c.ToString()));
 
             read_i = read_old;
             return false;

@@ -26,7 +26,8 @@ namespace _BOA_
         public bool IsOnCursor(in int cursor_i) => cursor_i >= cpl_start && cursor_i <= read_i;
         public bool IsOnCursor() => IsOnCursor(cursor_i);
 
-        public readonly HashSet<string> completions = new(StringComparer.Ordinal);
+        public readonly HashSet<string> completions_v = new(StringComparer.Ordinal);
+        public string completion_l, completion_r;
 
         //----------------------------------------------------------------------------------------------------------
 

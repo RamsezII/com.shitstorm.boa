@@ -1,5 +1,8 @@
 ﻿using _UTIL_;
+using System;
 using System.IO;
+using System.Linq;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -24,22 +27,50 @@ namespace _BOA_
             if (reader.sig_error != null)
                 goto failure;
 
-            string long_path = shell.PathCheck(path, PathModes.ForceFull, out bool is_rooted, out bool is_local_to_shell);
-            DirectoryInfo parent = Directory.GetParent(long_path);
+            if (reader.IsOnCursor())
+            {
+                reader.completion_l = reader.completion_r = null;
 
-            if (parent != null && parent.Exists)
-                if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
-                    if (reader.IsOnCursor())
+                try
+                {
+                    string long_path = shell.PathCheck(path, PathModes.ForceFull, out bool is_rooted, out bool is_local_to_shell);
+                    DirectoryInfo parent = Directory.GetParent(long_path);
+
+                    if (parent != null)
                     {
-                        var paths = type switch
-                        {
-                            FS_TYPES.DIRECTORY => parent.EnumerateDirectories(),
-                            _ => parent.EnumerateFileSystemInfos(),
-                        };
+                        reader.completion_l = shell.PathCheck(parent.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
 
-                        foreach (var fsi in paths)
-                            reader.completions.Add(shell.PathCheck(fsi.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal));
+                        if (parent.Exists)
+                        {
+                            string path_r;
+
+                            if (type == FS_TYPES.DIRECTORY)
+                                path_r = parent.EnumerateDirectories().FirstOrDefault().FullName;
+                            else
+                                path_r = parent.EnumerateFileSystemInfos().FirstOrDefault().FullName;
+
+                            if (path_r != null)
+                                reader.completion_r = shell.PathCheck(path_r, is_rooted ? PathModes.ForceFull : PathModes.TryLocal);
+
+                            if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
+                            {
+                                var paths = type switch
+                                {
+                                    FS_TYPES.DIRECTORY => parent.EnumerateDirectories(),
+                                    _ => parent.EnumerateFileSystemInfos(),
+                                };
+
+                                foreach (var fsi in paths)
+                                    reader.completions_v.Add(shell.PathCheck(fsi.FullName, is_rooted ? PathModes.ForceFull : PathModes.TryLocal));
+                            }
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    //Debug.LogException(e);
+                }
+            }
 
             return true;
         }
