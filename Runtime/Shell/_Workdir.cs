@@ -1,4 +1,5 @@
 ﻿using _ARK_;
+using System;
 using System.IO;
 using UnityEngine;
 
@@ -54,7 +55,7 @@ namespace _BOA_
         internal void ChangeWorkdir(in string path) => working_dir = PathCheck(path, PathModes.ForceFull);
 
         public string PathCheck(in string path, in PathModes path_mode) => PathCheck(path, path_mode, out _, out _);
-        public string PathCheck(in string path, in PathModes path_mode, out bool was_rooted, out bool is_local_to_shell)
+        public string PathCheck(in string path, in PathModes path_mode, out bool is_rooted, out bool is_local_to_shell)
         {
             bool empty = string.IsNullOrWhiteSpace(path);
 
@@ -63,43 +64,39 @@ namespace _BOA_
                 string result_path = path;
 
                 if (empty)
-                    was_rooted = false;
+                {
+                    is_rooted = false;
+                    is_local_to_shell = true;
+                    result_path = working_dir;
+                }
                 else
-                    was_rooted = Path.IsPathRooted(path);
-
-                is_local_to_shell = false;
-
-                if (!was_rooted)
-                    if (empty)
-                    {
-                        result_path = working_dir;
-                        is_local_to_shell = true;
-                    }
+                {
+                    is_rooted = Path.IsPathRooted(path);
+                    if (is_rooted)
+                        is_local_to_shell = result_path.StartsWith(working_dir, StringComparison.OrdinalIgnoreCase);
                     else
                     {
-                        result_path = Path.GetFullPath(Path.Combine(working_dir, result_path));
-                        result_path = result_path.Replace("\\", "/");
-                        is_local_to_shell = result_path.Contains(working_dir);
+                        is_local_to_shell = true;
+                        result_path = Path.Combine(working_dir, result_path);
                     }
+                    result_path = Path.GetFullPath(result_path);
+                }
 
                 switch (path_mode)
                 {
-                    case PathModes.TryMaintain when !was_rooted:
+                    case PathModes.TryMaintain when !is_rooted:
                     case PathModes.TryLocal:
                         if (is_local_to_shell)
-                        {
-                            string local_path = Path.GetRelativePath(working_dir, result_path);
-                            if (!string.IsNullOrWhiteSpace(local_path))
-                                result_path = local_path.Replace("\\", "/");
-                        }
+                            result_path = Path.GetRelativePath(working_dir, result_path);
                         break;
                 }
 
+                result_path = result_path.Replace("\\", "/");
                 return result_path;
             }
             catch
             {
-                was_rooted = false;
+                is_rooted = false;
                 is_local_to_shell = false;
                 return path;
             }
