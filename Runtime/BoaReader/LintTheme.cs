@@ -1,7 +1,9 @@
+using System;
 using UnityEngine;
 
 namespace _BOA_
 {
+    [Serializable]
     public sealed class LintTheme
     {
         public static readonly LintTheme
@@ -13,8 +15,6 @@ namespace _BOA_
             {
 
             };
-
-        public static readonly Color lint_default = Color.white;
 
         public Color
             argument = Color.deepPink,
@@ -36,7 +36,9 @@ namespace _BOA_
             literal = Color.limeGreen,
             constants = Color.deepSkyBlue,
             strings = Color.orange,
-            quotes = Color.yellowNice
+            quotes = Color.yellowNice,
+            error = Color.red,
+            fallback_default = Color.gray
             ;
 
         //----------------------------------------------------------------------------------------------------------

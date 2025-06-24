@@ -37,8 +37,8 @@ namespace _BOA_
 
                             case '\'' or '"' when !flag_escape && c == sep:
                                 {
-                                    LintToThisPosition(lint_theme.strings, false, read_i - 1);
-                                    LintToThisPosition(lint_theme.quotes, false);
+                                    LintToThisPosition(lint_theme.strings, true, read_i - 1);
+                                    LintToThisPosition(lint_theme.quotes, true);
 
                                     last_arg = value;
                                     cpl_start = start_i - 1;

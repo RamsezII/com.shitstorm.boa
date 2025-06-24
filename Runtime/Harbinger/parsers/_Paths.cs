@@ -11,12 +11,9 @@ namespace _BOA_
         {
             bool force_quotes = false;
             if (reader.TryParseString(out path, read_as_argument))
-            {
                 force_quotes = true;
-                reader.LintToThisPosition(reader.lint_theme.paths, true);
-            }
             else if (reader.sig_error == null)
-                reader.TryReadArgument(out path, false, reader.lint_theme.paths, stoppers: BoaReader._stoppers_paths);
+                reader.TryReadArgument(out path, false, reader.lint_theme.strings, stoppers: BoaReader._stoppers_paths);
 
             if (reader.sig_error != null)
                 goto failure;
@@ -57,7 +54,7 @@ namespace _BOA_
 
                         if (parent != null)
                         {
-                            reader.completion_l = shell.PathCheck(parent.FullName, path_mode, true, false);
+                            reader.completion_l = shell.PathCheck(parent.FullName, path_mode, true, true);
 
                             if (parent.Exists)
                             {
@@ -69,7 +66,7 @@ namespace _BOA_
                                         path_r = current.EnumerateDirectories().FirstOrDefault()?.FullName ?? long_path;
                                     else
                                         path_r = current.EnumerateFileSystemInfos().FirstOrDefault()?.FullName ?? long_path;
-                                    reader.completion_r = shell.PathCheck(path_r, path_mode, true, false);
+                                    reader.completion_r = shell.PathCheck(path_r, path_mode, true, true);
                                 }
 
                                 if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
@@ -81,7 +78,7 @@ namespace _BOA_
                                     };
 
                                     foreach (var fsi in paths)
-                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, path_mode, true, false));
+                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, path_mode, true, true));
                                 }
                             }
                         }

@@ -95,7 +95,7 @@ namespace _BOA_
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
 
-            if (TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))
+            if (HasNext(ignore_case: ignore_case, skippables: skippables) && TryReadArgument(out value, as_function_argument: as_function_argument, lint: lint, skippables: skippables, stoppers: stoppers))
             {
                 if (add_to_completions && !stop_completing)
                     if (IsOnCursor())
@@ -132,6 +132,7 @@ namespace _BOA_
 
                 out_of_loop:
             read_i = read_old;
+            value = null;
             return false;
         }
     }

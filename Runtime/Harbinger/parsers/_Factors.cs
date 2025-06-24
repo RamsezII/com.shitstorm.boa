@@ -49,7 +49,7 @@
                 }
                 else if (reader.sig_error != null)
                     return false;
-                else if (reader.TryReadArgument(out string arg, lint: LintTheme.lint_default, as_function_argument: false))
+                else if (reader.TryReadArgument(out string arg, lint: reader.lint_theme.fallback_default, as_function_argument: false))
                     switch (arg.ToLower())
                     {
                         case "true":

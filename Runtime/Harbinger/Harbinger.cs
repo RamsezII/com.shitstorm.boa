@@ -47,7 +47,12 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static void AddContract(in Contract contract) => global_contracts.Add(contract.name, contract);
+        public static void AddContract(in Contract contract, params string[] aliases)
+        {
+            global_contracts.Add(contract.name, contract);
+            for (int i = 0; i < aliases.Length; i++)
+                global_contracts.Add(aliases[i], contract);
+        }
 
         //----------------------------------------------------------------------------------------------------------
 

@@ -48,7 +48,7 @@ namespace _BOA_
                 0 => lint_theme.bracket_0,
                 1 => lint_theme.bracket_1,
                 2 => lint_theme.bracket_2,
-                _ => LintTheme.lint_default,
+                _ => lint_theme.fallback_default,
             };
         }
 
@@ -88,10 +88,10 @@ namespace _BOA_
                 }
         }
 
-        public string GetLintResult(in Color default_color, in int start = 0)
+        public string GetLintResult(in int start = 0)
         {
             if (lint_cursors.Count == 0)
-                return text[start..].SetColor(default_color);
+                return text[start..].SetColor(lint_theme.fallback_default);
 
             StringBuilder sb = new();
             int last_lint = start;
@@ -106,7 +106,7 @@ namespace _BOA_
                 }
 
             if (last_lint < text.Length)
-                sb.Append(text[last_lint..].SetColor(default_color));
+                sb.Append(text[last_lint..].SetColor(lint_theme.fallback_default));
 
             return sb.ToString();
         }

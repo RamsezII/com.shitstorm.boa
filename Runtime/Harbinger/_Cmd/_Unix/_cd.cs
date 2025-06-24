@@ -34,7 +34,8 @@ namespace _BOA_
                         modify_output: null,
                         exe.arg_0.EExecute()
                     );
-                }));
+                }),
+                "change_directory", "ChangeDirectory");
         }
     }
 }

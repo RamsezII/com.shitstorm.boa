@@ -53,7 +53,7 @@ namespace _BOA_
 
                         if (!success)
                         {
-                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
+                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult());
 
                             string error = reader.sig_long_error ?? reader.sig_error ?? $"could not parse command {{ {input_line} }}";
                             if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
@@ -61,7 +61,7 @@ namespace _BOA_
                         }
                         else
                         {
-                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult(LintTheme.lint_default));
+                            cobra_exe.line.LintToThisPosition(cobra_exe.line.read_i - read_old, reader.GetLintResult());
                             if (cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                             {
                                 var routine = program.EExecute();

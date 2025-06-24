@@ -29,8 +29,6 @@ namespace _BOA_
                             if (File.Exists(path))
                             {
                                 string cat = File.ReadAllText(path).Trim();
-                                if (exe.pipe_next == null)
-                                    exe.harbinger.shell.AddLine(cat);
                                 return cat;
                             }
                             exe.harbinger.Stderr($"Could not find file '{path}'.");
