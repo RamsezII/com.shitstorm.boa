@@ -25,7 +25,7 @@ namespace _BOA_
                 working_dir = Directory.GetParent(Application.dataPath).FullName;
             else
                 working_dir = NUCLEOR.home_path;
-            working_dir = PathCheck(working_dir, PathModes.ForceFull, false);
+            working_dir = PathCheck(working_dir, PathModes.ForceFull, false, false);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -39,8 +39,8 @@ namespace _BOA_
 
         public (string text, string lint) GetPrefixe(in string user_name = null, in string cmd_path = null)
         {
-            string referent_dir = PathCheck(Shell.referent_dir, PathModes.ForceFull, false);
-            string working_dir = this.working_dir = PathCheck(this.working_dir, PathModes.ForceFull, false);
+            string referent_dir = PathCheck(Shell.referent_dir, PathModes.ForceFull, false, false);
+            string working_dir = this.working_dir = PathCheck(this.working_dir, PathModes.ForceFull, false, false);
 
             if (Util.Equals_path(working_dir, referent_dir))
                 working_dir = "~";
@@ -52,10 +52,10 @@ namespace _BOA_
             return ($"{user_name ?? ArkMachine.user_name.Value}:{cmd_path ?? working_dir}$ ", $"{(user_name ?? ArkMachine.user_name.Value).SetColor("#73CC26")}:{(cmd_path ?? working_dir).SetColor("#73B2D9")}$ ");
         }
 
-        internal void ChangeWorkdir(in string path) => working_dir = PathCheck(path, PathModes.ForceFull, false);
+        internal void ChangeWorkdir(in string path) => working_dir = PathCheck(path, PathModes.ForceFull, false, false);
 
-        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes) => PathCheck(path, path_mode, check_quotes, out _, out _);
-        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes, out bool is_rooted, out bool is_local_to_shell)
+        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes, in bool force_quotes) => PathCheck(path, path_mode, check_quotes, force_quotes, out _, out _);
+        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes, in bool force_quotes, out bool is_rooted, out bool is_local_to_shell)
         {
             bool empty = string.IsNullOrWhiteSpace(path);
 
@@ -90,7 +90,7 @@ namespace _BOA_
                     case PathModes.TryMaintain when !is_rooted:
                     case PathModes.TryLocal:
                         if (is_local_to_shell)
-                            result_path = "./" + Path.GetRelativePath(working_dir, result_path);
+                            result_path = Path.GetRelativePath(working_dir, result_path);
                         break;
                 }
 
@@ -100,8 +100,10 @@ namespace _BOA_
                     if (result_path[^1] != '/')
                         result_path += "/";
 
-                if (check_quotes)
+                if (force_quotes)
                     result_path = result_path.QuoteStringSafely();
+                else if (check_quotes)
+                    result_path = result_path.QuotePathIfNeeded();
 
                 return result_path;
             }
