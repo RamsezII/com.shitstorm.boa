@@ -38,12 +38,12 @@ namespace _BOA_
 
                     var fsis = type switch
                     {
-                        FS_TYPES.FILE => Directory.EnumerateFiles(exe.harbinger.shell.working_dir, pattern),
-                        FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(exe.harbinger.shell.working_dir, pattern),
-                        _ => Directory.EnumerateFileSystemEntries(exe.harbinger.shell.working_dir, pattern),
+                        FS_TYPES.FILE => Directory.EnumerateFiles(exe.harbinger.shell.workdir, pattern),
+                        FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(exe.harbinger.shell.workdir, pattern),
+                        _ => Directory.EnumerateFileSystemEntries(exe.harbinger.shell.workdir, pattern),
                     };
 
-                    string join = fsis.Select(x => exe.harbinger.shell.PathCheck(x, PathModes.TryLocal, false, false, out _, out _)).Join("\n");
+                    string join = fsis.Select(x => exe.harbinger.PathCheck(x, PathModes.TryLocal, false, false, out _, out _)).Join("\n");
 
                     if (string.IsNullOrWhiteSpace(join))
                         join = string.Empty;

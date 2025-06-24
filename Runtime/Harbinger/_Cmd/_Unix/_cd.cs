@@ -24,10 +24,10 @@ namespace _BOA_
                         after_execution: data =>
                         {
                             string path = data is string str ? str : data.ToString();
-                            path = exe.harbinger.shell.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
+                            path = exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
 
                             if (Directory.Exists(path))
-                                exe.harbinger.shell.ChangeWorkdir(path);
+                                exe.harbinger.ChangeWorkdir(path);
                             else
                                 exe.harbinger.Stderr($"Found no directory at path '{path}'.");
                         },

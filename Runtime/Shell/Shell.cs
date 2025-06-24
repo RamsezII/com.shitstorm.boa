@@ -36,7 +36,7 @@ namespace _BOA_
         private void Start()
         {
             NUCLEOR.delegates.shell_tick += Tick;
-            ApplyShellPrefixe();
+            RefreshShellPrefixe();
         }
 
         //----------------------------------------------------------------------------------------------------------

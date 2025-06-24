@@ -30,6 +30,7 @@ namespace _BOA_
                 int ticks = 0;
             before_tick:
                 bool next = execution.MoveNext();
+                workdir = harbinger.workdir;
 
                 if (harbinger.TryPullError(out string error))
                 {
@@ -50,7 +51,7 @@ namespace _BOA_
                     if (program.IsMarkedAsOutput())
                         AddLine(execution.Current.output);
                     Clean();
-                    ApplyShellPrefixe();
+                    RefreshShellPrefixe();
                 }
 
                 void Clean()
@@ -71,7 +72,7 @@ namespace _BOA_
                 {
                     bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
 
-                    harbinger = new Harbinger(this, null, null);
+                    harbinger = new Harbinger(this, null, workdir, null);
                     harbinger.signal = signal;
 
                     var scope = this.scope;

@@ -56,13 +56,14 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Harbinger(in Shell shell, in Harbinger father, in Action<object> stdout)
+        public Harbinger(in Shell shell, in Harbinger father, in string workdir, in Action<object> stdout)
         {
             this.shell = shell;
             this.father = father;
             if (shell != null)
                 this.stdout += data => this.shell.AddLine(data);
             this.stdout += stdout;
+            this.workdir = PathCheck(workdir, PathModes.ForceFull, false, false, out _, out _);
         }
 
         //----------------------------------------------------------------------------------------------------------

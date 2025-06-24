@@ -57,7 +57,7 @@ namespace _BOA_
                     yield break;
                 }
 
-                Harbinger harbinger = new(null, null, data => exe.Stdout(data));
+                Harbinger harbinger = new(null, null, exe.shell.working_dir, data => exe.Stdout(data));
                 BoaReader reader = BoaReader.ReadScript(LintTheme.theme_dark, strict_syntax, script_path);
 
                 if (!harbinger.TryParseProgram(reader, null, out Executor program) || reader.sig_error != null)
