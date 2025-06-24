@@ -1,5 +1,4 @@
 ﻿using _ARK_;
-using System;
 using System.IO;
 using UnityEngine;
 
@@ -28,10 +27,8 @@ namespace _BOA_
 
             if (Util.Equals_path(workdir, Harbinger.app_dir))
                 workdir = "~";
-            else if (workdir.Contains(Harbinger.app_dir))
-                workdir = Path.Combine("~", Path.GetRelativePath(Harbinger.app_dir, workdir));
-
-            workdir = workdir.Replace("\\", "/");
+            else
+                workdir = workdir.TrimEnd('/');
 
             string prefixe_text = $"{ArkMachine.user_name.Value}:{workdir}$ ";
             string prefixe_lint = $"{ArkMachine.user_name.Value.SetColor("#73CC26")}:{workdir.SetColor("#73B2D9")}$ ";
