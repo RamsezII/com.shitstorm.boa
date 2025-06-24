@@ -73,7 +73,10 @@ namespace _BOA_
                 {
                     is_rooted = Path.IsPathRooted(path);
                     if (is_rooted)
+                    {
+                        result_path = Path.GetFullPath(result_path).Replace("\\", "/");
                         is_local_to_shell = result_path.StartsWith(working_dir, StringComparison.OrdinalIgnoreCase);
+                    }
                     else
                     {
                         is_local_to_shell = true;
@@ -87,7 +90,7 @@ namespace _BOA_
                     case PathModes.TryMaintain when !is_rooted:
                     case PathModes.TryLocal:
                         if (is_local_to_shell)
-                            result_path = Path.GetRelativePath(working_dir, result_path);
+                            result_path = "./" + Path.GetRelativePath(working_dir, result_path);
                         break;
                 }
 
