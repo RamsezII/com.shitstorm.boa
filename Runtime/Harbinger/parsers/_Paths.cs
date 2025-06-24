@@ -30,14 +30,14 @@ namespace _BOA_
                 if (string.IsNullOrWhiteSpace(path))
                 {
                     path = shell.working_dir;
-                    reader.completion_l = shell.PathCheck(Directory.GetParent(path).FullName, PathModes.TryLocal, true, false);
+                    reader.completion_l = shell.PathCheck(Directory.GetParent(path).FullName, PathModes.TryLocal, true, false, out _, out _);
 
                     string path_r;
                     if (type == FS_TYPES.DIRECTORY)
                         path_r = Directory.EnumerateDirectories(path).FirstOrDefault();
                     else
                         path_r = Directory.EnumerateFileSystemEntries(path).FirstOrDefault();
-                    reader.completion_r = shell.PathCheck(path_r, PathModes.TryLocal, true, false);
+                    reader.completion_r = shell.PathCheck(path_r, PathModes.TryLocal, true, false, out _, out _);
 
                     path = ".";
                     reader.completions_v.Add(path);
@@ -54,7 +54,7 @@ namespace _BOA_
 
                         if (parent != null)
                         {
-                            reader.completion_l = shell.PathCheck(parent.FullName, path_mode, true, true);
+                            reader.completion_l = shell.PathCheck(parent.FullName, path_mode, true, true, out _, out _);
 
                             if (parent.Exists)
                             {
@@ -66,7 +66,7 @@ namespace _BOA_
                                         path_r = current.EnumerateDirectories().FirstOrDefault()?.FullName ?? long_path;
                                     else
                                         path_r = current.EnumerateFileSystemInfos().FirstOrDefault()?.FullName ?? long_path;
-                                    reader.completion_r = shell.PathCheck(path_r, path_mode, true, true);
+                                    reader.completion_r = shell.PathCheck(path_r, path_mode, true, true, out _, out _);
                                 }
 
                                 if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
@@ -78,7 +78,7 @@ namespace _BOA_
                                     };
 
                                     foreach (var fsi in paths)
-                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, path_mode, true, true));
+                                        reader.completions_v.Add(shell.PathCheck(fsi.FullName, path_mode, true, true, out _, out _));
                                 }
                             }
                         }

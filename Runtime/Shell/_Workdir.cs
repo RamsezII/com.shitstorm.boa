@@ -25,7 +25,7 @@ namespace _BOA_
                 working_dir = Directory.GetParent(Application.dataPath).FullName;
             else
                 working_dir = NUCLEOR.home_path;
-            working_dir = PathCheck(working_dir, PathModes.ForceFull, false, false);
+            working_dir = PathCheck(working_dir, PathModes.ForceFull, false, false, out _, out _);
         }
 
         //--------------------------------------------------------------------------------------------------------------
@@ -39,8 +39,8 @@ namespace _BOA_
 
         public (string text, string lint) GetPrefixe(in string user_name = null, in string cmd_path = null)
         {
-            string referent_dir = PathCheck(Shell.referent_dir, PathModes.ForceFull, false, false);
-            string working_dir = this.working_dir = PathCheck(this.working_dir, PathModes.ForceFull, false, false);
+            string referent_dir = PathCheck(Shell.referent_dir, PathModes.ForceFull, false, false, out _, out _);
+            string working_dir = this.working_dir = PathCheck(this.working_dir, PathModes.ForceFull, false, false, out _, out _);
 
             if (Util.Equals_path(working_dir, referent_dir))
                 working_dir = "~";
@@ -52,10 +52,10 @@ namespace _BOA_
             return ($"{user_name ?? ArkMachine.user_name.Value}:{cmd_path ?? working_dir}$ ", $"{(user_name ?? ArkMachine.user_name.Value).SetColor("#73CC26")}:{(cmd_path ?? working_dir).SetColor("#73B2D9")}$ ");
         }
 
-        internal void ChangeWorkdir(in string path) => working_dir = PathCheck(path, PathModes.ForceFull, false, false);
+        internal void ChangeWorkdir(in string path) => working_dir = PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
 
-        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes, in bool force_quotes) => PathCheck(path, path_mode, check_quotes, force_quotes, out _, out _);
-        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes, in bool force_quotes, out bool is_rooted, out bool is_local_to_shell)
+        public string PathCheck(in string path, in PathModes path_mode, in bool check_quotes, in bool force_quotes, out bool is_rooted, out bool is_local_to_shell) => PathCheck(working_dir, path, path_mode, check_quotes, force_quotes, out is_rooted, out is_local_to_shell);
+        public static string PathCheck(in string default_dir, in string path, in PathModes path_mode, in bool check_quotes, in bool force_quotes, out bool is_rooted, out bool is_local_to_shell)
         {
             bool empty = string.IsNullOrWhiteSpace(path);
 
@@ -67,7 +67,7 @@ namespace _BOA_
                 {
                     is_rooted = false;
                     is_local_to_shell = true;
-                    result_path = working_dir;
+                    result_path = default_dir;
                 }
                 else
                 {
@@ -75,12 +75,12 @@ namespace _BOA_
                     if (is_rooted)
                     {
                         result_path = Path.GetFullPath(result_path).Replace("\\", "/");
-                        is_local_to_shell = result_path.StartsWith(working_dir, StringComparison.OrdinalIgnoreCase);
+                        is_local_to_shell = result_path.StartsWith(default_dir, StringComparison.OrdinalIgnoreCase);
                     }
                     else
                     {
                         is_local_to_shell = true;
-                        result_path = Path.Combine(working_dir, result_path);
+                        result_path = Path.Combine(default_dir, result_path);
                     }
                     result_path = Path.GetFullPath(result_path);
                 }
@@ -90,7 +90,7 @@ namespace _BOA_
                     case PathModes.TryMaintain when !is_rooted:
                     case PathModes.TryLocal:
                         if (is_local_to_shell)
-                            result_path = Path.GetRelativePath(working_dir, result_path);
+                            result_path = Path.GetRelativePath(default_dir, result_path);
                         break;
                 }
 

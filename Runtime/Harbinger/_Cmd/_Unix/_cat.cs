@@ -15,7 +15,7 @@ namespace _BOA_
                 {
                     if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.FILE, true, out string path))
                     {
-                        path = exe.harbinger.shell.PathCheck(path, PathModes.ForceFull, false, false);
+                        path = exe.harbinger.shell.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
                         exe.arg_0 = new LiteralExecutor(exe.harbinger, exe.scope, path);
                     }
                 },
