@@ -70,22 +70,9 @@ namespace _BOA_
 
         public void Stderr(string error)
         {
-            error += "\n\n" + Util.GetStackTrace().GetFrame(1).ToString();
             _stderr ??= error;
+            error += "\n\n" + Util.GetStackTrace().GetFrame(1).ToString();
             Debug.LogWarning(error);
-        }
-
-        public bool TryPullError(out string error)
-        {
-            if (_stderr == null)
-            {
-                error = null;
-                return false;
-            }
-
-            error = _stderr;
-            _stderr = null;
-            return true;
         }
     }
 }

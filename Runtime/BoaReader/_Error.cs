@@ -9,7 +9,7 @@ namespace _BOA_
             if (sig_long_error != null)
                 return;
 
-            int line_count = 0;
+            int line_count = 1;
             int column_count = 0;
             int start_line = 0;
             string line = null;

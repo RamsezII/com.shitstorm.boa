@@ -43,7 +43,7 @@ namespace _BOA_
 
                     contract.args?.Invoke(this);
 
-                    if (harbinger._stderr != null)
+                    if (reader.sig_error != null)
                         return;
 
                     if ((expects_parenthesis || found_parenthesis) && !reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))

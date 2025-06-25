@@ -23,6 +23,19 @@ namespace _BOA_
         void Tick() => PropagateSignal(sig_tick);
         public void PropagateSignal(in BoaSignal signal)
         {
+            void Clean()
+            {
+                execution.Dispose();
+                execution = null;
+
+                program.Dispose();
+                program = null;
+
+                harbinger = null;
+
+                RefreshShellPrefixe();
+            }
+
         before_execution:
             if (execution != null)
             {
@@ -33,9 +46,9 @@ namespace _BOA_
                 bool next = execution.MoveNext();
                 workdir = harbinger.workdir;
 
-                if (harbinger.TryPullError(out string error))
+                if (harbinger._stderr != null)
                 {
-                    AddLine(error, error.SetColor(Color.orange));
+                    AddLine(harbinger._stderr, harbinger._stderr.SetColor(Color.orange));
                     Clean();
                 }
                 else if (next)
@@ -48,21 +61,7 @@ namespace _BOA_
                     current_status = execution.Current;
                 }
                 else
-                {
                     Clean();
-                    RefreshShellPrefixe();
-                }
-
-                void Clean()
-                {
-                    execution.Dispose();
-                    execution = null;
-
-                    program.Dispose();
-                    program = null;
-
-                    harbinger = null;
-                }
             }
             else
             {

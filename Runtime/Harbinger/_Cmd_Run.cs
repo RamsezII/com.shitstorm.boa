@@ -66,7 +66,17 @@ namespace _BOA_
                     {
                         using var routine = program.EExecute();
                         while (routine.MoveNext())
+                        {
+                            if (harbinger._stderr != null)
+                            {
+                                executor.harbinger.Stderr(harbinger._stderr);
+                                yield break;
+                            }
                             yield return routine.Current;
+                        }
+
+                        if (harbinger._stderr != null)
+                            executor.harbinger.Stderr(harbinger._stderr);
                     }
                 }
             }
