@@ -71,10 +71,7 @@ namespace _BOA_
                             if (routine.MoveNext())
                             {
                                 if (harbinger._stderr != null)
-                                {
-                                    executor.harbinger.Stderr(harbinger._stderr);
-                                    yield break;
-                                }
+                                    break;
                                 yield return routine.Current;
                             }
                             else

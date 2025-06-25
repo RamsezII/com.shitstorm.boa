@@ -1,4 +1,6 @@
-﻿namespace _BOA_
+﻿using _ARK_;
+
+namespace _BOA_
 {
     partial class Harbinger
     {
@@ -8,6 +10,7 @@
 
             BlockExecutor program = new(this, scope ?? new ScopeNode(null, true));
             program.scope.SetVariable("_args_", new BoaVariable(args));
+            program.scope.SetVariable("_app_dir_", new BoaVariable(NUCLEOR.game_path.DOS2UNIX_full()));
 
             while (TryParseBlock(reader, program.scope, out var sub_block))
                 if (sub_block != null)

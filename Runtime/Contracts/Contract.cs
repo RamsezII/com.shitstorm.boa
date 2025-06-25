@@ -20,6 +20,7 @@ namespace _BOA_
 
             static byte _id;
             public readonly byte id;
+            public readonly bool print;
             public readonly States state;
             public string prefixe_text, prefixe_lint;
             [Range(0, 1)] public float progress;
@@ -27,9 +28,10 @@ namespace _BOA_
 
             //----------------------------------------------------------------------------------------------------------
 
-            public Status(in States state, in string prefixe_text = default, in string prefixe_lint = default, in float progress = default, in object output = default)
+            public Status(in States state, in string prefixe_text = default, in string prefixe_lint = default, in float progress = default, in object output = default, in bool print = false)
             {
                 id = _id++;
+                this.print = print;
                 this.state = state;
                 this.prefixe_text = prefixe_text ?? string.Empty;
                 this.prefixe_lint = prefixe_lint ?? prefixe_text;

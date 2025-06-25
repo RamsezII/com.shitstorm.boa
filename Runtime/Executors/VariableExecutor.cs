@@ -15,6 +15,11 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        internal override bool IsMarkedAsOutput()
+        {
+            return false;
+        }
+
         internal override IEnumerator<Contract.Status> EExecute()
         {
             if (scope.TryGetVariable(var_name, out var variable))

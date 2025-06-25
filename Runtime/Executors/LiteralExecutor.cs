@@ -15,6 +15,11 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        internal override bool IsMarkedAsOutput()
+        {
+            return false;
+        }
+
         internal override IEnumerator<Contract.Status> EExecute()
         {
             yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: literal);
