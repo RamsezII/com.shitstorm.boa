@@ -50,6 +50,7 @@ namespace _BOA_
 
                 string script_path = (string)exe.args[0];
                 script_path = exe.shell.PathCheck(script_path, _COBRA_.PathModes.ForceFull);
+                string script_text = File.ReadAllText(script_path);
 
                 if (!File.Exists(script_path))
                 {
@@ -58,7 +59,7 @@ namespace _BOA_
                 }
 
                 Harbinger harbinger = new(null, null, exe.shell.working_dir, data => exe.Stdout(data));
-                BoaReader reader = BoaReader.ReadScript(LintTheme.theme_dark, strict_syntax, script_path);
+                BoaReader reader = new BoaReader(LintTheme.theme_dark, strict_syntax, script_text, script_path);
 
                 if (!harbinger.TryParseProgram(reader, null, out Executor program) || reader.sig_error != null)
                 {

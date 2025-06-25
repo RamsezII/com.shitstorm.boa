@@ -60,7 +60,7 @@ namespace _BOA_
                     }
 
                 failure:
-                    if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
+                    if (value.TryIndexOf_min(out int err_index, 0, true, ' ', '\t', '\n', '\r'))
                     {
                         value = value[..err_index];
                         read_i = start_i + err_index;

@@ -40,13 +40,14 @@ namespace _BOA_
 
                 string path = (string)routines[0].Current.output;
                 string long_path = executor.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
+                string text = File.ReadAllText(long_path);
 
                 if (!File.Exists(long_path))
                     executor.reader.Stderr($"can not find file at path: {long_path}.");
                 else
                 {
                     var harbinger = new Harbinger(executor.harbinger.shell, executor.harbinger, executor.harbinger.workdir, executor.harbinger.stdout);
-                    var reader = BoaReader.ReadScript(executor.reader.lint_theme, executor.reader.strict_syntax, long_path);
+                    var reader = new BoaReader(executor.reader.lint_theme, executor.reader.strict_syntax, text, long_path);
 
                     harbinger.args.Add(long_path);
                     for (int arg_i = 1; arg_i < routines.Length; ++arg_i)

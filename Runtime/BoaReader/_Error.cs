@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace _BOA_
 {
     partial class BoaReader
@@ -7,33 +9,57 @@ namespace _BOA_
             if (sig_long_error != null)
                 return;
 
-            int char_count = 0;
-            int eol_lenth = Util.is_windows ? 2 : 1;
+            int line_count = 0;
+            int column_count = 0;
+            int start_line = 0;
+            string line = null;
 
-            for (int i = 0; i < lines.Length; ++i)
+            if (!multiline)
             {
-                string line = lines[i];
-                if (i == lines.Length - 1 || !string.IsNullOrWhiteSpace(line) && char_count + line.Length + eol_lenth >= read_i)
-                {
-                    int char_i = read_i - char_count + 6;
-                    string spaces = new(' ', char_i);
-
-                    if (multiline)
-                    {
-                        if (false)
-                            sig_long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}|\n{spaces}└──> {sig_error}";
-                        else
-                            sig_long_error = $"at {script_path ?? "line"}:{i}\n({nameof(last_arg)}: '{last_arg}', {i}, {char_i})\n {i + ".",-4} {line}\n{spaces}└──> {sig_error}";
-                    }
-                    else
-                        sig_long_error = $"{line}\n{new string(' ', read_i - char_count)}└──> {sig_error}";
-                    sig_long_error += "\n\n" + err_trace;
-
-                    return;
-                }
-                char_count += eol_lenth + line.Length;
+                column_count = read_i;
+                line = text;
             }
-            sig_long_error = $"\n{sig_error}";
+            else
+                for (int i = 0; i < read_i; ++i)
+                    switch (text[i])
+                    {
+                        case '\n':
+                            ++line_count;
+                            column_count = 0;
+                            break;
+
+                        case '\r':
+                            ++line_count;
+                            ++i;
+                            column_count = 0;
+                            break;
+
+                        default:
+                            if (column_count == 0)
+                                start_line = i;
+                            ++column_count;
+                            break;
+                    }
+
+            if (multiline)
+            {
+                if (text.TryIndexOf_min(out int next_rn, start_line, true, '\r', '\n'))
+                    line = text[start_line..next_rn];
+                else
+                    line = text[start_line..];
+
+                StringBuilder sb = new();
+
+                sb.AppendLine($"at {script_path ?? "line"}:{line_count}");
+                sb.AppendLine($"({nameof(last_arg)}: '{last_arg}', {line_count}, {column_count})");
+                sb.AppendLine($" {line_count + ".",-4} {line}");
+                sb.Append($"{new string(' ', 6 + column_count)}└──> {sig_error}");
+
+                sig_long_error = sb.ToString();
+            }
+            else
+                sig_long_error = $"{line}\n{new string(' ', read_i)}└──> {sig_error}";
+            sig_long_error += "\n\n" + err_trace;
         }
     }
 }

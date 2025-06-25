@@ -87,7 +87,7 @@ namespace _BOA_
                         break;
                 }
 
-            if (value.TryIndexOf_min(out int err_index, true, ' ', '\t', '\n', '\r'))
+            if (value.TryIndexOf_min(out int err_index, 0, true, ' ', '\t', '\n', '\r'))
                 reader.read_i = start_i + err_index;
             else
                 reader.read_i = read_old;

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace _BOA_
 {
@@ -9,11 +8,9 @@ namespace _BOA_
     {
         public readonly bool strict_syntax;
         public readonly string script_path;
-        public readonly string[] lines;
         public readonly string text;
 
         public readonly bool multiline;
-        public readonly int first_line, last_line;
         public int cursor_i, cpl_start, read_i, cpl_end;
         public string last_arg;
 
@@ -32,37 +29,18 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public static BoaReader ReadScript(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int cursor_i = int.MaxValue) => new BoaReader(lint_theme, strict_syntax, script_path, cursor_i, File.ReadAllLines(script_path));
-        public static BoaReader ReadLines(in LintTheme lint_theme, in bool strict_syntax, in int cursor_i = int.MaxValue, params string[] lines) => new BoaReader(lint_theme, strict_syntax, "line", cursor_i, lines);
-        BoaReader(in LintTheme lint_theme, in bool strict_syntax, in string script_path, in int cursor_i, in string[] lines)
+        public BoaReader(in LintTheme lint_theme, in bool strict_syntax, in string text, in string script_path, in int cursor_i = int.MaxValue)
         {
             this.lint_theme = lint_theme ?? LintTheme.theme_dark;
             this.strict_syntax = strict_syntax;
             this.script_path = script_path;
             this.cursor_i = cursor_i;
-            text = lines.Join("\n");
+            this.text = text;
 #if UNITY_EDITOR
             _text_length = text.Length;
 #endif
-
-            first_line = last_line = -1;
-            for (int i = 0; i < lines.Length; i++)
-                if (!string.IsNullOrWhiteSpace(lines[i]))
-                {
-                    if (first_line == -1)
-                        first_line = i;
-                    last_line = 1 + i;
-                }
-
-            if (false)
-                if (first_line > 0 || last_line < lines.Length)
-                    this.lines = lines[first_line..last_line];
-                else
-                    this.lines = lines;
-            else
-                this.lines = lines;
-
-            multiline = last_line - first_line > 1;
+            if (Util.TryIndexOf_min(text, out int index_of, 0, true, '\n', '\r'))
+                multiline = index_of < text.Length - 1;
         }
 
         //----------------------------------------------------------------------------------------------------------
