@@ -117,7 +117,7 @@ namespace _BOA_
                     BoaVariable bvar = exe.scope.GetVariable(arg_name);
                     ExpressionExecutor expr = (ExpressionExecutor)bvar.value;
 
-                    var expr_routine = expr.EExecute();
+                    using var expr_routine = expr.EExecute();
                     while (expr_routine.MoveNext())
                         yield return expr_routine.Current;
 
@@ -125,7 +125,8 @@ namespace _BOA_
                 }
 
                 Executor func_block = (Executor)exe.args[0];
-                var block_routine = func_block.EExecute();
+                using var block_routine = func_block.EExecute();
+
                 while (block_routine.MoveNext())
                     yield return block_routine.Current;
             }

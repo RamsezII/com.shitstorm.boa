@@ -28,7 +28,15 @@
                     reader.Stderr($"expected closing bracket '}}'.");
             }
             else if (TryParseInstruction(reader, scope, true, out block))
+            {
+                if (block != null)
+                {
+                    BlockExecutor body = new(this, scope);
+                    body.stack.Add(block);
+                    block = body;
+                }
                 return true;
+            }
 
             return false;
         }

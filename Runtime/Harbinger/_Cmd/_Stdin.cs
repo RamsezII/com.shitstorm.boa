@@ -10,26 +10,33 @@ namespace _BOA_
         static void Init_Stdin()
         {
             AddContract(new("stdin",
-                min_args: 1,
+                max_args: 1,
                 args: static exe =>
                 {
-                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expr))
-                        exe.arg_0 = expr;
+                    if (exe.pipe_previous == null)
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expr))
+                            exe.arg_0 = expr;
                 },
                 routine: EStdin));
 
             static IEnumerator<Contract.Status> EStdin(ContractExecutor exe)
             {
-                var routine = exe.arg_0.EExecute();
-                while (routine.MoveNext())
-                    yield return routine.Current;
+                string prefixe = string.Empty;
 
-                string prefixe = routine.Current.output.IterateThroughData_str().FirstOrDefault();
+                if (exe.arg_0 != null)
+                {
+                    var routine = exe.arg_0.EExecute();
+                    while (routine.MoveNext())
+                        yield return routine.Current;
+
+                    prefixe = routine.Current.output.IterateThroughData_str().FirstOrDefault();
+                }
 
                 Contract.Status status_last = new(Contract.Status.States.WAIT_FOR_STDIN, prefixe_text: prefixe);
 
-                while (!exe.harbinger.signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT))
+                do
                     yield return status_last;
+                while (!exe.harbinger.signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT));
 
                 string stdin = exe.harbinger.signal.reader.ReadAll();
                 yield return new(Contract.Status.States.ACTION_skip, output: stdin);
