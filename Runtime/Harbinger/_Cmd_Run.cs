@@ -64,16 +64,21 @@ namespace _BOA_
                     }
                     else
                     {
-                        harbinger.signal = executor.harbinger.signal;
                         using var routine = program.EExecute();
-                        while (routine.MoveNext())
+                        while (true)
                         {
-                            if (harbinger._stderr != null)
+                            harbinger.signal = executor.harbinger.signal;
+                            if (routine.MoveNext())
                             {
-                                executor.harbinger.Stderr(harbinger._stderr);
-                                yield break;
+                                if (harbinger._stderr != null)
+                                {
+                                    executor.harbinger.Stderr(harbinger._stderr);
+                                    yield break;
+                                }
+                                yield return routine.Current;
                             }
-                            yield return routine.Current;
+                            else
+                                break;
                         }
 
                         if (harbinger._stderr != null)

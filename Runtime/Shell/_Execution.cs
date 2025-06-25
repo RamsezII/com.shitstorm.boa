@@ -39,10 +39,9 @@ namespace _BOA_
         before_execution:
             if (execution != null)
             {
-                harbinger.signal = signal;
-
                 int ticks = 0;
             before_tick:
+                harbinger.signal = signal;
                 bool next = execution.MoveNext();
                 workdir = harbinger.workdir;
 
