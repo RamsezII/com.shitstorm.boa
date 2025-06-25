@@ -54,8 +54,11 @@ namespace _BOA_
                     last_line = 1 + i;
                 }
 
-            if (first_line > 0 || last_line < lines.Length)
-                this.lines = lines[first_line..last_line];
+            if (false)
+                if (first_line > 0 || last_line < lines.Length)
+                    this.lines = lines[first_line..last_line];
+                else
+                    this.lines = lines;
             else
                 this.lines = lines;
 

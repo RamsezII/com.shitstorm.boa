@@ -4,7 +4,7 @@ namespace _BOA_
     {
         public void LocalizeError()
         {
-            if (sig_long_error == null)
+            if (sig_long_error != null)
                 return;
 
             int char_count = 0;
@@ -13,7 +13,7 @@ namespace _BOA_
             for (int i = 0; i < lines.Length; ++i)
             {
                 string line = lines[i];
-                if (i == lines.Length - 1 || !string.IsNullOrWhiteSpace(line) && char_count + line.Length >= read_i)
+                if (i == lines.Length - 1 || !string.IsNullOrWhiteSpace(line) && char_count + line.Length + eol_lenth >= read_i)
                 {
                     int char_i = read_i - char_count + 6;
                     string spaces = new(' ', char_i);
