@@ -39,7 +39,7 @@ namespace _BOA_
                 while (routine.MoveNext())
                     yield return routine.Current;
 
-                if (exe.is_instruction_output)
+                if (exe.IsMarkedAsOutput())
                     exe.harbinger.shell.AddLine(routine.Current.output);
             }
         }

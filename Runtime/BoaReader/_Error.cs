@@ -4,6 +4,9 @@ namespace _BOA_
     {
         public void LocalizeError()
         {
+            if (sig_long_error == null)
+                return;
+
             int char_count = 0;
             int eol_lenth = Util.is_windows ? 2 : 1;
 

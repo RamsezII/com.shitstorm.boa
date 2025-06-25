@@ -16,6 +16,17 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        internal override void MarkAsInstructionOutput()
+        {
+            base.MarkAsInstructionOutput();
+            is_instruction_output = false;
+        }
+
+        internal override bool IsMarkedAsOutput()
+        {
+            return false;
+        }
+
         internal override IEnumerator<Contract.Status> EExecute()
         {
             StringBuilder sb = new();

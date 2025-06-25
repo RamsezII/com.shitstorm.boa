@@ -13,6 +13,7 @@ namespace _BOA_
         static void Init_Math()
         {
             AddContract(cmd_math_ = new("math",
+                outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {
                     if (exe.reader.TryReadArgument(out string operator_name, true, lint: exe.reader.lint_theme.operators))

@@ -18,18 +18,21 @@ namespace _BOA_
                         else
                             exe.reader.Stderr($"'echo' expected expression.");
                 },
+                //routine: static exe => exe.arg_0.EExecute(),
                 routine: static exe =>
                 {
-                    //if (exe.pipe_next == null)
                     //if (exe.is_instruction_output)
+                    //if (exe.pipe_next == null)
                     if (false)
                         return Executor.EExecute(
                             after_execution: exe.harbinger.stdout,
                             modify_output: null,
-                            exe.arg_0.EExecute());
+                            exe.arg_0.EExecute()
+                            );
                     else
                         return exe.arg_0.EExecute();
-                }));
+                }
+                ));
         }
     }
 }

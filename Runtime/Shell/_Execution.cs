@@ -23,6 +23,7 @@ namespace _BOA_
         void Tick() => PropagateSignal(sig_tick);
         public void PropagateSignal(in BoaSignal signal)
         {
+        before_execution:
             if (execution != null)
             {
                 harbinger.signal = signal;
@@ -48,8 +49,6 @@ namespace _BOA_
                 }
                 else
                 {
-                    if (program.IsMarkedAsOutput())
-                        AddLine(execution.Current.output);
                     Clean();
                     RefreshShellPrefixe();
                 }
@@ -95,7 +94,10 @@ namespace _BOA_
                         harbinger = null;
                     }
                     else if (submit)
+                    {
                         execution = program.EExecute();
+                        goto before_execution;
+                    }
                     else
                         harbinger = null;
                 }
