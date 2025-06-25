@@ -30,20 +30,30 @@ namespace _BOA_
                             exe.reader.Stderr($"please specify a pattern (flag '--pattern'");
                         else
                             exe.opts.Add("pattern", arg);
+
+                    if (exe.reader.TryReadString_match("p", false, default, add_to_completions: false))
+                        if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, false, out string path))
+                            exe.opts.Add("path", exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _));
+                        else
+                            exe.reader.Stderr($"expected path expression.");
                 },
                 function: static exe =>
                 {
                     FS_TYPES type = exe.opts.TryGetValue(nameof(FS_TYPES), out var _type) ? (FS_TYPES)_type : FS_TYPES.BOTH;
                     string pattern = exe.opts.TryGetValue("pattern", out var _pattern) ? (string)_pattern : "*";
 
+                    string workdir = exe.harbinger.shell.workdir;
+                    if (exe.opts.TryGetValue("path", out var path))
+                        workdir = (string)path;
+
                     var fsis = type switch
                     {
-                        FS_TYPES.FILE => Directory.EnumerateFiles(exe.harbinger.shell.workdir, pattern),
-                        FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(exe.harbinger.shell.workdir, pattern),
-                        _ => Directory.EnumerateFileSystemEntries(exe.harbinger.shell.workdir, pattern),
+                        FS_TYPES.FILE => Directory.EnumerateFiles(workdir, pattern),
+                        FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(workdir, pattern),
+                        _ => Directory.EnumerateFileSystemEntries(workdir, pattern),
                     };
 
-                    string join = fsis.Select(x => exe.harbinger.PathCheck(x, PathModes.TryLocal, false, false, out _, out _)).Join("\n");
+                    string join = fsis.Select(x => exe.harbinger.PathCheck(x, PathModes.ForceFull, false, false, out _, out _)).Join("\n");
 
                     if (string.IsNullOrWhiteSpace(join))
                         join = string.Empty;
