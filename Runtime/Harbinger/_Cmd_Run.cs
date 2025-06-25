@@ -64,6 +64,7 @@ namespace _BOA_
                     }
                     else
                     {
+                        harbinger.signal = executor.harbinger.signal;
                         using var routine = program.EExecute();
                         while (routine.MoveNext())
                         {
