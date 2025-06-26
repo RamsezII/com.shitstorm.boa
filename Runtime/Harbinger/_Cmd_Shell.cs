@@ -32,7 +32,7 @@ namespace _BOA_
                         if (!cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
                             scope1 = scope.Dedoublate();
 
-                        bool success = harbinger.TryParseProgram(reader, scope1, out var program);
+                        bool success = harbinger.TryParseProgram(reader, scope1, out _, out var program);
 
                         if (debug)
                             if (cobra_exe.line.HasFlags_any(SIG_FLAGS.TAB | SIG_FLAGS.ALT))

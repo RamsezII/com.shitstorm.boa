@@ -62,7 +62,7 @@ namespace _BOA_
                     if (false)
                         scope = scope.Dedoublate();
 
-                    if (!harbinger.TryParseProgram(reader, scope, out var program))
+                    if (!harbinger.TryParseProgram(reader, scope, out _, out var program))
                     {
                         reader.LocalizeError();
                         executor.harbinger.Stderr(reader.sig_long_error ?? reader.sig_error);

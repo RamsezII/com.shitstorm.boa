@@ -76,7 +76,7 @@ namespace _BOA_
                     if (!submit)
                         scope = scope.Dedoublate();
 
-                    if (!harbinger.TryParseProgram(signal.reader, scope, out program))
+                    if (!harbinger.TryParseProgram(signal.reader, scope, out bool daemonize, out program))
                     {
                         if (submit)
                         {
@@ -92,10 +92,21 @@ namespace _BOA_
                         harbinger = null;
                     }
                     else if (submit)
-                    {
-                        execution = program.EExecute();
-                        goto before_execution;
-                    }
+                        if (daemonize)
+                        {
+                            Daemonize(program);
+
+                            execution = null;
+                            program = null;
+                            harbinger = null;
+
+                            RefreshShellPrefixe();
+                        }
+                        else
+                        {
+                            execution = program.EExecute();
+                            goto before_execution;
+                        }
                     else
                         harbinger = null;
                 }

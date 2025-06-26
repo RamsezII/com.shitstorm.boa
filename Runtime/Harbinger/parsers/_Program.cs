@@ -4,8 +4,9 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        public bool TryParseProgram(in BoaReader reader, in ScopeNode scope, out Executor executor)
+        public bool TryParseProgram(in BoaReader reader, in ScopeNode scope, out bool background, out Executor executor)
         {
+            background = false;
             executor = null;
 
             BlockExecutor program = new(this, scope ?? new ScopeNode(null, true));
@@ -18,6 +19,8 @@ namespace _BOA_
 
             if (reader.sig_error != null)
                 goto failure;
+
+            background = reader.TryReadChar_match('&', lint: reader.lint_theme.command_separators);
 
             if (reader.TryPeekChar_out(out char peek, out _))
             {

@@ -15,7 +15,6 @@ namespace _BOA_
         public virtual string ToLog => $"{GetType().Name}[{id}]";
 
         public ScopeNode scope;
-        public BoaSignal signal;
 
         internal bool is_instruction_output;
 
