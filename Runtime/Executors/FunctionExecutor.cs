@@ -11,6 +11,6 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute() => throw new NotImplementedException();
+        public override IEnumerator<Contract.Status> EExecute() => throw new NotImplementedException();
     }
 }

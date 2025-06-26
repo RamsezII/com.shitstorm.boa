@@ -42,6 +42,9 @@ namespace _BOA_
                             object data1 = routine1.Current.output;
                             object data2 = routine2.Current.output;
 
+                            if (data1 is int iballs && data2 is Vector3 vballs)
+                                return iballs * vballs;
+
                             if (data1 is int int1 && data2 is int int2)
                                 return code switch
                                 {

@@ -41,7 +41,7 @@ namespace _BOA_
         internal virtual void MarkAsInstructionOutput() => is_instruction_output = true;
         internal virtual bool IsMarkedAsOutput() => is_instruction_output;
 
-        internal abstract IEnumerator<Contract.Status> EExecute();
+        public abstract IEnumerator<Contract.Status> EExecute();
         public static IEnumerator<Contract.Status> EExecute(Action<object> after_execution = null, Func<object, object> modify_output = null, params IEnumerator<Contract.Status>[] stack)
         {
             try

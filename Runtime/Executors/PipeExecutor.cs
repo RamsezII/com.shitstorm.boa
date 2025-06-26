@@ -17,7 +17,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        public override IEnumerator<Contract.Status> EExecute()
         {
             using var routine1 = previous.EExecute();
             while (routine1.MoveNext())

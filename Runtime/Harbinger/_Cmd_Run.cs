@@ -1,5 +1,4 @@
-﻿using _UTIL_;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -12,6 +11,11 @@ namespace _BOA_
         {
             AddContract(new("run",
                 max_args: 10,
+                opts: static exe =>
+                {
+                    if (exe.reader.TryReadString_match("s", false, default))
+                        exe.opts.Add("strict", null);
+                },
                 args: static exe =>
                 {
                     if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
@@ -47,7 +51,8 @@ namespace _BOA_
                 else
                 {
                     var harbinger = new Harbinger(executor.harbinger.shell, executor.harbinger, executor.harbinger.workdir, executor.harbinger.stdout);
-                    var reader = new BoaReader(executor.reader.lint_theme, executor.reader.strict_syntax, text, long_path);
+                    bool strict_syntax = executor.reader.strict_syntax || executor.opts.TryGetValue("strict", out _);
+                    var reader = new BoaReader(executor.reader.lint_theme, strict_syntax, text, long_path);
 
                     harbinger.args.Add(long_path);
                     for (int arg_i = 1; arg_i < routines.Length; ++arg_i)

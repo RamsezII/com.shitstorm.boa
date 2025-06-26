@@ -20,7 +20,7 @@ namespace _BOA_
             return false;
         }
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        public override IEnumerator<Contract.Status> EExecute()
         {
             yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: literal);
         }

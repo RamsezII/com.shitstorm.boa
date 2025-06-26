@@ -26,7 +26,7 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        public override IEnumerator<Contract.Status> EExecute()
         {
             if (!scope.TryGetVariable(var_name, out var variable))
             {

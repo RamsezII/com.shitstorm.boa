@@ -27,7 +27,7 @@ namespace _BOA_
             return false;
         }
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        public override IEnumerator<Contract.Status> EExecute()
         {
             StringBuilder sb = new();
 

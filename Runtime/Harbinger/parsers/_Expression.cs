@@ -2,7 +2,7 @@
 {
     partial class Harbinger
     {
-        internal bool TryParseExpression(in BoaReader reader, in ScopeNode scope, in bool read_as_argument, out ExpressionExecutor expression)
+        public bool TryParseExpression(in BoaReader reader, in ScopeNode scope, in bool read_as_argument, out ExpressionExecutor expression)
         {
             if (TryParseAssignation(reader, scope, out expression) || reader.sig_error == null && TryParseOr(reader, scope, out expression))
             {

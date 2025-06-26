@@ -63,7 +63,7 @@ namespace _BOA_
                 base.MarkAsInstructionOutput();
         }
 
-        internal override IEnumerator<Contract.Status> EExecute()
+        public override IEnumerator<Contract.Status> EExecute()
         {
             if (contract.routine != null)
             {

@@ -42,7 +42,7 @@ namespace _BOA_
                     FS_TYPES type = exe.opts.TryGetValue(nameof(FS_TYPES), out var _type) ? (FS_TYPES)_type : FS_TYPES.BOTH;
                     string pattern = exe.opts.TryGetValue("pattern", out var _pattern) ? (string)_pattern : "*";
 
-                    string workdir = exe.harbinger.shell.workdir;
+                    string workdir = exe.harbinger.workdir;
                     if (exe.opts.TryGetValue("path", out var path))
                         workdir = (string)path;
 
