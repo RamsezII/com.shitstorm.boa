@@ -5,13 +5,13 @@ namespace _BOA_
 {
     public class SubContract : Contract
     {
-        public readonly Type input_type;
-        public readonly Func<Type> get_input_type;
+        public readonly Type left_type;
+        public readonly Func<Type> get_left_type;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public SubContract(in string name, in Type input_type, in Type output_type,
-            in Func<Type> get_input_type = null,
+        public SubContract(in string name, in Type left_type, in Type output_type,
+            in Func<Type> get_left_type = null,
             in Func<ContractExecutor, Type> get_output_type = null,
             in int min_args = 0, in int max_args = 0,
             in bool function_style_arguments = true,
@@ -33,8 +33,8 @@ namespace _BOA_
                 outputs_if_end_of_instruction,
                 opts, args, action, function, routine)
         {
-            this.input_type = input_type;
-            this.get_input_type = get_input_type;
+            this.left_type = left_type;
+            this.get_left_type = get_left_type;
         }
     }
 }

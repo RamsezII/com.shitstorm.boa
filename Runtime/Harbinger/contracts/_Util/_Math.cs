@@ -65,6 +65,23 @@ namespace _BOA_
                                     _ => 0,
                                 };
 
+                            if (data1 is float f1 && data2 is float f2)
+                                return code switch
+                                {
+                                    OperatorsM.add => f1 + f2,
+                                    OperatorsM.sub => f1 - f2,
+                                    OperatorsM.mul => f1 * f2,
+                                    OperatorsM.div or OperatorsM.div_int => f1 / f2,
+                                    OperatorsM.mod => f1 % f2,
+                                    OperatorsM.eq => f1 == f2,
+                                    OperatorsM.neq => f1 != f2,
+                                    OperatorsM.gt => f1 > f2,
+                                    OperatorsM.lt => f1 < f2,
+                                    OperatorsM.ge => f1 >= f2,
+                                    OperatorsM.le => f1 <= f2,
+                                    _ => 0,
+                                };
+
                             if (data1 is bool b1 && data2 is bool b2)
                                 return code switch
                                 {
@@ -88,51 +105,19 @@ namespace _BOA_
                                     case OperatorsM.add:
                                         return $"{str1}{str2}";
 
-                                    case OperatorsM.assign:
-                                        break;
-
-                                    case OperatorsM.sub:
-                                        break;
-
-                                    case OperatorsM.mul:
-                                        break;
-
-                                    case OperatorsM.mod:
-                                        break;
-
                                     case OperatorsM.eq:
                                         return str1.Equals(str2, StringComparison.Ordinal);
 
                                     case OperatorsM.neq:
                                         return !str1.Equals(str2, StringComparison.Ordinal);
-
-                                    case OperatorsM.gt:
-                                        break;
-
-                                    case OperatorsM.lt:
-                                        break;
-
-                                    case OperatorsM.ge:
-                                        break;
-
-                                    case OperatorsM.le:
-                                        break;
-
-                                    case OperatorsM.and:
-                                        break;
-
-                                    case OperatorsM.or:
-                                        break;
-
-                                    case OperatorsM.xor:
-                                        break;
                                 }
                             }
 
-                            if (data1 != null && data2 != null)
-                                return data1.Equals(data2);
+                            if (code == OperatorsM.eq)
+                                if (data1 != null && data2 != null)
+                                    return data1.Equals(data2);
 
-                            exe.harbinger.Stderr($"could not apply operation '{code}' on {data1} and {data2}");
+                            exe.harbinger.Stderr($"could not apply operation '{code}' on {data1} ({data1?.GetType()}) and {data2} ({data2?.GetType()})");
                             return null;
                         },
                         routine1,

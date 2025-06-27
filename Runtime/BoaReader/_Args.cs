@@ -8,6 +8,7 @@ namespace _BOA_
     {
         public const string
             _stoppers_ = " \n\r[]{}().,;'\"\\=+-*/%<>|&",
+            _stoppers_operators_ = " \n\r[]{}().,;'\"\\<>|&",
             _stoppers_factors_ = " \n\r[]{}(),;'\"\\=+-*/%<>|&",
             _stoppers_paths = " \n\r[]{}(),;'\"=+-*%<>|&",
             _empties_ = " \t\n\r";

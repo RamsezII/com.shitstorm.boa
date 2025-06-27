@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace _BOA_
 {
@@ -58,34 +57,6 @@ namespace _BOA_
                         reader.Stderr($"expected expression of type '{output_constraint}', got '{output_type}' instead.");
                         expression = null;
                         return false;
-                    }
-
-                if (expression != null)
-                    if (reader.TryReadChar_match('.', lint: reader.lint_theme.point))
-                    {
-                        if (output_type == null)
-                        {
-                            reader.Stderr($"void expressions have no methods.");
-                            return false;
-                        }
-
-                        var sub_conts = sub_contracts.Where(pair => output_type.IsOfType(pair.Value.get_input_type?.Invoke() ?? pair.Value.input_type)).Select(pair => pair.Key.name);
-
-                        if (!reader.TryReadString_matches_out(out string subcont_name, false, reader.lint_theme.sub_contracts, sub_conts, strict: false))
-                        {
-                            reader.Stderr($"type '{output_type}' has no attribute '{subcont_name}'.");
-                            return false;
-                        }
-                        else if (!TryGetSubContract(output_type, subcont_name, out SubContract sub_contract))
-                        {
-                            reader.Stderr($"type: '{output_type}' has no methods '{subcont_name}'.");
-                            return false;
-                        }
-                        else
-                        {
-                            expression = new SubContractExecutor(this, scope, expression, sub_contract, reader);
-                            return true;
-                        }
                     }
 
                 return true;

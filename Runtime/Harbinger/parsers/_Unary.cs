@@ -45,7 +45,7 @@
                         break;
                 }
 
-                if (TryParseFactor(reader, scope, out expression))
+                if (TryParseFactorAttribute(reader, scope, out expression))
                 {
                     expression = new UnaryExecutor(this, scope, expression, code);
                     return true;
@@ -57,7 +57,7 @@
                 }
             }
 
-            if (TryParseFactor(reader, scope, out var list))
+            if (TryParseFactorAttribute(reader, scope, out var list))
             {
                 if (reader.TryReadChar_match('['))
                 {
