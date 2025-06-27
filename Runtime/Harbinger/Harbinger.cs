@@ -28,7 +28,8 @@ namespace _BOA_
 
         */
 
-        internal static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
+        static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
+        static readonly Dictionary<Type, Func<Harbinger, BoaReader, bool, bool>> sub_parsers = new();
 
         public readonly Shell shell;
         public readonly Harbinger father;
