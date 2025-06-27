@@ -22,6 +22,9 @@ namespace _BOA_
             this.reader = reader;
             this.pipe_previous = pipe_previous;
 
+            if (pipe_previous != null)
+                pipe_previous.pipe_next = this;
+
             if (parse_arguments)
             {
                 contract.opts?.Invoke(this);

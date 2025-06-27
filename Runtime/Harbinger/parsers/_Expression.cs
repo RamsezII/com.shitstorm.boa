@@ -14,7 +14,7 @@
                             reader.sig_error += $" ('{cont.contract.name}')";
                         else
                             reader.sig_error += $" ('{expression.GetType()}')";
-                        goto failure;
+                        return false;
                     }
 
                 if (reader.TryReadChar_match('?', lint: reader.lint_theme.operators))
@@ -34,37 +34,34 @@
                     }
                 }
 
+                if (!TryPipe(reader, scope, ref expression))
+                {
+                    reader.Stderr($"could not parse pipe statement.");
+                    return false;
+                }
+
                 if (reader.TryReadChar_match('.', lint: reader.lint_theme.point))
                 {
                     reader.Stderr($"type: {{{expression?.OutputType()}}}");
                     return false;
                 }
 
-                if (TryPipe(reader, scope, ref expression))
-                    return true;
+                return true;
             }
-
-        failure:
             return false;
         }
 
-        bool TryPipe(in BoaReader reader, in ScopeNode scope, ref ExpressionExecutor expression)
+        bool TryPipe(in BoaReader reader, in ScopeNode scope, ref ExpressionExecutor current_expression)
         {
             if (!reader.TryReadChar_match('|', lint: reader.lint_theme.operators))
                 return true;
-            else if (!reader.TryReadArgument(out string pipe_cont_name, lint: reader.lint_theme.contracts, as_function_argument: false))
-                reader.Stderr($"expected command after pipe operator '|'.");
-            else if (!global_contracts.TryGetValue(pipe_cont_name, out var pipe_cont))
-                reader.Stderr($"can not find command with name '{pipe_cont_name}'.");
+            else if (!TryParseMethod(reader, scope, current_expression, out var cont_pipe))
+                reader.Stderr($"expected method after pipe symbol '|'.");
             else
             {
-                expression.pipe_next = new ContractExecutor(this, scope, pipe_cont, reader, pipe_previous: expression);
-                if (reader.sig_error != null)
-                    return false;
+                current_expression = new PipeExecutor(this, scope, current_expression);
 
-                expression = new PipeExecutor(this, scope, expression, expression.pipe_next);
-
-                if (!TryPipe(reader, scope, ref expression) || reader.sig_error != null)
+                if (!TryPipe(reader, scope, ref current_expression) || reader.sig_error != null)
                 {
                     reader.Stderr($"could not parse pipe statement.");
                     return false;

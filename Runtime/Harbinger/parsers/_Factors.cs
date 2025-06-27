@@ -35,7 +35,7 @@
                     return false;
 
             if (reader.sig_error == null)
-                if (TryParseMethod(reader, scope, out var func_exe))
+                if (TryParseMethod(reader, scope, null, out var func_exe))
                 {
                     factor = func_exe;
                     return true;
