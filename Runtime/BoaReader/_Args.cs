@@ -7,7 +7,8 @@ namespace _BOA_
     partial class BoaReader
     {
         public const string
-            _stoppers_ = " \n\r[]{}(),;'\"\\=+-*/%<>|&",
+            _stoppers_ = " \n\r[]{}().,;'\"\\=+-*/%<>|&",
+            _stoppers_factors_ = " \n\r[]{}(),;'\"\\=+-*/%<>|&",
             _stoppers_paths = " \n\r[]{}(),;'\"=+-*%<>|&",
             _empties_ = " \t\n\r";
 
