@@ -22,7 +22,7 @@ namespace _BOA_
                                 exe.reader.Stderr($"unknown operator '{operator_name}'.");
                             else
                             {
-                                if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expression))
+                                if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(object), out var expression))
                                     exe.arg_0 = expression;
                                 else
                                     exe.reader.Stderr($"assignation expect an expression.");

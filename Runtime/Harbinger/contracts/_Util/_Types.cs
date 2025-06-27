@@ -12,12 +12,30 @@ namespace _BOA_
                 outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {
-                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
+                        exe.arg_0 = expr;
+                },
+                function: static exe => exe.arg_0.OutputType()
+                ));
+
+            AddSubContract(
+                typeof(object),
+                new("type", typeof(object), typeof(Type),
+                    outputs_if_end_of_instruction: true,
+                    function: static exe => ((SubContractExecutor)exe).output_exe.OutputType()
+                    )
+                );
+
+            AddContract(new("bool", typeof(bool),
+                min_args: 1,
+                args: static exe =>
+                {
+                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
                         exe.arg_0 = expr;
                 },
                 routine: static exe => Executor.EExecute(
                     after_execution: null,
-                    modify_output: static data => data?.GetType(),
+                    modify_output: data => data.ToBool(),
                     exe.arg_0.EExecute()
                     )
                 ));
@@ -26,7 +44,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
                         exe.arg_0 = expr;
                 },
                 routine: static exe => Executor.EExecute(
@@ -46,7 +64,7 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                    if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
                         exe.arg_0 = expr;
                 },
                 routine: static exe => Executor.EExecute(null, data => data switch

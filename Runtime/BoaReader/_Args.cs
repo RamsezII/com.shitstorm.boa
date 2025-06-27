@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace _BOA_
@@ -88,9 +89,9 @@ namespace _BOA_
             return true;
         }
 
-        public bool TryReadString_match(in string match, in bool as_function_argument, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out _, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: match);
-        public bool TryReadString_match_out(out string value, in bool as_function_argument, in string match, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out value, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: match);
-        public bool TryReadString_matches_out(out string value, in bool as_function_argument, in Color lint, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_, params string[] matches)
+        public bool TryReadString_match(in string match, in bool as_function_argument, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out _, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: new string[] { match, });
+        public bool TryReadString_match_out(out string value, in bool as_function_argument, in string match, in Color lint, in bool ignore_case = true, in bool add_to_completions = true) => TryReadString_matches_out(out value, as_function_argument, lint: lint, ignore_case: ignore_case, add_to_completions: add_to_completions, matches: new string[] { match });
+        public bool TryReadString_matches_out(out string value, in bool as_function_argument, in Color lint, in IEnumerable<string> matches, in bool strict = true, in bool ignore_case = true, in bool add_to_completions = true, in string skippables = _empties_, in string stoppers = _stoppers_)
         {
             StringComparison ordinal = ignore_case.ToOrdinal();
             int read_old = read_i;
@@ -101,39 +102,38 @@ namespace _BOA_
                     if (IsOnCursor())
                         completions_v.UnionWith(matches);
 
-                for (int match_i = 0; match_i <= matches.Length; ++match_i)
-                    if (match_i == matches.Length)
-                        goto out_of_loop;
-                    else
+                if (!strict)
+                    return true;
+
+                foreach (string match in matches)
+                    if (match.Equals(value, ordinal))
                     {
-                        string match = matches[match_i];
-                        if (match.Equals(value, ordinal))
-                        {
-                            last_arg = value = match;
-                            LintToThisPosition(lint, true);
+                        last_arg = value = match;
+                        LintToThisPosition(lint, true);
 
-                            if (as_function_argument)
-                                if (TryReadChar_match(',', lint: lint_theme.argument_coma))
-                                    return true;
+                        if (as_function_argument)
+                            if (TryReadChar_match(',', lint: lint_theme.argument_coma))
+                                goto success;
 
-                            if (!as_function_argument || !strict_syntax)
-                                return true;
+                        if (!as_function_argument || !strict_syntax)
+                            goto success;
 
-                            if (TryPeekChar_match(')', out _))
-                                return true;
+                        if (TryPeekChar_match(')', out _))
+                            goto success;
 
-                            return true;
-                        }
+                        goto success;
                     }
             }
             else if (add_to_completions && !stop_completing)
                 if (IsOnCursor())
                     completions_v.UnionWith(matches);
 
-                out_of_loop:
             read_i = read_old;
             value = null;
             return false;
+
+        success:
+            return true;
         }
     }
 }

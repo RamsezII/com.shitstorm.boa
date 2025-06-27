@@ -16,7 +16,7 @@
                     add_to_completions: true,
                     skippables: BoaReader._empties_,
                     stoppers: " \n\r{}(),;'\"",
-                    "=", "+=", "-=", "*=", "/=", "&=", "|=", "^=")
+                    matches: new string[] { "=", "+=", "-=", "*=", "/=", "&=", "|=", "^=", })
                     )
                 {
                     OperatorsM code = op_name switch
@@ -33,7 +33,7 @@
 
                     code |= OperatorsM.assign;
 
-                    if (TryParseExpression(reader, scope, false, out var expr))
+                    if (TryParseExpression(reader, scope, false, typeof(object), out var expr))
                     {
                         ContractExecutor exe = new(this, scope, cmd_assign_, reader, parse_arguments: false);
                         exe.args.Add(code);

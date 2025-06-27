@@ -11,6 +11,47 @@ namespace _BOA_
 
             AddContract(new("random_onSphere", typeof(Vector3), function: static exe => Random.onUnitSphere));
 
+            AddSubContract(typeof(Vector3), new("set", typeof(Vector3), typeof(Vector3),
+                args: static exe =>
+                {
+                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(int), out var expr_index))
+                        exe.reader.Stderr($"expected {typeof(int)} expression.");
+                    else
+                    {
+                        ExpressionExecutor expr_value = null;
+                        if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(float), out expr_value))
+                            exe.reader.Stderr($"expected {typeof(float)} expression.");
+                        else
+                        {
+                            exe.args.Add(expr_index);
+                            exe.arg_0 = expr_value;
+                        }
+                    }
+                },
+                routine: static exe =>
+                {
+                    ExpressionExecutor output_exe = ((SubContractExecutor)exe).output_exe;
+                    ExpressionExecutor expr_index = (ExpressionExecutor)exe.args[0];
+
+                    using var rout_output = output_exe.EExecute();
+                    using var rout_index = expr_index.EExecute();
+                    using var rout_value = exe.arg_0.EExecute();
+
+                    return Executor.EExecute(
+                        after_execution: null,
+                        modify_output: data =>
+                        {
+                            int index = (int)rout_index.Current.output;
+                            float value = (float)rout_value.Current.output;
+                            Vector3 output = (Vector3)rout_output.Current.output;
+                            output[index] = value;
+                            return output;
+                        },
+                        rout_output,
+                        rout_index,
+                        rout_value);
+                }));
+
             AddContract(new("set", typeof(Vector3),
                 args: static exe =>
                 {
@@ -21,12 +62,12 @@ namespace _BOA_
                         exe.args.Add(item);
 
                         if (exe.pipe_previous == null)
-                            if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                            if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(float), out var expr))
                                 exe.reader.Stderr($"expected float expression.");
                             else
                                 exe.arg_0 = expr;
 
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_vect))
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(Vector3), out var expr_vect))
                             exe.args.Add(expr_vect);
                         else
                             exe.reader.Stderr($"expected vector.");
@@ -68,11 +109,11 @@ namespace _BOA_
             AddContract(new("vector3", typeof(Vector3),
                 args: static exe =>
                 {
-                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_x))
+                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(float), out var expr_x))
                         exe.reader.Stderr($"expected x.");
-                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_y))
+                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(float), out var expr_y))
                         exe.reader.Stderr($"expected y.");
-                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_z))
+                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(float), out var expr_z))
                         exe.reader.Stderr($"expected z.");
                     else
                     {

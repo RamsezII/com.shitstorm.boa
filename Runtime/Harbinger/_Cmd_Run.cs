@@ -18,13 +18,13 @@ namespace _BOA_
                 },
                 args: static exe =>
                 {
-                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, null, out var expr, type_check: false))
                         exe.reader.Stderr($"Expected path expression.");
                     else
                     {
                         exe.args.Add(expr);
                         // parameters
-                        while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out expr))
+                        while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out expr))
                             exe.args.Add(expr);
                     }
                 },

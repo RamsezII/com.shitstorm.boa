@@ -14,7 +14,7 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (exe.pipe_previous == null)
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out var expr))
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr))
                             exe.arg_0 = expr;
                 },
                 routine: EStdin));

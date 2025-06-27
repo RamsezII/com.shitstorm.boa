@@ -25,7 +25,7 @@ namespace _BOA_
                             exe.reader.Stderr("expected instruction after '(' in 'for' instruction.");
                         else
                         {
-                            if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
+                            if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, typeof(bool), out var cond))
                                 exe.reader.Stderr("expected expression after first instruction in 'for' instruction.");
                             else
                             {

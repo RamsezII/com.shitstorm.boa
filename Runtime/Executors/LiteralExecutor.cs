@@ -5,14 +5,14 @@ namespace _BOA_
 {
     public class LiteralExecutor : ExpressionExecutor
     {
-        readonly object literal;
-        public override Type OutputType() => literal?.GetType();
+        readonly object value;
+        public override Type OutputType() => value?.GetType();
 
         //----------------------------------------------------------------------------------------------------------
 
-        public LiteralExecutor(in Harbinger harbinger, in ScopeNode scope, in object literal) : base(harbinger, scope)
+        public LiteralExecutor(in Harbinger harbinger, in ScopeNode scope, in object value) : base(harbinger, scope)
         {
-            this.literal = literal;
+            this.value = value;
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -24,7 +24,7 @@ namespace _BOA_
 
         public override IEnumerator<Contract.Status> EExecute()
         {
-            yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: literal);
+            yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: value);
         }
     }
 }

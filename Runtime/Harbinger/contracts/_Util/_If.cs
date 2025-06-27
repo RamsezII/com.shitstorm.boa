@@ -21,7 +21,7 @@ namespace _BOA_
                         exe.reader.LintOpeningBraquet();
                         var sub_scope = new ScopeNode(exe.scope, true);
 
-                        if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, out var cond))
+                        if (!exe.harbinger.TryParseExpression(exe.reader, sub_scope, false, typeof(bool), out var cond))
                             exe.reader.Stderr("expected expression for 'if' condition.");
                         else if (!exe.reader.TryReadChar_match(')', lint: exe.reader.CloseBraquetLint()))
                             exe.reader.Stderr("expected closing parenthesis ')' for 'if' condition.");

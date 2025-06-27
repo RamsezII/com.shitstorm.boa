@@ -14,7 +14,7 @@ namespace _BOA_
                 args: static exe =>
                 {
                     if (exe.pipe_previous == null)
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
                             exe.arg_0 = expr;
                         else
                             exe.reader.Stderr($"'echo' expected expression.");

@@ -17,7 +17,7 @@
                 return true;
             else if (reader.sig_error != null)
                 return false;
-            else if (TryParseExpression(reader, scope, false, out var expr))
+            else if (TryParseExpression(reader, scope, false, null, out var expr, type_check: false))
             {
                 if (expr is not ContractExecutor contractor || !contractor.contract.no_semicolon_required)
                     if (check_semicolon || reader.strict_syntax)

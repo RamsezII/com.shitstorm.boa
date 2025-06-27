@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace _BOA_
@@ -29,7 +30,7 @@ namespace _BOA_
         */
 
         static readonly Dictionary<string, Contract> global_contracts = new(StringComparer.OrdinalIgnoreCase);
-        static readonly Dictionary<Type, Func<Harbinger, BoaReader, bool, bool>> sub_parsers = new();
+        static readonly Dictionary<(Type type, string name), SubContract> sub_contracts = new();
 
         public readonly Shell shell;
         public readonly Harbinger father;
@@ -44,6 +45,7 @@ namespace _BOA_
         static void OnBeforeSceneLoad()
         {
             global_contracts.Clear();
+            sub_contracts.Clear();
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -53,6 +55,29 @@ namespace _BOA_
             global_contracts.Add(contract.name, contract);
             for (int i = 0; i < aliases.Length; i++)
                 global_contracts.Add(aliases[i], contract);
+        }
+
+        public static void AddSubContract(in Type type, in SubContract contract, params string[] aliases)
+        {
+            sub_contracts.Add((type, contract.name), contract);
+            for (int i = 0; i < aliases.Length; i++)
+                sub_contracts.Add((type, aliases[i]), contract);
+        }
+
+        public static bool TryGetSubContract(in Type type, string name, out SubContract subContract)
+        {
+            if (sub_contracts.TryGetValue((type, name), out subContract))
+                return true;
+
+            foreach (var pair in sub_contracts)
+                if (pair.Key.name.Equals(name, StringComparison.Ordinal))
+                    if (type.IsOfType(pair.Key.type))
+                    {
+                        subContract = pair.Value;
+                        return true;
+                    }
+
+            return false;
         }
 
         //----------------------------------------------------------------------------------------------------------

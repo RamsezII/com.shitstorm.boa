@@ -25,6 +25,7 @@ namespace _BOA_
             option_args = Color.sandyBrown,
             operators = Color.lightGray,
             contracts = Color.darkSlateBlue,
+            sub_contracts = Color.darkSlateBlue,
             functions = Color.deepSkyBlue,
             variables = Color.mediumPurple,
             paths = Color.ivory,

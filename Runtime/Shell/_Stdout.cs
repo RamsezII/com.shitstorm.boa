@@ -35,7 +35,7 @@ namespace _BOA_
                     lines.Dequeue();
 
                 lines.Enqueue((str, lint));
-                Debug.Log($"{ToLog} {lint}", this);
+                Debug.Log($"{ToLog}\n{lint}", this);
 
                 foreach (var (line_text, line_lint) in lines)
                 {

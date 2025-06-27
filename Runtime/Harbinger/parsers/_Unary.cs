@@ -62,7 +62,7 @@
                 if (reader.TryReadChar_match('['))
                 {
                     reader.LintOpeningBraquet();
-                    if (!TryParseExpression(reader, scope, false, out var index))
+                    if (!TryParseExpression(reader, scope, false, typeof(int), out var index))
                         reader.Stderr($"expected expression inside index accessor.");
                     else if (!reader.TryReadChar_match(']', lint: reader.CloseBraquetLint()))
                         reader.Stderr($"expected closing braquet ']'.");

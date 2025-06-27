@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace _BOA_
                 max_args: 100,
                 args: static exe =>
                 {
-                    while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr))
+                    while (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
                         exe.args.Add(expr);
                 },
                 routine: static exe =>
@@ -36,13 +37,13 @@ namespace _BOA_
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_list))
+                    if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(IList), out var expr_list))
                         exe.args.Add(expr_list);
                     else
                         exe.reader.Stderr("expected expression of type List.");
 
                     if (exe.pipe_previous == null)
-                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_item))
+                        if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr_item))
                             exe.arg_0 = expr_item;
                         else
                             exe.reader.Stderr("expeted item to add to the list.");

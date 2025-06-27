@@ -19,8 +19,8 @@ namespace _BOA_
                     if (exe.reader.TryReadArgument(out string operator_name, true, lint: exe.reader.lint_theme.operators))
                         if (!Enum.TryParse(operator_name, true, out OperatorsM code))
                             exe.reader.Stderr($"unknown operator '{operator_name}'.");
-                        else if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr1))
-                            if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr2))
+                        else if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr1))
+                            if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr2))
                             {
                                 exe.args.Add(code);
                                 exe.args.Add(expr1);
@@ -64,15 +64,18 @@ namespace _BOA_
                                     OperatorsM.xor => int1 ^ int2,
                                     _ => 0,
                                 };
-                            else if (data1 is bool b1 && data2 is bool b2)
+
+                            if (data1 is bool b1 && data2 is bool b2)
                                 return code switch
                                 {
+                                    OperatorsM.eq => b1 == b2,
                                     OperatorsM.and => b1 & b2,
                                     OperatorsM.or => b1 | b2,
                                     OperatorsM.xor => b1 ^ b2,
                                     _ => false,
                                 };
-                            else if (data1 is string || data2 is string)
+
+                            if (data1 is string || data2 is string)
                             {
                                 if (data1 is not string str1)
                                     str1 = data1?.ToString() ?? string.Empty;
@@ -125,6 +128,9 @@ namespace _BOA_
                                         break;
                                 }
                             }
+
+                            if (data1 != null && data2 != null)
+                                return data1.Equals(data2);
 
                             exe.harbinger.Stderr($"could not apply operation '{code}' on {data1} and {data2}");
                             return null;

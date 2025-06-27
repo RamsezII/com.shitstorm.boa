@@ -10,7 +10,7 @@
                 if (reader.TryReadChar_match('('))
                 {
                     reader.LintOpeningBraquet();
-                    if (!TryParseExpression(reader, scope, false, out factor))
+                    if (!TryParseExpression(reader, scope, false, null, out factor, type_check: false))
                     {
                         reader.Stderr("expected expression inside factor parenthesis.");
                         return false;
@@ -54,19 +54,21 @@
                     {
                         case "true":
                             reader.LintToThisPosition(reader.lint_theme.constants, true);
-                            factor = new LiteralExecutor(this, scope, literal: true);
+                            factor = new LiteralExecutor(this, scope, true);
                             return true;
 
                         case "false":
                             reader.LintToThisPosition(reader.lint_theme.constants, true);
-                            factor = new LiteralExecutor(this, scope, literal: false);
+                            factor = new LiteralExecutor(this, scope, false);
                             return true;
 
                         default:
-                            if (int.TryParse(arg, out int _int))
-                                factor = new LiteralExecutor(this, scope, literal: _int);
-                            else if (Util.TryParseFloat(arg, out float _float))
-                                factor = new LiteralExecutor(this, scope, literal: _float);
+                            if (arg[^1] == 'f' && Util.TryParseFloat(arg[..^1], out float _float))
+                                factor = new LiteralExecutor(this, scope, _float);
+                            else if (int.TryParse(arg, out int _int))
+                                factor = new LiteralExecutor(this, scope, _int);
+                            else if (Util.TryParseFloat(arg, out _float))
+                                factor = new LiteralExecutor(this, scope, _float);
                             else
                             {
                                 reader.Stderr($"unrecognized literal : '{arg}'.");

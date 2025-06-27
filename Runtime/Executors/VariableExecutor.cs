@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -18,6 +19,13 @@ namespace _BOA_
         internal override bool IsMarkedAsOutput()
         {
             return false;
+        }
+
+        public override Type OutputType()
+        {
+            if (scope.TryGetVariable(var_name, out var variable))
+                return variable?.value?.GetType();
+            return typeof(object);
         }
 
         public override IEnumerator<Contract.Status> EExecute()

@@ -15,9 +15,9 @@ namespace _BOA_
                 min_args: 2,
                 args: static exe =>
                 {
-                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_min))
+                    if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(int), out var expr_min))
                         exe.reader.Stderr($"expected int expr (min).");
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_max))
+                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(int), out var expr_max))
                         exe.reader.Stderr($"expected int expr (max).");
                     else
                     {

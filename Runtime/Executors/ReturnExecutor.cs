@@ -12,7 +12,7 @@ namespace _BOA_
 
         public ReturnExecutor(in Harbinger harbinger, in ScopeNode scope, in BoaReader reader) : base(harbinger, scope)
         {
-            if (!harbinger.TryParseExpression(reader, scope, false, out executor))
+            if (!harbinger.TryParseExpression(reader, scope, false, null, out executor, type_check: false))
                 reader.Stderr($"expected expression.");
         }
 

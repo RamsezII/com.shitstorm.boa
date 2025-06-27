@@ -63,7 +63,7 @@ namespace _BOA_
                                 value = string.Empty;
                             }
 
-                            if (!TryParseExpression(reader, scope, false, out var expr))
+                            if (!TryParseExpression(reader, scope, false, typeof(object), out var expr))
                             {
                                 reader.Stderr($"expected expression after '{{'.");
                                 return false;

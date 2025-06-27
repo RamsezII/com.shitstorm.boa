@@ -17,7 +17,7 @@ namespace _BOA_
                         exe.reader.Stderr($"Expected variable name after 'var'.");
                     if (exe.pipe_previous == null && !exe.reader.TryReadChar_match('=', lint: exe.reader.lint_theme.operators))
                         exe.reader.Stderr($"Expected '=' after variable name '{varname}'.");
-                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, out expr))
+                    else if (exe.pipe_previous == null && !exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(object), out expr))
                         exe.reader.Stderr($"Failed to parse expression after '=' for variable '{varname}'.");
                     else
                     {
