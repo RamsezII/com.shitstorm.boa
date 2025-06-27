@@ -40,11 +40,19 @@
                     return false;
                 }
 
-                if (reader.TryReadChar_match('.', lint: reader.lint_theme.point))
-                {
-                    reader.Stderr($"type: {{{expression?.OutputType()}}}");
-                    return false;
-                }
+                if (expression != null)
+                    if (reader.TryReadChar_match('.', lint: reader.lint_theme.point))
+                    {
+                        System.Type type = expression.OutputType();
+
+                        if (!sub_parsers.TryGetValue(type, out var sub_parser))
+                        {
+                            reader.Stderr($"type: '{type}' has no methods.");
+                            return false;
+                        }
+
+                        if(!sub_parser(this,reader,r))
+                    }
 
                 return true;
             }
