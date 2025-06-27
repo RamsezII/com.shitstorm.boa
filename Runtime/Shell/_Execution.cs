@@ -56,7 +56,7 @@ namespace _BOA_
                         if (ticks++ < maximum_instant_ticks)
                             goto before_tick;
                         else
-                            Debug.LogWarning($"{ToLog} reached the loop limit ({maximum_instant_ticks} ticks), waiting one frame.", this);
+                            Debug.LogWarning($"{this} reached the loop limit ({maximum_instant_ticks} ticks), waiting one frame.", this);
                     current_status = execution.Current;
                 }
                 else
