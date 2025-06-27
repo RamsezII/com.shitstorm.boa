@@ -38,9 +38,8 @@ namespace _BOA_
             {
                 output = code switch
                 {
-                    Operators.Add => +(int)data,
-                    Operators.Sub => -(int)data,
-                    Operators.Not => !(bool)data,
+                    Operators.Sub => data switch { int i => -i, float f => -f, _ => data, },
+                    Operators.Not => data switch { bool b => !b, _ => !data.ToBool(), },
                     _ => data,
                 },
             };
