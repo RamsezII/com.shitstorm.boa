@@ -18,6 +18,8 @@ namespace _BOA_
 
         internal bool is_instruction_output;
 
+        public virtual Type OutputType() => null;
+
         //----------------------------------------------------------------------------------------------------------
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

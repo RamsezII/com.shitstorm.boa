@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
     public class LiteralExecutor : ExpressionExecutor
     {
         readonly object literal;
+        public override Type OutputType() => literal?.GetType();
 
         //----------------------------------------------------------------------------------------------------------
 

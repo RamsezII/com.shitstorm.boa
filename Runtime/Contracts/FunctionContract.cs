@@ -7,11 +7,13 @@ namespace _BOA_
     {
         FunctionContract(
             in string name,
+            in Func<Type> output_type,
             in int args_count,
             in Action<ContractExecutor> args = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
             : base(name,
+                  output_type: output_type,
                   min_args: args_count,
                   max_args: args_count,
                   args: args,
@@ -73,7 +75,7 @@ namespace _BOA_
                 func_exe.scope.AddVariable(args_names[i], null);
 
             read_old = reader.read_i;
-            if (!harbinger.TryParseBlock(reader, func_exe.scope, out _))
+            if (!harbinger.TryParseBlock(reader, func_exe.scope, out var block))
                 goto failure;
             string block_text = reader.text[read_old..reader.read_i];
 
@@ -81,6 +83,7 @@ namespace _BOA_
                 func_name,
                 new FunctionContract(
                     name: func_name,
+                    output_type: block.OutputType,
                     args_count: args_names.Count,
                     args: exe =>
                     {

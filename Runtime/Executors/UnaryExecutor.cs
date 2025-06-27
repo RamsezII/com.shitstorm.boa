@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -13,6 +14,7 @@ namespace _BOA_
 
         readonly Operators code;
         readonly ExpressionExecutor expr;
+        public override Type OutputType() => expr?.OutputType();
 
         //----------------------------------------------------------------------------------------------------------
 

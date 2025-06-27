@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
@@ -6,6 +7,7 @@ namespace _BOA_
     {
         readonly Executor previous;
         readonly ContractExecutor next;
+        public override Type OutputType() => next?.OutputType();
 
         //----------------------------------------------------------------------------------------------------------
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace _BOA_
@@ -6,6 +7,7 @@ namespace _BOA_
     internal sealed class StringExecutor : ExpressionExecutor
     {
         readonly List<Executor> stack;
+        public override Type OutputType() => typeof(string);
 
         //----------------------------------------------------------------------------------------------------------
 

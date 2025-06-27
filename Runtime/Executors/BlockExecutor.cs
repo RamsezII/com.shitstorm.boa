@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace _BOA_
 {
     public sealed class BlockExecutor : Executor
     {
         internal readonly List<Executor> stack = new();
+        public override Type OutputType() => stack.Count == 0 ? null : stack[^1].OutputType();
 
         //----------------------------------------------------------------------------------------------------------
 
