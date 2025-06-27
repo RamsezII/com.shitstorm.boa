@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_ParentDir()
         {
-            AddContract(new("parent_dir",
+            AddContract(new("parent_dir", typeof(string),
                 min_args: 1,
                 args: static exe =>
                 {

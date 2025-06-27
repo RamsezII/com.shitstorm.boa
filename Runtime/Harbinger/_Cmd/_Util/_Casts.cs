@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace _BOA_
 {
@@ -7,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Casts()
         {
-            AddContract(new("typeof",
+            AddContract(new("typeof", typeof(Type),
                 outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {
@@ -21,7 +22,7 @@ namespace _BOA_
                     )
                 ));
 
-            AddContract(new("int",
+            AddContract(new("int", typeof(int),
                 min_args: 1,
                 args: static exe =>
                 {
@@ -41,7 +42,7 @@ namespace _BOA_
                     )
                 ));
 
-            AddContract(new("float",
+            AddContract(new("float", typeof(float),
                 min_args: 1,
                 args: static exe =>
                 {

@@ -7,7 +7,8 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Var()
         {
-            AddContract(new("var",
+            AddContract(new("var", typeof(object),
+                get_output_type: static exe => exe.arg_0.OutputType(),
                 function_style_arguments: false,
                 args: static exe =>
                 {

@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Foreach()
         {
-            AddContract(new("foreach",
+            AddContract(new("foreach", null,
                 min_args: 2,
                 function_style_arguments: false,
                 no_parenthesis: true,

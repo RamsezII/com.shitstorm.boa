@@ -9,7 +9,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_List()
         {
-            AddContract(new("list",
+            AddContract(new("list", typeof(List<object>),
                 max_args: 100,
                 args: static exe =>
                 {
@@ -31,7 +31,8 @@ namespace _BOA_
                         );
                 }));
 
-            AddContract(new("append",
+            AddContract(new("append", typeof(List<object>),
+                get_output_type: static exe => exe.arg_0.OutputType(),
                 min_args: 1,
                 args: static exe =>
                 {

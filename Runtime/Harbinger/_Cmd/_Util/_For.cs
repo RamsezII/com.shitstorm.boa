@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_For()
         {
-            AddContract(new("for",
+            AddContract(new("for", null,
                 min_args: 1,
                 function_style_arguments: false,
                 no_parenthesis: true,

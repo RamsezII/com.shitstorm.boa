@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Path()
         {
-            AddContract(new("path",
+            AddContract(new("path", typeof(string),
                 min_args: 1,
                 opts: static exe =>
                 {

@@ -12,7 +12,8 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Assign()
         {
-            AddContract(cmd_assign_ = new("assign",
+            AddContract(cmd_assign_ = new("assign", typeof(object),
+                get_output_type: static exe => exe.arg_0.OutputType(),
                 args: static exe =>
                 {
                     if (exe.harbinger.TryParseVariable(exe.reader, exe.scope, out string var_name, out _))

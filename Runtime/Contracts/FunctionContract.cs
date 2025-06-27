@@ -7,13 +7,12 @@ namespace _BOA_
     {
         FunctionContract(
             in string name,
-            in Func<Type> output_type,
+            in Type output_type,
             in int args_count,
             in Action<ContractExecutor> args = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             )
-            : base(name,
-                  output_type: output_type,
+            : base(name, output_type,
                   min_args: args_count,
                   max_args: args_count,
                   args: args,
@@ -83,7 +82,7 @@ namespace _BOA_
                 func_name,
                 new FunctionContract(
                     name: func_name,
-                    output_type: block.OutputType,
+                    output_type: block.OutputType(),
                     args_count: args_names.Count,
                     args: exe =>
                     {

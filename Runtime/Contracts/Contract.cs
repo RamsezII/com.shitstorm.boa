@@ -45,7 +45,8 @@ namespace _BOA_
         }
 
         public readonly string name;
-        public readonly Func<Type> output_type;
+        public readonly Type output_type;
+        public readonly Func<ContractExecutor, Type> get_output_type;
         internal readonly int min_args, max_args;
         public readonly bool function_style_arguments, no_semicolon_required, no_parenthesis, outputs_if_end_of_instruction;
         public readonly Action<ContractExecutor> opts, args;
@@ -55,8 +56,8 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Contract(in string name,
-            in Func<Type> output_type = null,
+        public Contract(in string name, in Type output_type,
+            in Func<ContractExecutor, Type> get_output_type = null,
             in int min_args = 0,
             in int max_args = 0,
             in bool function_style_arguments = true,
@@ -72,6 +73,7 @@ namespace _BOA_
         {
             this.name = name;
             this.output_type = output_type;
+            this.get_output_type = get_output_type;
             this.min_args = Mathf.Min(min_args, max_args);
             this.max_args = Mathf.Max(min_args, max_args);
             this.function_style_arguments = function_style_arguments;

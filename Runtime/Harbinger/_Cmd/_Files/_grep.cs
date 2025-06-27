@@ -9,7 +9,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Unix_grep()
         {
-            AddContract(new("grep",
+            AddContract(new("grep", null,
                 min_args: 1,
                 outputs_if_end_of_instruction: true,
                 args: static exe =>
@@ -43,7 +43,7 @@ namespace _BOA_
                         exe.arg_0.EExecute());
                 }));
 
-            AddContract(new("regex",
+            AddContract(new("regex", null,
                 min_args: 1,
                 args: static exe =>
                 {

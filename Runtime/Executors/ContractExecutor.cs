@@ -12,7 +12,7 @@ namespace _BOA_
         public readonly List<object> args = new();
         public readonly ExpressionExecutor pipe_previous;
         public override string ToLog => $"'{base.ToLog}[{contract?.name}]'";
-        public override Type OutputType() => contract?.output_type?.Invoke();
+        public override Type OutputType() => contract?.get_output_type?.Invoke(this) ?? contract?.output_type;
 
         //----------------------------------------------------------------------------------------------------------
 

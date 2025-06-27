@@ -7,17 +7,11 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Types()
         {
-            AddContract(new("random_inSphere",
-                output_type: static () => typeof(Vector3),
-                function: static exe => Random.insideUnitSphere
-                ));
+            AddContract(new("random_inSphere", typeof(Vector3), function: static exe => Random.insideUnitSphere));
 
-            AddContract(new("random_onSphere",
-                output_type: static () => typeof(Vector3),
-                function: static exe => Random.onUnitSphere
-                ));
+            AddContract(new("random_onSphere", typeof(Vector3), function: static exe => Random.onUnitSphere));
 
-            AddContract(new("set",
+            AddContract(new("set", typeof(Vector3),
                 args: static exe =>
                 {
                     if (!exe.reader.TryReadString_matches_out(out string item, true, default, matches: new string[] { "x", "y", "z", }))
@@ -71,8 +65,7 @@ namespace _BOA_
                         routine_float);
                 }));
 
-            AddContract(new("vector3",
-                output_type: static () => typeof(Vector3),
+            AddContract(new("vector3", typeof(Vector3),
                 args: static exe =>
                 {
                     if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_x))

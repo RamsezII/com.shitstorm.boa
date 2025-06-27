@@ -18,7 +18,7 @@ namespace _BOA_
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
             static void Init_String()
             {
-                AddContract(new("str",
+                AddContract(new("str", typeof(string),
                     min_args: 1,
                     args: static exe =>
                     {

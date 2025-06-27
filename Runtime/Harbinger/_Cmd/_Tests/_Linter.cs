@@ -9,7 +9,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Linter()
         {
-            AddContract(new("linter",
+            AddContract(new("linter", null,
                 opts: static exe =>
                 {
                     var dict = exe.reader.lint_theme.GetColorProperties();

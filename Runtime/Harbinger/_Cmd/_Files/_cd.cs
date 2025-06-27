@@ -9,7 +9,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Unix_cd()
         {
-            AddContract(new("cd",
+            AddContract(new("cd", null,
                 min_args: 1,
                 args: static exe =>
                 {

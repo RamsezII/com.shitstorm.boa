@@ -7,11 +7,11 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd__Random()
         {
-            AddContract(new("rand01",
+            AddContract(new("rand01", typeof(float),
                 function: static exe => Random.Range(0f, 1f)
                 ));
 
-            AddContract(new("randint",
+            AddContract(new("randint", typeof(int),
                 min_args: 2,
                 args: static exe =>
                 {

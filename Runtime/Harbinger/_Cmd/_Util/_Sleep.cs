@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Sleep()
         {
-            AddContract(new("sleep",
+            AddContract(new("sleep", null,
                 min_args: 1,
                 args: static exe =>
                 {

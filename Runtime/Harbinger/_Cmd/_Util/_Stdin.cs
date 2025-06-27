@@ -9,7 +9,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_Stdin()
         {
-            AddContract(new("stdin",
+            AddContract(new("stdin", typeof(string),
                 max_args: 1,
                 args: static exe =>
                 {

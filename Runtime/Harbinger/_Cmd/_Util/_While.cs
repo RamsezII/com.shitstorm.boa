@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Init_While()
         {
-            AddContract(new("while",
+            AddContract(new("while", null,
                 function_style_arguments: false,
                 no_semicolon_required: true,
                 no_parenthesis: true,

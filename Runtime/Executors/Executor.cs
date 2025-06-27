@@ -17,7 +17,6 @@ namespace _BOA_
         public ScopeNode scope;
 
         internal bool is_instruction_output;
-
         public virtual Type OutputType() => null;
 
         //----------------------------------------------------------------------------------------------------------

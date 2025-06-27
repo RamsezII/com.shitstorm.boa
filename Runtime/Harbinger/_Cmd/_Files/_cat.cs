@@ -1,4 +1,5 @@
 ﻿using _UTIL_;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Unix_cat()
         {
-            AddContract(new("cat",
+            AddContract(new("cat", typeof(string),
                 outputs_if_end_of_instruction: true,
                 args: static exe =>
                 {

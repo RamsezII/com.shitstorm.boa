@@ -1,4 +1,5 @@
 ﻿using _UTIL_;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Unix_ls()
         {
-            AddContract(new("ls",
+            AddContract(new("ls", typeof(List<string>),
                 outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
