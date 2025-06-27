@@ -19,6 +19,7 @@ namespace _BOA_
         public Color
             argument = Color.deepPink,
             argument_coma = Color.lightPink,
+            point = Color.yellow,
             flags = Color.beige,
             options = Color.bisque,
             option_args = Color.sandyBrown,

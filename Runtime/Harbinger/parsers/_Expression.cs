@@ -34,6 +34,12 @@
                     }
                 }
 
+                if (reader.TryReadChar_match('.', lint: reader.lint_theme.point))
+                {
+                    reader.Stderr($"type: {{{expression?.OutputType()}}}");
+                    return false;
+                }
+
                 if (TryPipe(reader, scope, ref expression))
                     return true;
             }

@@ -8,10 +8,12 @@ namespace _BOA_
         static void InitCmd_Types()
         {
             AddContract(new("random_inSphere",
+                output_type: static () => typeof(Vector3),
                 function: static exe => Random.insideUnitSphere
                 ));
 
             AddContract(new("random_onSphere",
+                output_type: static () => typeof(Vector3),
                 function: static exe => Random.onUnitSphere
                 ));
 
@@ -70,6 +72,7 @@ namespace _BOA_
                 }));
 
             AddContract(new("vector3",
+                output_type: static () => typeof(Vector3),
                 args: static exe =>
                 {
                     if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, out var expr_x))
