@@ -7,7 +7,10 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Files_other()
         {
-            AddContract(new("_workdir_", null, function: static exe => exe.harbinger.workdir));
+            AddContract(new("_workdir_", typeof(string),
+                outputs_if_end_of_instruction: true,
+                function: static exe => exe.harbinger.workdir
+                ));
         }
     }
 }

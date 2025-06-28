@@ -37,7 +37,7 @@ namespace _BOA_
                 if (type_check)
                     if (((output_type == null) != (output_constraint == null)) || !output_type.IsOfType(output_constraint))
                     {
-                        reader.Stderr($"expected expression of type '{output_constraint}', got '{output_type}' instead.");
+                        reader.Stderr($"expected '{output_constraint}', got '{output_type}' instead.");
                         expression = null;
                         return false;
                     }

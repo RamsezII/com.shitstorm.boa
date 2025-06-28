@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,8 +25,14 @@ namespace _BOA_
                         exe.reader.Stderr("expected expression to iterate through.");
                     else
                     {
+                        Type list_type = expr_list.OutputType();
+
+                        Type item_type = typeof(object);
+                        if (list_type.IsGenericType && list_type.GetGenericTypeDefinition() == typeof(List<>))
+                            item_type = list_type.GetGenericTypeDefinition();
+
                         var sub_scope = new ScopeNode(exe.scope, true);
-                        sub_scope.AddVariable(var_name, new BoaVariable(null));
+                        sub_scope.AddVariable(var_name, new BoaVariable(null, item_type));
 
                         if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
                             exe.reader.Stderr("expected instruction (or block of instructions) after ')' in 'for' instruction.");

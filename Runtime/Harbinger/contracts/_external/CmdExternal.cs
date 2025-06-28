@@ -11,24 +11,35 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Harbinger.AddContract(new("os_cmdline", null,
+            Harbinger.AddContract(new("os_cmdline", typeof(object),
                 min_args: 1,
-                outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
-                    if (exe.reader.TryReadString_matches_out(out string flag, false, exe.reader.lint_theme.flags, add_to_completions: false, matches: new string[] { "a", "s", }))
-                        exe.opts.Add("mode", flag);
-                    else
-                    {
-                        exe.reader.Stderr($"expects flag 's' or 'a' (synchronous or asynchronous).");
-                        return;
-                    }
+                    string[] options = new string[] { "-a", "--async", "-wd", "--working-dir", "-l", "--log", };
 
-                    if (exe.reader.TryReadString_match("d", false, exe.reader.lint_theme.options, add_to_completions: false))
-                        if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_wdir))
-                            exe.reader.Stderr($"please specify workdir.");
-                        else
-                            exe.opts.Add("d", expr_wdir);
+                    exe.reader.completions_v.Clear();
+
+                    while (exe.reader.TryReadString_matches_out(out string flag, false, exe.reader.lint_theme.flags, matches: options, stoppers: BoaReader._stoppers_options_))
+                        switch (flag)
+                        {
+                            case "-a":
+                            case "--async":
+                                exe.opts["async"] = null;
+                                break;
+
+                            case "-l":
+                            case "--log":
+                                exe.opts["log"] = null;
+                                break;
+
+                            case "-wd":
+                            case "--working-dir":
+                                if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_wdir))
+                                    exe.reader.Stderr($"please specify workdir.");
+                                else
+                                    exe.opts["workdir"] = expr_wdir;
+                                break;
+                        }
                 },
                 args: static exe =>
                 {
@@ -37,16 +48,13 @@ namespace _BOA_
                     else
                         exe.reader.Stderr($"expected string expression.");
                 },
-                routine: static exe => exe.opts["mode"] switch
-                {
-                    "s" => ERunCmd_sync(exe),
-                    "a" => ERunCmd_async(exe),
-                    _ => null,
-                }));
+                routine: static exe => exe.opts.ContainsKey("async") ? ERunCmd_async(exe) : ERunCmd_sync(exe)
+                ));
 
             static IEnumerator<Contract.Status> ERunCmd_sync(ContractExecutor executor)
             {
-                bool wdir_b = executor.TryGetOptionValue("d", out ExpressionExecutor expr_wdir);
+                bool log_b = executor.opts.ContainsKey("log");
+                bool wdir_b = executor.TryGetOptionValue("workdir", out ExpressionExecutor expr_wdir);
                 using var rout_wdir = expr_wdir?.EExecute();
 
                 return Executor.EExecute(
@@ -56,12 +64,17 @@ namespace _BOA_
                         string wdir = wdir_b
                             ? executor.harbinger.PathCheck((string)rout_wdir.Current.output, PathModes.ForceFull, false, false, out _, out _)
                             : executor.harbinger.workdir;
+
                         StringBuilder sb = new();
-                        Util.RunExternalCommand(wdir, (string)data, on_stdout: stdout =>
-                        {
-                            sb.Append(stdout);
-                        });
-                        return sb.ToString();
+
+                        Util.RunExternalCommand(wdir, (string)data, on_stdout: stdout => sb.Append(stdout));
+
+                        string output = sb.ToString();
+
+                        if (log_b)
+                            executor.harbinger.stdout(output);
+
+                        return output;
                     },
                     rout_wdir,
                     executor.arg_0.EExecute());
@@ -69,9 +82,10 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> ERunCmd_async(ContractExecutor executor)
             {
+                bool log_b = executor.opts.ContainsKey("log");
                 string wdir = executor.harbinger.workdir;
 
-                if (executor.TryGetOptionValue("d", out ExpressionExecutor expr_wdir))
+                if (executor.TryGetOptionValue("workdir", out ExpressionExecutor expr_wdir))
                 {
                     using var rout_wdir = expr_wdir.EExecute();
                     while (rout_wdir.MoveNext())
@@ -86,10 +100,11 @@ namespace _BOA_
 
                 StringBuilder sb = new();
 
-                using var task = Task.Run(() => Util.RunExternalCommandBlockingStreaming(wdir, cmdline, on_stdout: stdout =>
+                using var task = Task.Run(() => Util.RunExternalCommand_streaming(wdir, cmdline, on_stdout: stdout =>
                 {
-                    NUCLEOR.instance.ToMainThread(() => executor.harbinger.stdout(stdout));
-                    sb.Append(stdout);
+                    if (log_b)
+                        NUCLEOR.instance.ToMainThread(() => executor.harbinger.stdout(stdout + "\n"));
+                    sb.AppendLine(stdout);
                 }));
 
                 while (!task.IsCompleted)

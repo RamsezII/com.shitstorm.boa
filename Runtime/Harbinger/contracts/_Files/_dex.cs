@@ -8,7 +8,7 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_FS_Exists()
         {
-            AddContract(new("directory-exists", typeof(bool),
+            AddContract(new("directory_exists", typeof(bool),
                 min_args: 1,
                 outputs_if_end_of_instruction: true,
                 args: static exe =>
@@ -31,7 +31,7 @@ namespace _BOA_
                 ),
                 "dex");
 
-            AddContract(new("file-exists", typeof(bool),
+            AddContract(new("file_exists", typeof(bool),
                 min_args: 1,
                 outputs_if_end_of_instruction: true,
                 args: static exe =>
