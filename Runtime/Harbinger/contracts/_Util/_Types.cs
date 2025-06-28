@@ -19,7 +19,6 @@ namespace _BOA_
                 ));
 
             AddSubContract(
-                typeof(object),
                 new("type", typeof(object), typeof(Type),
                     outputs_if_end_of_instruction: true,
                     function: static exe => ((SubContractExecutor)exe).output_exe.OutputType()

@@ -9,39 +9,7 @@ namespace _BOA_
         {
             if (!TryParseFactor(reader, scope, out expression))
                 return false;
-
-            if (!reader.TryReadChar_match('.', lint: reader.lint_theme.point))
-                return true;
-            else
-            {
-                Type output_type = expression.OutputType();
-
-                if (output_type == null)
-                {
-                    reader.Stderr($"can not call attribute on a void method.");
-                    return false;
-                }
-
-                var sub_conts = sub_contracts
-                    .Where(pair => output_type.IsOfType(pair.Value.get_left_type?.Invoke() ?? pair.Value.left_type))
-                    .Select(pair => pair.Key.name);
-
-                if (!reader.TryReadString_matches_out(out string subcont_name, false, reader.lint_theme.sub_contracts, sub_conts, strict: false))
-                {
-                    reader.Stderr($"expression '.' on type '{output_type}' expects attribute or method.");
-                    return false;
-                }
-                else if (!TryGetSubContract(output_type, subcont_name, out SubContract sub_contract))
-                {
-                    reader.Stderr($"type: '{output_type}' has no attribute named '{subcont_name}'.");
-                    return false;
-                }
-                else
-                {
-                    expression = new SubContractExecutor(this, scope, expression, sub_contract, reader);
-                    return true;
-                }
-            }
+            return TryParseAttribute(reader, scope, ref expression);
         }
 
         internal bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor)
@@ -122,5 +90,42 @@ namespace _BOA_
 
             return false;
         }
+
+        internal bool TryParseAttribute(in BoaReader reader, in ScopeNode scope, ref ExpressionExecutor expression)
+        {
+            if (!reader.TryReadChar_match('.', lint: reader.lint_theme.point))
+                return true;
+            else
+            {
+                Type output_type = expression.OutputType();
+
+                if (output_type == null)
+                {
+                    reader.Stderr($"can not call attribute on a void method.");
+                    return false;
+                }
+
+                var sub_conts = sub_contracts
+                    .Where(pair => output_type.IsOfType(pair.Value.get_object_type?.Invoke() ?? pair.Value.object_type))
+                    .Select(pair => pair.Key.name);
+
+                if (!reader.TryReadString_matches_out(out string subcont_name, false, reader.lint_theme.sub_contracts, sub_conts, strict: false))
+                {
+                    reader.Stderr($"expression '.' on type '{output_type}' expects attribute or method.");
+                    return false;
+                }
+                else if (!TryGetSubContract(output_type, subcont_name, out SubContract sub_contract))
+                {
+                    reader.Stderr($"type: '{output_type}' has no attribute named '{subcont_name}'.");
+                    return false;
+                }
+                else
+                {
+                    expression = new SubContractExecutor(this, scope, expression, sub_contract, reader);
+                    return true;
+                }
+            }
+        }
+
     }
 }

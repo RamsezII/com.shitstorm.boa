@@ -15,8 +15,8 @@ namespace _BOA_
                 in string name
                 ) : base(
                     name,
-                    left_type: typeof(Vector3),
-                    output_type: typeof(float),
+                    object_type: typeof(Vector3),
+                    attribute_type: typeof(float),
                     function_style_arguments: false,
                     no_semicolon_required: true,
                     no_parenthesis: true,
@@ -49,10 +49,10 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Vectors_attributes()
         {
-            Harbinger.AddSubContract(typeof(Vector3), new SubContract_xyz("x"));
-            Harbinger.AddSubContract(typeof(Vector3), new SubContract_xyz("y"));
-            Harbinger.AddSubContract(typeof(Vector3), new SubContract_xyz("z"));
-            Harbinger.AddSubContract(typeof(Vector4), new SubContract_xyz("w"));
+            Harbinger.AddSubContract(new SubContract_xyz("x"));
+            Harbinger.AddSubContract(new SubContract_xyz("y"));
+            Harbinger.AddSubContract(new SubContract_xyz("z"));
+            Harbinger.AddSubContract(new SubContract_xyz("w"));
         }
     }
 }

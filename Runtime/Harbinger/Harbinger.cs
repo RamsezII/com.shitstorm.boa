@@ -56,11 +56,11 @@ namespace _BOA_
                 global_contracts.Add(aliases[i], contract);
         }
 
-        public static void AddSubContract(in Type left_type, in SubContract contract, params string[] aliases)
+        public static void AddSubContract(in SubContract contract, params string[] aliases)
         {
-            sub_contracts.Add((left_type, contract.name), contract);
+            sub_contracts.Add((contract.object_type, contract.name), contract);
             for (int i = 0; i < aliases.Length; i++)
-                sub_contracts.Add((left_type, aliases[i]), contract);
+                sub_contracts.Add((contract.object_type, aliases[i]), contract);
         }
 
         public static bool TryGetSubContract(in Type type, string name, out SubContract subContract)

@@ -11,7 +11,7 @@ namespace _BOA_
 
             AddContract(new("random_onSphere", typeof(Vector3), function: static exe => Random.onUnitSphere));
 
-            AddSubContract(typeof(Vector3), new("set", typeof(Vector3), typeof(Vector3),
+            AddSubContract(new("set", typeof(Vector3), typeof(Vector3),
                 args: static exe =>
                 {
                     if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(int), out var expr_index))
