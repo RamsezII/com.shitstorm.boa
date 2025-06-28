@@ -22,13 +22,19 @@ namespace _BOA_
                                 exe.reader.Stderr($"unknown operator '{operator_name}'.");
                             else
                             {
-                                if (exe.pipe_previous == null && exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(object), out var expression))
-                                    exe.arg_0 = expression;
-                                else
-                                    exe.reader.Stderr($"assignation expect an expression.");
+                                if (exe.pipe_previous == null)
+                                    if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(object), out var expression))
+                                        exe.arg_0 = expression;
+                                    else
+                                    {
+                                        exe.reader.Stderr($"assignation expect an expression.");
+                                        return;
+                                    }
 
                                 exe.args.Add(code);
                                 exe.args.Add(var_name);
+
+                                exe.scope.AddVariable(var_name, new BoaVariable(null, exe.arg_0?.OutputType()));
                             }
                 },
                 routine: static exe =>

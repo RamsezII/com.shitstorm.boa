@@ -35,17 +35,20 @@ namespace _BOA_
     internal class BoaVariable
     {
         public object value;
+        public Type type = typeof(object);
+        public Type OutputType => value?.GetType() ?? type ?? typeof(object);
 
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaVariable(in object value)
+        public BoaVariable(in object value, in Type type = null)
         {
             this.value = value;
+            this.type = type ?? value?.GetType() ?? this.type;
         }
 
         //----------------------------------------------------------------------------------------------------------
 
-        public BoaVariable Dedoublate() => new(value);
+        public BoaVariable Dedoublate() => new(value, type);
     }
 
     public sealed class ScopeNode

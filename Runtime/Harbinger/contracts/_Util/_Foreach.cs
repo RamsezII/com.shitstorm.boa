@@ -25,7 +25,7 @@ namespace _BOA_
                     else
                     {
                         var sub_scope = new ScopeNode(exe.scope, true);
-                        sub_scope.AddVariable(var_name, new BoaVariable(null));
+                        sub_scope.AddVariable(var_name, new BoaVariable(null, typeof(IList)));
 
                         if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
                             exe.reader.Stderr("expected instruction (or block of instructions) after ')' in 'for' instruction.");

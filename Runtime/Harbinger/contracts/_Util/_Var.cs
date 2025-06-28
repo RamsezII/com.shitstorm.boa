@@ -21,7 +21,7 @@ namespace _BOA_
                         exe.reader.Stderr($"Failed to parse expression after '=' for variable '{varname}'.");
                     else
                     {
-                        BoaVariable variable = new(null);
+                        BoaVariable variable = new(null, expr.OutputType());
                         exe.scope.AddVariable(varname, variable);
                         exe.arg_0 = expr;
                         exe.args.Add(varname);

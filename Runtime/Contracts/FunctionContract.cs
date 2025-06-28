@@ -90,7 +90,7 @@ namespace _BOA_
 
                         for (int i = 0; i < args_names.Count; i++)
                             if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, null, out var expr, type_check: false))
-                                func_scope.AddVariable(args_names[i], new BoaVariable(expr));
+                                func_scope.AddVariable(args_names[i], new BoaVariable(expr, expr.OutputType()));
                             else
                                 exe.reader.Stderr($"could not parse expression for arg[{i}] '{args_names[i]}'.");
 
