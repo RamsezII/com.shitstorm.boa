@@ -58,9 +58,9 @@ namespace _BOA_
 
         public static void AddSubContract(in SubContract contract, params string[] aliases)
         {
-            sub_contracts.Add((contract.object_type, contract.name), contract);
+            sub_contracts.Add((contract.input_type, contract.name), contract);
             for (int i = 0; i < aliases.Length; i++)
-                sub_contracts.Add((contract.object_type, aliases[i]), contract);
+                sub_contracts.Add((contract.input_type, aliases[i]), contract);
         }
 
         public static bool TryGetSubContract(in Type type, string name, out SubContract subContract)

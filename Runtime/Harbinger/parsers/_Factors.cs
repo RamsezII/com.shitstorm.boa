@@ -106,7 +106,7 @@ namespace _BOA_
                 }
 
                 var sub_conts = sub_contracts
-                    .Where(pair => output_type.IsOfType(pair.Value.get_object_type?.Invoke() ?? pair.Value.object_type))
+                    .Where(pair => output_type.IsOfType(pair.Value.get_input_type?.Invoke() ?? pair.Value.input_type))
                     .Select(pair => pair.Key.name);
 
                 if (!reader.TryReadString_matches_out(out string subcont_name, false, reader.lint_theme.sub_contracts, sub_conts, strict: false))

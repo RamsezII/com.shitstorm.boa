@@ -4,7 +4,7 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        static class CmdString
+        static partial class CmdString
         {
             [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
             static void Init_String()
@@ -22,13 +22,6 @@ namespace _BOA_
                     routine: static exe => Executor.EExecute(
                         modify_output: static data => data?.ToBoaString(),
                         stack: exe.arg_0.EExecute()
-                        )
-                    ));
-
-                AddSubContract(new("mirrored", typeof(string), typeof(string),
-                    routine: static exe => Executor.EExecute(
-                        modify_output: static data => ((string)data).Mirror(),
-                        stack: ((SubContractExecutor)exe).output_exe.EExecute()
                         )
                     ));
             }

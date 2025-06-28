@@ -15,8 +15,8 @@ namespace _BOA_
                 in string name
                 ) : base(
                     name,
-                    object_type: typeof(Vector3),
-                    input_type: typeof(float),
+                    input_type: typeof(Vector3),
+                    output_type: typeof(float),
                     function_style_arguments: false,
                     no_semicolon_required: true,
                     no_parenthesis: true,

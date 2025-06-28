@@ -5,14 +5,16 @@ namespace _BOA_
 {
     public class SubContract : Contract
     {
-        public readonly Type object_type;
-        public readonly Func<Type> get_object_type;
+        public readonly Type input_type;
+        public readonly Func<Type> get_input_type;
 
         //----------------------------------------------------------------------------------------------------------
 
-        public SubContract(in string name, in Type object_type, in Type input_type,
-            in Func<Type> get_object_type = null,
-            in Func<ContractExecutor, Type> get_input_type = null,
+        public SubContract(in string name,
+            in Type input_type,
+            in Type output_type,
+            in Func<Type> get_input_type = null,
+            in Func<ContractExecutor, Type> get_output_type = null,
             in int min_args = 0, in int max_args = 0,
             in bool function_style_arguments = true,
             in bool no_semicolon_required = false,
@@ -24,8 +26,9 @@ namespace _BOA_
             in Func<ContractExecutor, object> function = null,
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             ) :
-            base(name, input_type,
-                get_output_type: get_input_type,
+            base(name,
+                output_type: output_type,
+                get_output_type: get_output_type,
                 no_type_check: false,
                 min_args: min_args,
                 max_args: max_args,
@@ -39,8 +42,8 @@ namespace _BOA_
                 function: function,
                 routine: routine)
         {
-            this.object_type = object_type;
-            this.get_object_type = get_object_type;
+            this.input_type = input_type;
+            this.get_input_type = get_input_type;
         }
     }
 }

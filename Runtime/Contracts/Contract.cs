@@ -57,7 +57,9 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Contract(in string name, in Type output_type,
+        public Contract(
+            in string name, 
+            in Type output_type,
             in Func<ContractExecutor, Type> get_output_type = null,
             in bool no_type_check = false,
             in int min_args = 0,
