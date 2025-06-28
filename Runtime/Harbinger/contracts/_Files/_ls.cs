@@ -15,28 +15,40 @@ namespace _BOA_
                 outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
-                    if (exe.reader.TryReadString_matches_out(out string flag, false, lint: exe.reader.lint_theme.flags, matches: new string[] { "f", "d", }))
-                    {
-                        FS_TYPES type = flag switch
+                    string[] flags = new string[] { "-f", "--files", "-d", "--directories", "--pattern", "-wd", "--working-dir", };
+                    while (exe.reader.TryReadString_matches_out(out string flag, false, lint: exe.reader.lint_theme.flags, stoppers: BoaReader._stoppers_options_, matches: flags))
+                        switch (flag)
                         {
-                            "f" => FS_TYPES.FILE,
-                            "d" => FS_TYPES.DIRECTORY,
-                            _ => FS_TYPES.BOTH,
-                        };
-                        exe.opts.Add(nameof(FS_TYPES), type);
-                    }
+                            case "-f":
+                            case "--files":
+                            case "-d":
+                            case "--directories":
+                                {
+                                    FS_TYPES type = flag switch
+                                    {
+                                        "-f" or "--files" => FS_TYPES.FILE,
+                                        "-d" or "--directories" => FS_TYPES.DIRECTORY,
+                                        _ => FS_TYPES.BOTH,
+                                    };
+                                    exe.opts[nameof(FS_TYPES)] = type;
+                                }
+                                break;
 
-                    if (exe.reader.TryReadString_match("pattern", false, lint: exe.reader.lint_theme.options))
-                        if (!exe.reader.TryParseString(out string arg, false))
-                            exe.reader.Stderr($"please specify a pattern (flag '--pattern'");
-                        else
-                            exe.opts.Add("pattern", arg);
+                            case "--pattern":
+                                if (!exe.reader.TryParseString(out string arg, false))
+                                    exe.reader.Stderr($"please specify a pattern.");
+                                else
+                                    exe.opts["pattern"] = arg;
+                                break;
 
-                    if (exe.reader.TryReadString_match("p", false, default, add_to_completions: false))
-                        if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, false, out string path))
-                            exe.opts.Add("path", exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _));
-                        else
-                            exe.reader.Stderr($"expected path expression.");
+                            case "-wd":
+                            case "--working-dir":
+                                if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, false, out string path))
+                                    exe.opts["path"] = exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
+                                else
+                                    exe.reader.Stderr($"expected path expression.");
+                                break;
+                        }
                 },
                 function: static exe =>
                 {
