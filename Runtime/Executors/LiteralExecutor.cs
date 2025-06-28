@@ -6,7 +6,7 @@ namespace _BOA_
     public class LiteralExecutor : ExpressionExecutor
     {
         readonly object value;
-        public override Type OutputType() => value?.GetType();
+        public override Type OutputType() => value?.GetType() ?? typeof(object);
 
         //----------------------------------------------------------------------------------------------------------
 

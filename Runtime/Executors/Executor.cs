@@ -68,7 +68,7 @@ namespace _BOA_
             finally
             {
                 for (int i = 0; i < stack.Length; i++)
-                    stack[i].Dispose();
+                    stack[i]?.Dispose();
             }
         }
 

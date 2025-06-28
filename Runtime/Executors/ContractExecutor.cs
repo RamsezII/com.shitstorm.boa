@@ -61,6 +61,17 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
+        public bool TryGetOptionValue<T>(in string name, out T value)
+        {
+            if (opts.TryGetValue(name, out object _value))
+            {
+                value = (T)_value;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
         internal override void MarkAsInstructionOutput()
         {
             if (contract.outputs_if_end_of_instruction)

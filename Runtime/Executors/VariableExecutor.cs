@@ -23,9 +23,8 @@ namespace _BOA_
 
         public override Type OutputType()
         {
-            if (scope.TryGetVariable(var_name, out var variable))
-                return variable?.value?.GetType();
-            return typeof(object);
+            scope.TryGetVariable(var_name, out BoaVariable variable);
+            return variable?.value?.GetType() ?? typeof(object);
         }
 
         public override IEnumerator<Contract.Status> EExecute()

@@ -28,21 +28,20 @@ namespace _BOA_
                     if (reader.strict_syntax)
                     {
                         reader.Stderr($"expected ',' or ')' after expression.");
-                        if (expression is ContractExecutor cont)
-                            reader.sig_error += $" ('{cont.contract.name}')";
-                        else
-                            reader.sig_error += $" ('{expression.GetType()}')";
                         return false;
                     }
 
-            Type output_type = expression.OutputType();
-            if (type_check)
-                if (((output_type == null) != (output_constraint == null)) || !output_type.IsOfType(output_constraint))
-                {
-                    reader.Stderr($"expected expression of type '{output_constraint}', got '{output_type}' instead.");
-                    expression = null;
-                    return false;
-                }
+            if (expression is not ContractExecutor cont || !cont.contract.no_type_check)
+            {
+                Type output_type = expression.OutputType();
+                if (type_check)
+                    if (((output_type == null) != (output_constraint == null)) || !output_type.IsOfType(output_constraint))
+                    {
+                        reader.Stderr($"expected expression of type '{output_constraint}', got '{output_type}' instead.");
+                        expression = null;
+                        return false;
+                    }
+            }
 
             if (reader.TryReadChar_match('?', lint: reader.lint_theme.operators))
             {

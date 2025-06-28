@@ -8,7 +8,7 @@ namespace _BOA_
         static void Init_Echo()
         {
             AddContract(new("echo", typeof(object),
-                get_output_type: static exe => exe.arg_0.OutputType(),
+                get_input_type: static exe => exe.arg_0.OutputType(),
                 min_args: 1,
                 outputs_if_end_of_instruction: true,
                 args: static exe =>

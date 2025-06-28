@@ -9,7 +9,8 @@ namespace _BOA_
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void InitCmd_Run()
         {
-            AddContract(new("run", null,
+            AddContract(new("run", typeof(object),
+                no_type_check: true,
                 max_args: 10,
                 opts: static exe =>
                 {

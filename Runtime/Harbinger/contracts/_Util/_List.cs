@@ -32,16 +32,10 @@ namespace _BOA_
                         );
                 }));
 
-            AddContract(new("append", typeof(List<object>),
-                get_output_type: static exe => exe.arg_0.OutputType(),
+            AddSubContract(new("add", typeof(List<object>), typeof(object),
                 min_args: 1,
                 args: static exe =>
                 {
-                    if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(IList), out var expr_list))
-                        exe.args.Add(expr_list);
-                    else
-                        exe.reader.Stderr("expected expression of type List.");
-
                     if (exe.pipe_previous == null)
                         if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr_item))
                             exe.arg_0 = expr_item;
@@ -50,21 +44,22 @@ namespace _BOA_
                 },
                 routine: static exe =>
                 {
-                    ExpressionExecutor expr_list = (ExpressionExecutor)exe.args[0];
-                    using var expr_routine = expr_list.EExecute();
-                    using var expr_item = exe.arg_0.EExecute();
+                    ExpressionExecutor expr_list = ((SubContractExecutor)exe).output_exe;
+
+                    using var rout_list = expr_list.EExecute();
+                    using var rout_item = exe.arg_0.EExecute();
 
                     return Executor.EExecute(
                         after_execution: null,
                         modify_output: data =>
                         {
-                            List<object> list = (List<object>)expr_routine.Current.output;
-                            object item = expr_item.Current.output;
+                            List<object> list = (List<object>)rout_list.Current.output;
+                            object item = rout_item.Current.output;
                             list.Add(item);
                             return list;
                         },
-                        expr_routine,
-                        expr_item);
+                        rout_list,
+                        rout_item);
                 }));
         }
     }
