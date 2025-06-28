@@ -14,6 +14,12 @@ namespace _BOA_
         {
             AddContract(cmd_math_ = new("math", typeof(object),
                 outputs_if_end_of_instruction: true,
+                get_output_type: static exe =>
+                {
+                    ExpressionExecutor expr1 = (ExpressionExecutor)exe.args[1];
+                    ExpressionExecutor expr2 = (ExpressionExecutor)exe.args[2];
+                    return expr1.OutputType();
+                },
                 args: static exe =>
                 {
                     if (exe.reader.TryReadArgument(out string operator_name, true, lint: exe.reader.lint_theme.operators))

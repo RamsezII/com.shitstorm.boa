@@ -25,7 +25,7 @@ namespace _BOA_
             in Func<ContractExecutor, IEnumerator<Status>> routine = null
             ) :
             base(name, input_type,
-                get_input_type: get_input_type,
+                get_output_type: get_input_type,
                 no_type_check: false,
                 min_args: min_args,
                 max_args: max_args,

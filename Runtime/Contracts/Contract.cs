@@ -57,8 +57,8 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Contract(in string name, in Type input_type,
-            in Func<ContractExecutor, Type> get_input_type = null,
+        public Contract(in string name, in Type output_type,
+            in Func<ContractExecutor, Type> get_output_type = null,
             in bool no_type_check = false,
             in int min_args = 0,
             in int max_args = 0,
@@ -74,8 +74,8 @@ namespace _BOA_
             )
         {
             this.name = name;
-            this.output_type = input_type;
-            this.get_output_type = get_input_type;
+            this.output_type = output_type;
+            this.get_output_type = get_output_type;
             this.no_type_check = no_type_check;
             this.min_args = Mathf.Min(min_args, max_args);
             this.max_args = Mathf.Max(min_args, max_args);

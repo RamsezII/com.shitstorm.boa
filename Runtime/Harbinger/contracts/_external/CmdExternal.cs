@@ -51,7 +51,7 @@ namespace _BOA_
                         rout_wdir,
                         exe.arg_0.EExecute());
                 }),
-                ".");
+                ".", "_recs");
 
             Harbinger.AddContract(new("run_external_command__asynchronous", null,
                 min_args: 1,
@@ -71,7 +71,7 @@ namespace _BOA_
                         exe.reader.Stderr($"expected string expression.");
                 },
                 routine: ERunCmd_async),
-                "..");
+                "..", "_reca");
 
             static IEnumerator<Contract.Status> ERunCmd_async(ContractExecutor executor)
             {
