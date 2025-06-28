@@ -19,18 +19,16 @@ namespace _BOA_
                         else
                             exe.reader.Stderr($"expected path expression.");
                 },
-                routine: static exe =>
-                {
-                    return Executor.EExecute(
-                        after_execution: null,
-                        modify_output: data =>
-                        {
-                            string path = (string)data;
-                            path = exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
-                            return Directory.Exists(path);
-                        },
-                        exe.arg_0.EExecute());
-                }),
+                routine: static exe => Executor.EExecute(
+                    after_execution: null,
+                    modify_output: data =>
+                    {
+                        string path = (string)data;
+                        path = exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
+                        return Directory.Exists(path);
+                    },
+                    exe.arg_0.EExecute())
+                ),
                 "dex");
 
             AddContract(new("file-exists", typeof(bool),
