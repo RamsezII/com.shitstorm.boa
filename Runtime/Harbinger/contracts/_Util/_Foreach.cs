@@ -20,7 +20,7 @@ namespace _BOA_
                         exe.reader.Stderr("specify an item name.");
                     if (!exe.reader.TryReadString_match("in", as_function_argument: false, lint: exe.reader.lint_theme.keywords))
                         exe.reader.Stderr($"expected 'in' keyword.");
-                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(IList), out var expr_list))
+                    else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(IList), out var expr_list, type_check: false))
                         exe.reader.Stderr("expected expression to iterate through.");
                     else
                     {
