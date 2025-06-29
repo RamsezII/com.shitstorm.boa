@@ -7,7 +7,7 @@ namespace _BOA_
     {
         readonly ExpressionExecutor expr_list;
         readonly ExpressionExecutor expr_access;
-        public override Type OutputType() => expr_access?.OutputType();
+        public override Type OutputType() => typeof(object);
 
         //----------------------------------------------------------------------------------------------------------
 
