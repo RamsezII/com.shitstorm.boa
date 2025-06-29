@@ -15,7 +15,7 @@ namespace _BOA_
                 outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
-                    string[] flags = new string[] { "-f", "--files", "-d", "--directories", "--pattern", "-wd", "--working-dir", };
+                    string[] flags = new string[] { "-f", "--files", "-d", "--directories", "-p", "--pattern", "-wd", "--working-dir", };
                     while (exe.reader.TryReadString_matches_out(out string flag, false, lint: exe.reader.lint_theme.flags, stoppers: BoaReader._stoppers_options_, matches: flags))
                         switch (flag)
                         {
@@ -34,17 +34,18 @@ namespace _BOA_
                                 }
                                 break;
 
+                            case "-p":
                             case "--pattern":
-                                if (exe.harbinger.TryParseFactor(exe.reader, exe.scope, out var expr_patt, type_check: true, output_constraint: typeof(string)))
-                                    exe.opts["pattern"] = expr_patt;
+                                if (exe.harbinger.TryParseFactor(exe.reader, exe.scope, out var exe_pattern, type_check: true, output_constraint: typeof(string)))
+                                    exe.opts["pattern"] = exe_pattern;
                                 else
                                     exe.reader.Stderr($"please specify a pattern.");
                                 break;
 
                             case "-wd":
                             case "--working-dir":
-                                if (exe.harbinger.TryParseFactor(exe.reader, exe.scope, out var expr_wd, type_check: true, output_constraint: typeof(string)))
-                                    exe.opts["path"] = expr_wd;
+                                if (exe.harbinger.TryParseFactor(exe.reader, exe.scope, out var exe_wdir, type_check: true, output_constraint: typeof(string)))
+                                    exe.opts["path"] = exe_wdir;
                                 else
                                     exe.reader.Stderr($"expected path expression.");
                                 break;
