@@ -35,7 +35,7 @@ namespace _BOA_
                                 break;
 
                             case "--pattern":
-                                if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_patt))
+                                if (exe.harbinger.TryParseFactor(exe.reader, exe.scope, out var expr_patt, type_check: true, output_constraint: typeof(string)))
                                     exe.opts["pattern"] = expr_patt;
                                 else
                                     exe.reader.Stderr($"please specify a pattern.");
@@ -43,7 +43,7 @@ namespace _BOA_
 
                             case "-wd":
                             case "--working-dir":
-                                if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_wd))
+                                if (exe.harbinger.TryParseFactor(exe.reader, exe.scope, out var expr_wd, type_check: true, output_constraint: typeof(string)))
                                     exe.opts["path"] = expr_wd;
                                 else
                                     exe.reader.Stderr($"expected path expression.");

@@ -7,12 +7,12 @@ namespace _BOA_
     {
         internal bool TryParseFactorAttribute(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression)
         {
-            if (!TryParseFactor(reader, scope, out expression))
+            if (!TryParseFactor(reader, scope, out expression, null))
                 return false;
             return TryParseAttribute(reader, scope, ref expression);
         }
 
-        internal bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor)
+        internal bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor, in Type output_constraint = null, in bool type_check = false)
         {
             factor = null;
 
@@ -23,54 +23,54 @@ namespace _BOA_
                     if (!TryParseExpression(reader, scope, false, null, out factor, type_check: false))
                     {
                         reader.Stderr("expected expression inside factor parenthesis.");
-                        return false;
+                        goto failure;
                     }
                     else if (!reader.TryReadChar_match(')', lint: reader.CloseBraquetLint()))
                     {
                         reader.Stderr($"expected closing parenthesis ')' after factor {factor.ToLog}.");
                         --reader.read_i;
-                        return false;
+                        goto failure;
                     }
                     else
-                        return true;
+                        goto success;
                 }
 
             if (reader.sig_error == null)
                 if (TryParseString(reader, scope, out var str))
                 {
                     factor = str;
-                    return true;
+                    goto success;
                 }
                 else if (reader.sig_error != null)
-                    return false;
+                    goto failure;
 
             if (reader.sig_error == null)
                 if (TryParseMethod(reader, scope, null, out var func_exe))
                 {
                     factor = func_exe;
-                    return true;
+                    goto success;
                 }
                 else if (reader.sig_error != null)
-                    return false;
+                    goto failure;
                 else if (TryParseVariable(reader, scope, out _, out var var_exe))
                 {
                     factor = var_exe;
-                    return true;
+                    goto success;
                 }
                 else if (reader.sig_error != null)
-                    return false;
+                    goto failure;
                 else if (reader.TryReadArgument(out string arg, lint: reader.lint_theme.fallback_default, as_function_argument: false, stoppers: BoaReader._stoppers_factors_))
                     switch (arg.ToLower())
                     {
                         case "true":
                             reader.LintToThisPosition(reader.lint_theme.constants, true);
                             factor = new LiteralExecutor(this, scope, true);
-                            return true;
+                            goto success;
 
                         case "false":
                             reader.LintToThisPosition(reader.lint_theme.constants, true);
                             factor = new LiteralExecutor(this, scope, false);
-                            return true;
+                            goto success;
 
                         default:
                             if (arg[^1] == 'f' && Util.TryParseFloat(arg[..^1], out float _float))
@@ -82,13 +82,28 @@ namespace _BOA_
                             else
                             {
                                 reader.Stderr($"unrecognized literal : '{arg}'.");
-                                return false;
+                                goto failure;
                             }
                             reader.LintToThisPosition(reader.lint_theme.literal, true);
-                            return true;
+                            goto success;
                     }
 
+                failure:
             return false;
+
+        success:
+            if (factor is not ContractExecutor cont || !cont.contract.no_type_check)
+            {
+                Type output_type = factor.OutputType();
+                if (type_check)
+                    if (((output_type == null) != (output_constraint == null)) || !output_type.IsOfType(output_constraint))
+                    {
+                        reader.Stderr($"expected '{output_constraint}', got '{output_type}' instead.");
+                        factor = null;
+                        goto failure;
+                    }
+            }
+            return true;
         }
 
         internal bool TryParseAttribute(in BoaReader reader, in ScopeNode scope, ref ExpressionExecutor expression)
