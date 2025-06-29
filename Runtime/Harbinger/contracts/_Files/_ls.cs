@@ -35,43 +35,60 @@ namespace _BOA_
                                 break;
 
                             case "--pattern":
-                                if (!exe.reader.TryParseString(out string arg, false))
-                                    exe.reader.Stderr($"please specify a pattern.");
+                                if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_patt))
+                                    exe.opts["pattern"] = expr_patt;
                                 else
-                                    exe.opts["pattern"] = arg;
+                                    exe.reader.Stderr($"please specify a pattern.");
                                 break;
 
                             case "-wd":
                             case "--working-dir":
-                                if (exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, false, out string path))
-                                    exe.opts["path"] = exe.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
+                                if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_wd))
+                                    exe.opts["path"] = expr_wd;
                                 else
                                     exe.reader.Stderr($"expected path expression.");
                                 break;
                         }
                 },
-                function: static exe =>
+                routine: static exe =>
                 {
-                    FS_TYPES type = exe.opts.TryGetValue(nameof(FS_TYPES), out var _type) ? (FS_TYPES)_type : FS_TYPES.BOTH;
-                    string pattern = exe.opts.TryGetValue("pattern", out var _pattern) ? (string)_pattern : "*";
+                    using var rout_patt = exe.TryGetOptionValue("pattern", out ExpressionExecutor expr_patt) ? expr_patt.EExecute() : null;
 
-                    string workdir = exe.harbinger.workdir;
-                    if (exe.opts.TryGetValue("path", out var path))
-                        workdir = (string)path;
+                    using var rout_wdir = exe.TryGetOptionValue("path", out ExpressionExecutor expr_wd) ? expr_wd.EExecute() : null;
 
-                    var fsis = type switch
-                    {
-                        FS_TYPES.FILE => Directory.EnumerateFiles(workdir, pattern),
-                        FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(workdir, pattern),
-                        _ => Directory.EnumerateFileSystemEntries(workdir, pattern),
-                    };
+                    return Executor.EExecute(
+                        after_execution: null,
+                        modify_output: data =>
+                        {
+                            string wdir = exe.harbinger.workdir;
+                            if (rout_wdir != null)
+                            {
+                                wdir = (string)rout_wdir.Current.output;
+                                wdir = exe.harbinger.PathCheck(wdir, PathModes.ForceFull, false, false, out _, out _);
+                            }
 
-                    string join = fsis.Select(x => exe.harbinger.PathCheck(x, PathModes.ForceFull, false, false, out _, out _)).Join("\n");
+                            string patt = "*";
+                            if (rout_patt != null)
+                                patt = (string)rout_patt.Current.output;
 
-                    if (string.IsNullOrWhiteSpace(join))
-                        join = string.Empty;
+                            FS_TYPES type = exe.opts.TryGetValue(nameof(FS_TYPES), out var _type) ? (FS_TYPES)_type : FS_TYPES.BOTH;
 
-                    return join;
+                            var fsis = type switch
+                            {
+                                FS_TYPES.FILE => Directory.EnumerateFiles(wdir, patt),
+                                FS_TYPES.DIRECTORY => Directory.EnumerateDirectories(wdir, patt),
+                                _ => Directory.EnumerateFileSystemEntries(wdir, patt),
+                            };
+
+                            string join = fsis.Select(x => exe.harbinger.PathCheck(x, PathModes.ForceFull, false, false, out _, out _)).Join("\n");
+
+                            if (string.IsNullOrWhiteSpace(join))
+                                join = string.Empty;
+
+                            return join;
+                        },
+                        rout_patt,
+                        rout_wdir);
                 }));
         }
     }
