@@ -20,6 +20,8 @@
                     if (reader.TryReadChar_match('=', lint: reader.lint_theme.operators, skippables: null) && code != 0)
                         code |= OperatorsM.eq;
 
+                    reader.LintToThisPosition(reader.lint_theme.operators, true);
+
                     if (TryParseAddSub(reader, scope, out var addsub2))
                     {
                         ContractExecutor exe = new(this, scope, cmd_math_, reader, parse_arguments: false);

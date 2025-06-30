@@ -67,7 +67,7 @@ namespace _BOA_
 
                         StringBuilder sb = new();
 
-                        Util.RunExternalCommand(wdir, (string)data, on_stdout: stdout => sb.Append(stdout));
+                        Util.RunExternalCommand(wdir, (string)data, on_stdout: stdout => sb.AppendLine(stdout));
 
                         string output = sb.ToString();
 

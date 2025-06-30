@@ -16,6 +16,34 @@ namespace _BOA_
                 outputs_if_end_of_instruction: true,
                 get_output_type: static exe =>
                 {
+                    OperatorsM code = (OperatorsM)exe.args[0];
+                    switch (code)
+                    {
+                        case OperatorsM.not:
+                        case OperatorsM.eq:
+                        case OperatorsM.neq:
+                        case OperatorsM.gt:
+                        case OperatorsM.lt:
+                        case OperatorsM.ge:
+                        case OperatorsM.le:
+                        case OperatorsM.and:
+                        case OperatorsM.or:
+                        case OperatorsM.xor:
+                            return typeof(bool);
+
+                        case OperatorsM.add:
+                            break;
+                        case OperatorsM.sub:
+                            break;
+                        case OperatorsM.mul:
+                            break;
+                        case OperatorsM.div:
+                            break;
+                        case OperatorsM.div_int:
+                            break;
+                        case OperatorsM.mod:
+                            break;
+                    }
                     ExpressionExecutor expr1 = (ExpressionExecutor)exe.args[1];
                     ExpressionExecutor expr2 = (ExpressionExecutor)exe.args[2];
                     return expr1.OutputType();

@@ -6,9 +6,22 @@ namespace _BOA_
     partial class Harbinger
     {
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Init_Sleep()
+        static void InitCmd_Waiters()
         {
-            AddContract(new("sleep", null,
+            AddContract(new("wait_one_frame",
+                output_type: null,
+                routine: EWaitOneFrame
+                ));
+
+            static IEnumerator<Contract.Status> EWaitOneFrame(ContractExecutor executor)
+            {
+                while (!executor.harbinger.signal.flags.HasFlag(SIG_FLAGS_new.TICK))
+                    yield return default;
+                yield return default;
+            }
+
+            AddContract(new("sleep",
+                output_type: null,
                 min_args: 1,
                 args: static exe =>
                 {

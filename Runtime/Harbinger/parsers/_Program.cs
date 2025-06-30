@@ -13,6 +13,10 @@ namespace _BOA_
             program.scope.SetVariable("_args_", new BoaVariable(args));
             program.scope.SetVariable("_app_dir_", new BoaVariable(NUCLEOR.game_path.DOS2UNIX_full()));
 
+#if UNITY_EDITOR
+            program.scope.SetVariable("_assets_dir_", new BoaVariable(NUCLEOR.assets_path));
+#endif
+
             while (TryParseBlock(reader, program.scope, out var sub_block))
                 if (sub_block != null)
                     program.stack.Add(sub_block);
