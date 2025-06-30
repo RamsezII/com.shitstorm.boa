@@ -16,16 +16,16 @@ namespace _BOA_
                 outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
-                    string[] options = new string[] { "-a", "--async", "-w", "--working-dir", "-n", "--no-log", };
+                    string[] options = new string[] { "-s", "--sync", "-w", "--working-dir", "-n", "--no-log", };
 
                     exe.reader.completions_v.Clear();
 
                     while (exe.reader.TryReadString_matches_out(out string flag, false, exe.reader.lint_theme.flags, matches: options, stoppers: BoaReader._stoppers_options_))
                         switch (flag)
                         {
-                            case "-a":
-                            case "--async":
-                                exe.opts["async"] = null;
+                            case "-s":
+                            case "--sync":
+                                exe.opts["sync"] = null;
                                 break;
 
                             case "-w":
@@ -44,7 +44,7 @@ namespace _BOA_
                     else
                         exe.reader.Stderr($"expected string expression.");
                 },
-                routine: static exe => exe.opts.ContainsKey("async") ? ERunCmd_async(exe) : ERunCmd_sync(exe)
+                routine: static exe => exe.opts.ContainsKey("sync") ? ERunCmd_sync(exe) : ERunCmd_async(exe)
                 ));
 
             static IEnumerator<Contract.Status> ERunCmd_sync(ContractExecutor executor)
