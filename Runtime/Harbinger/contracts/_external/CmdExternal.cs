@@ -13,9 +13,10 @@ namespace _BOA_
         {
             Harbinger.AddContract(new("os_cmdline", typeof(object),
                 min_args: 1,
+                outputs_if_end_of_instruction: true,
                 opts: static exe =>
                 {
-                    string[] options = new string[] { "-a", "--async", "-wd", "--working-dir", "-l", "--log", };
+                    string[] options = new string[] { "-a", "--async", "-w", "--working-dir", "-n", "--no-log", };
 
                     exe.reader.completions_v.Clear();
 
@@ -27,12 +28,7 @@ namespace _BOA_
                                 exe.opts["async"] = null;
                                 break;
 
-                            case "-l":
-                            case "--log":
-                                exe.opts["log"] = null;
-                                break;
-
-                            case "-wd":
+                            case "-w":
                             case "--working-dir":
                                 if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_wdir))
                                     exe.reader.Stderr($"please specify workdir.");
@@ -53,7 +49,6 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> ERunCmd_sync(ContractExecutor executor)
             {
-                bool log_b = executor.opts.ContainsKey("log");
                 bool wdir_b = executor.TryGetOptionValue("workdir", out ExpressionExecutor expr_wdir);
                 using var rout_wdir = expr_wdir?.EExecute();
 
@@ -69,12 +64,7 @@ namespace _BOA_
 
                         Util.RunExternalCommand(wdir, (string)data, on_stdout: stdout => sb.AppendLine(stdout));
 
-                        string output = sb.ToString();
-
-                        if (log_b)
-                            executor.harbinger.stdout(output);
-
-                        return output;
+                        return sb.ToString();
                     },
                     rout_wdir,
                     executor.arg_0.EExecute());
@@ -82,7 +72,7 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> ERunCmd_async(ContractExecutor executor)
             {
-                bool log_b = executor.opts.ContainsKey("log");
+                bool log_b = !executor.opts.ContainsKey("no-log");
                 string wdir = executor.harbinger.workdir;
 
                 if (executor.TryGetOptionValue("workdir", out ExpressionExecutor expr_wdir))
@@ -98,19 +88,25 @@ namespace _BOA_
                     yield return rout_cmd.Current;
                 string cmdline = (string)rout_cmd.Current.output;
 
-                StringBuilder sb = new();
+                string output = string.Empty;
+                object _lock = new();
 
                 using var task = Task.Run(() => Util.RunExternalCommand_streaming(wdir, cmdline, on_stdout: stdout =>
                 {
-                    if (log_b)
-                        NUCLEOR.instance.ToMainThread(() => executor.harbinger.stdout(stdout + "\n"));
-                    sb.AppendLine(stdout);
+                    lock (_lock)
+                        output += stdout + "\n";
                 }));
 
                 while (!task.IsCompleted)
-                    yield return new Contract.Status(Contract.Status.States.BLOCKING, "running external command...");
+                {
+                    string temp;
+                    lock (_lock)
+                        temp = output;
+                    yield return new Contract.Status(Contract.Status.States.BLOCKING, prefixe_text: temp);
+                }
 
-                yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: sb.ToString());
+                lock (_lock)
+                    yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: output);
             }
         }
     }
