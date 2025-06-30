@@ -4,23 +4,22 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        internal bool TryParseAssignation(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression)
+        internal bool TryParseAssignation(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor assignation)
         {
-            expression = null;
+            assignation = null;
             int read_old = reader.read_i;
 
-            if (!TryParseVariable(reader, scope, out string var_name, out VariableExecutor var_exe) || var_exe == null)
-                return reader.sig_error == null;
+            if (!TryParseVariable(reader, scope, out string var_name, out VariableExecutor var_exe))
+                goto failure;
 
-            expression = var_exe;
+            assignation = var_exe;
 
-            if (!TryParseAttribute(reader, scope, ref expression))
-                if (reader.sig_error != null)
-                    return false;
+            if (!TryParseAttribute(reader, scope, ref assignation))
+                goto failure;
 
             List<string> matches = new() { "=", "+=", "-=", "*=", "/=", "&=", "|=", "^=", };
 
-            if (reader.TryReadString_matches_out(
+            if (!reader.TryReadString_matches_out(
                 out string op_name,
                 as_function_argument: false,
                 lint: reader.lint_theme.operators,
@@ -30,6 +29,8 @@ namespace _BOA_
                 stoppers: " \n\r{}(),;'\"",
                 matches: matches)
                 )
+                goto failure;
+            else
             {
                 OperatorsM code = op_name switch
                 {
@@ -51,17 +52,19 @@ namespace _BOA_
                     exe.args.Add(code);
                     exe.args.Add(var_name);
                     exe.arg_0 = expr;
-                    expression = exe;
+                    assignation = exe;
                     return true;
                 }
                 else
                 {
                     reader.Stderr($"expected expression after '{op_name}' operator.");
-                    return false;
+                    goto failure;
                 }
             }
 
+        failure:
             reader.read_i = read_old;
+            assignation = null;
             return false;
         }
     }

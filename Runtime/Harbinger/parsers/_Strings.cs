@@ -44,11 +44,10 @@ namespace _BOA_
                             reader.last_arg = value;
                             reader.cpl_end = reader.read_i - 1;
 
-                            if (value.Length > 0)
+                            if (value.Length > 0 || stack.Count == 0)
                                 stack.Add(new LiteralExecutor(this, scope, value));
 
-                            if (stack.Count > 0)
-                                executor = new StringExecutor(this, scope, stack);
+                            executor = new StringExecutor(this, scope, stack);
                         }
                         return true;
 

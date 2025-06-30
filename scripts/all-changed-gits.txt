@@ -1,0 +1,15 @@
+
+var path_gits = parent_dir(str(_args_[0]))
+path_gits = "{path_gits}/all-gits.txt"
+var gits = (run path_gits).to_list 
+
+var res = list()
+
+foreach x in gits 
+{
+    var output = os_cmdline -w str(x) "git status --porcelain"
+    if (str(output) != "")
+        res.add(x)
+}
+
+res

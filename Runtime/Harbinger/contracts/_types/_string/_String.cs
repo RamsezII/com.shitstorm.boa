@@ -15,12 +15,12 @@ namespace _BOA_
                     {
                         if (exe.pipe_previous == null)
                             if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, typeof(object), out var expr))
-                                exe.reader.Stderr($"'{exe.contract.name}' expects an expression.");
+                                exe.reader.Stderr($"expected an expression.");
                             else
                                 exe.arg_0 = expr;
                     },
                     routine: static exe => Executor.EExecute(
-                        modify_output: static data => data?.ToBoaString(),
+                        modify_output: static data => data?.ToBoaString() ?? string.Empty,
                         stack: exe.arg_0.EExecute()
                         )
                     ));

@@ -32,9 +32,9 @@ namespace _BOA_
                             item_type = list_type.GetGenericTypeDefinition();
 
                         var sub_scope = new ScopeNode(exe.scope, true);
-                        sub_scope.AddVariable(var_name, new BoaVariable(null, item_type));
-
-                        if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
+                        if (!sub_scope.TryAddVariable(var_name, new BoaVariable(null, item_type)))
+                            exe.reader.Stderr($"Could not declare local variable '{var_name}'.");
+                        else if (!exe.harbinger.TryParseBlock(exe.reader, sub_scope, out var block))
                             exe.reader.Stderr("expected instruction (or block of instructions) after ')' in 'for' instruction.");
                         else
                         {

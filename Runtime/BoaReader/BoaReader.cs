@@ -50,7 +50,7 @@ namespace _BOA_
         public void Stderr(in string error)
         {
             sig_error ??= error;
-            err_trace = Util.GetStackTrace().GetFrame(1).ToString();
+            err_trace ??= Util.GetStackTrace().GetFrame(1).ToString();
         }
     }
 }

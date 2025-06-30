@@ -71,14 +71,21 @@ namespace _BOA_
             var func_exe = new FunctionExecutor(harbinger, new ScopeNode(scope, false));
 
             for (int i = 0; i < args_names.Count; i++)
-                func_exe.scope.AddVariable(args_names[i], null);
+            {
+                string var_name = args_names[i];
+                if (!func_exe.scope.TryAddVariable(var_name, null))
+                {
+                    reader.Stderr($"Could not declare variable '{var_name}'.");
+                    goto failure;
+                }
+            }
 
             read_old = reader.read_i;
             if (!harbinger.TryParseBlock(reader, func_exe.scope, out var block))
                 goto failure;
             string block_text = reader.text[read_old..reader.read_i];
 
-            scope.AddFunction(
+            if (!scope.TryAddFunction(
                 func_name,
                 new FunctionContract(
                     name: func_name,
@@ -89,10 +96,13 @@ namespace _BOA_
                         var func_scope = new ScopeNode(scope, false);
 
                         for (int i = 0; i < args_names.Count; i++)
-                            if (exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, null, out var expr, type_check: false))
-                                func_scope.AddVariable(args_names[i], new BoaVariable(expr, expr.OutputType()));
-                            else
-                                exe.reader.Stderr($"could not parse expression for arg[{i}] '{args_names[i]}'.");
+                        {
+                            string arg_name = args_names[i];
+                            if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, true, null, out var expr, type_check: false))
+                                exe.reader.Stderr($"could not parse expression for arg[{i}] '{arg_name}'.");
+                            else if (!func_scope.TryAddVariable(arg_name, new BoaVariable(expr, expr.OutputType())))
+                                exe.reader.Stderr($"Could not add argument '{arg_name}'.");
+                        }
 
                         exe.scope = func_scope;
                         var func_reader = new BoaReader(reader.lint_theme, reader.strict_syntax, block_text, reader.script_path);
@@ -104,7 +114,11 @@ namespace _BOA_
                     },
                     routine: ERoutine
                 )
-            );
+            ) || reader.sig_error != null)
+            {
+                reader.Stderr($"Could not declare function '{func_name}'.");
+                goto failure;
+            }
 
             return true;
 

@@ -34,7 +34,7 @@ namespace _BOA_
                                 exe.args.Add(code);
                                 exe.args.Add(var_name);
 
-                                exe.scope.AddVariable(var_name, new BoaVariable(null, exe.arg_0?.OutputType()));
+                                exe.scope.SetVariable(var_name, new BoaVariable(null, exe.arg_0?.OutputType()));
                             }
                 },
                 routine: static exe =>

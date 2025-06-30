@@ -115,7 +115,7 @@ namespace _BOA_
             return clone;
         }
 
-        internal void AddVariable(in string name, in BoaVariable value) => Add(ref _variables, name, value);
+        internal bool TryAddVariable(in string name, in BoaVariable value) => TryAdd(ref _variables, name, value);
         internal void SetVariable(in string name, in BoaVariable value) => Set(ref _variables, name, value);
         internal BoaVariable GetVariable(in string name) => Get(ref _variables, name);
         internal bool TryGetVariable(in string name, out BoaVariable value) => TryGet(ref _variables, name, out value) || parent != null && parent.TryGetVariable(name, out value);
@@ -134,7 +134,7 @@ namespace _BOA_
         }
         internal IEnumerable<string> EVarNames() => GetVariables().Select(v => v.Key);
 
-        internal void AddFunction(in string name, in FunctionContract value) => Add(ref _functions, name, value);
+        internal bool TryAddFunction(in string name, in FunctionContract value) => TryAdd(ref _functions, name, value);
         internal void SetFunction(in string name, in FunctionContract value) => Set(ref _functions, name, value);
         internal FunctionContract GetFunction(in string name) => Get(ref _functions, name);
         internal bool TryGetFunction(in string name, out FunctionContract value) => TryGet(ref _functions, name, out value) || parent != null && parent.TryGetFunction(name, out value);
@@ -153,7 +153,15 @@ namespace _BOA_
         }
         internal IEnumerable<string> EFuncNames() => GetFunctions().Select(f => f.Key);
 
-        static void Add<T>(ref Dictionary<string, T> _dict, in string name, in T value) where T : class => (_dict ??= new(StringComparer.Ordinal)).Add(name, value);
+        static bool TryAdd<T>(ref Dictionary<string, T> _dict, in string name, in T value) where T : class
+        {
+            _dict ??= new(StringComparer.Ordinal);
+            if (_dict.ContainsKey(name))
+                return false;
+            _dict.Add(name, value);
+            return true;
+        }
+
         static void Set<T>(ref Dictionary<string, T> _dict, in string name, in T value) where T : class => (_dict ??= new(StringComparer.Ordinal))[name] = value;
         static T Get<T>(ref Dictionary<string, T> _dict, in string name) where T : class => _dict?[name];
         static bool TryGet<T>(ref Dictionary<string, T> _dict, string name, out T value) where T : class

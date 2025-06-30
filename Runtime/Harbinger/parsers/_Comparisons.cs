@@ -7,18 +7,24 @@
             expression = null;
             if (TryParseAddSub(reader, scope, out var addsub1))
             {
-                if (reader.TryReadChar_matches_out(out char op_char, true, "<>="))
+                if (!reader.TryReadChar_matches_out(out char op_char, true, "!<>="))
+                {
+                    expression = addsub1;
+                    return true;
+                }
+                else
                 {
                     OperatorsM code = op_char switch
                     {
                         '<' => OperatorsM.lt,
                         '>' => OperatorsM.gt,
-                        '=' => OperatorsM.eq,
+                        '=' when reader.TryReadChar_match('=', lint: reader.lint_theme.operators, skippables: null) => OperatorsM.eq,
+                        '!' when reader.TryReadChar_match('=', lint: reader.lint_theme.operators, skippables: null) => OperatorsM.neq,
                         _ => 0,
                     };
 
-                    if (reader.TryReadChar_match('=', lint: reader.lint_theme.operators, skippables: null) && code != 0)
-                        code |= OperatorsM.eq;
+                    if (code == 0)
+                        goto failure;
 
                     reader.LintToThisPosition(reader.lint_theme.operators, true);
 
@@ -34,15 +40,13 @@
                     else
                     {
                         reader.Stderr($"expected expression after '{op_char}' operator.");
-                        return false;
+                        goto failure;
                     }
                 }
-                else
-                {
-                    expression = addsub1;
-                    return true;
-                }
             }
+
+        failure:
+            expression = null;
             return false;
         }
     }

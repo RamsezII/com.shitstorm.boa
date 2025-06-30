@@ -6,15 +6,10 @@ namespace _BOA_
     {
         public bool TryParseExpression(in BoaReader reader, in ScopeNode scope, in bool read_as_argument, in Type output_constraint, out ExpressionExecutor expression, in bool type_check = true)
         {
-            if (!TryParseAssignation(reader, scope, out expression))
-                if (reader.sig_error != null)
-                    return false;
+            if (!TryParseAssignation(reader, scope, out expression) && reader.sig_error != null)
+                return false;
 
-            if (!TryParseOr(reader, scope, out expression))
-                if (reader.sig_error != null)
-                    return false;
-
-            if (expression == null)
+            if (expression == null && !TryParseOr(reader, scope, out expression))
                 return false;
 
             if (!TryPipe(reader, scope, ref expression))
@@ -31,17 +26,22 @@ namespace _BOA_
                         return false;
                     }
 
-            if (expression is not ContractExecutor cont || !cont.contract.no_type_check)
-            {
-                Type output_type = expression.OutputType();
-                if (type_check)
+            if (type_check)
+                if (expression == null)
+                {
+                    reader.Stderr($"can not check type on null expression.");
+                    return false;
+                }
+                else if (expression is not ContractExecutor cont || !cont.contract.no_type_check)
+                {
+                    Type output_type = expression.OutputType();
                     if (((output_type == null) != (output_constraint == null)) || !output_type.IsOfType(output_constraint))
                     {
                         reader.Stderr($"expected '{output_constraint}', got '{output_type}' instead.");
                         expression = null;
                         return false;
                     }
-            }
+                }
 
             if (reader.TryReadChar_match('?', lint: reader.lint_theme.operators))
             {

@@ -97,7 +97,7 @@ namespace _BOA_
         {
             _stderr ??= error;
             error += "\n\n" + Util.GetStackTrace().GetFrame(1).ToString();
-            Debug.LogWarning(error);
+            Debug.LogWarning(error, shell);
         }
     }
 }

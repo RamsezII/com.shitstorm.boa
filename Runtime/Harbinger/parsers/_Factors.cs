@@ -92,17 +92,23 @@ namespace _BOA_
             return false;
 
         success:
-            if (factor is not ContractExecutor cont || !cont.contract.no_type_check)
-            {
-                Type output_type = factor.OutputType();
-                if (type_check)
+            if (type_check)
+                if (factor == null)
+                {
+                    reader.Stderr($"can not check type on null factor.");
+                    return false;
+                }
+                else if (factor is not ContractExecutor cont || !cont.contract.no_type_check)
+                {
+                    Type output_type = factor.OutputType();
                     if (((output_type == null) != (output_constraint == null)) || !output_type.IsOfType(output_constraint))
                     {
                         reader.Stderr($"expected '{output_constraint}', got '{output_type}' instead.");
                         factor = null;
                         goto failure;
                     }
-            }
+                }
+
             return true;
         }
 
@@ -141,6 +147,5 @@ namespace _BOA_
                 }
             }
         }
-
     }
 }

@@ -66,8 +66,8 @@ namespace _BOA_
                     OperatorsM code = (OperatorsM)exe.args[0];
                     Executor expr1 = (Executor)exe.args[1];
                     Executor expr2 = (Executor)exe.args[2];
-                    var routine1 = expr1.EExecute();
-                    var routine2 = expr2.EExecute();
+                    using var routine1 = expr1.EExecute();
+                    using var routine2 = expr2.EExecute();
 
                     return Executor.EExecute(
                         after_execution: null,

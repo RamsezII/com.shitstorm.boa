@@ -13,7 +13,7 @@ namespace _BOA_
                 function_style_arguments: false,
                 args: static exe =>
                 {
-                    if (!exe.reader.TryReadArgument(out string varname, as_function_argument: false, lint: exe.reader.lint_theme.variables))
+                    if (!exe.reader.TryReadArgument(out string var_name, as_function_argument: false, lint: exe.reader.lint_theme.variables))
                         exe.reader.Stderr($"Expected variable name after 'var'.");
                     else
                     {
@@ -22,9 +22,9 @@ namespace _BOA_
                         if (exe.pipe_previous != null)
                             type = exe.pipe_previous.OutputType();
                         else if (!exe.reader.TryReadChar_match('=', lint: exe.reader.lint_theme.operators))
-                            exe.reader.Stderr($"Expected '=' after variable name '{varname}'.");
+                            exe.reader.Stderr($"Expected '=' after variable name '{var_name}'.");
                         else if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(object), out var expr))
-                            exe.reader.Stderr($"Failed to parse expression after '=' for variable '{varname}'.");
+                            exe.reader.Stderr($"Failed to parse expression after '=' for variable '{var_name}'.");
                         else
                         {
                             exe.arg_0 = expr;
@@ -35,8 +35,9 @@ namespace _BOA_
                             return;
 
                         BoaVariable variable = new(null, type);
-                        exe.scope.AddVariable(varname, variable);
-                        exe.args.Add(varname);
+                        if (!exe.scope.TryAddVariable(var_name, variable))
+                            exe.reader.Stderr($"Could not declare variable '{var_name}'.");
+                        exe.args.Add(var_name);
                     }
                 },
                 routine: static exe =>
