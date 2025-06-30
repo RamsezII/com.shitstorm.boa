@@ -1,5 +1,6 @@
 ﻿using _ARK_;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -62,7 +63,7 @@ namespace _BOA_
 
                         StringBuilder sb = new();
 
-                        Util.RunExternalCommand(wdir, (string)data, on_stdout: stdout => sb.AppendLine(stdout));
+                        Util.RunExternalCommand(wdir, (string)data, log: false, on_stdout: stdout => sb.AppendLine(stdout));
 
                         return sb.ToString();
                     },
@@ -81,6 +82,7 @@ namespace _BOA_
                     while (rout_wdir.MoveNext())
                         yield return rout_wdir.Current;
                     wdir = (string)rout_wdir.Current.output;
+                    wdir = executor.harbinger.PathCheck(wdir, PathModes.ForceFull, false, false, out _, out _);
                 }
 
                 using var rout_cmd = executor.arg_0.EExecute();
@@ -91,7 +93,7 @@ namespace _BOA_
                 string output = string.Empty;
                 object _lock = new();
 
-                using var task = Task.Run(() => Util.RunExternalCommand_streaming(wdir, cmdline, on_stdout: stdout =>
+                using var task = Task.Run(() => Util.RunExternalCommand_streaming(wdir, cmdline, log: false, on_stdout: stdout =>
                 {
                     lock (_lock)
                         output += stdout + "\n";
@@ -106,7 +108,11 @@ namespace _BOA_
                 }
 
                 lock (_lock)
+                {
+                    if (output.Length > 0 && output[^1] == '\n')
+                        output = output[..^1];
                     yield return new Contract.Status(Contract.Status.States.ACTION_skip, output: output);
+                }
             }
         }
     }
