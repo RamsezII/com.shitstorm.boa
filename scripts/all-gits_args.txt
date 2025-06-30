@@ -1,0 +1,10 @@
+
+var path_gits = parent_dir(str(_args_[0]))
+path_gits = "{path_gits}/all-gits.txt"
+
+echo path_gits
+'
+var gits = (run path_gits).to_list 
+
+foreach x in gits 
+    echo x'

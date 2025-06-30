@@ -9,11 +9,9 @@ namespace _BOA_
             expression = null;
             int read_old = reader.read_i;
 
-            if (!TryParseVariable(reader, scope, out string var_name, out VariableExecutor var_exe))
+            if (!TryParseVariable(reader, scope, out string var_name, out VariableExecutor var_exe) || var_exe == null)
                 return reader.sig_error == null;
 
-            if (var_exe == null)
-                return true;
             expression = var_exe;
 
             if (!TryParseAttribute(reader, scope, ref expression))

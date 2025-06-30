@@ -45,12 +45,12 @@ namespace _BOA_
 
                 string path = (string)routines[0].Current.output;
                 string long_path = executor.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
-                string text = File.ReadAllText(long_path);
 
                 if (!File.Exists(long_path))
                     executor.reader.Stderr($"can not find file at path: {long_path}.");
                 else
                 {
+                    string text = File.ReadAllText(long_path);
                     var harbinger = new Harbinger(executor.harbinger.shell, executor.harbinger, executor.harbinger.workdir, executor.harbinger.stdout);
                     bool strict_syntax = executor.reader.strict_syntax || executor.opts.TryGetValue("strict", out _);
                     var reader = new BoaReader(executor.reader.lint_theme, strict_syntax, text, long_path);

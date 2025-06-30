@@ -1,0 +1,11 @@
+
+var paths = list()
+path.add(_app_dir_)
+
+foreach p in (ls -d -p "_*_" -wd "{_app_dir_}/Assets").to_list
+{
+    if (dex "{p}/.git")
+        paths.add(str(p))
+}
+
+paths
