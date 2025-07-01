@@ -5,14 +5,14 @@ namespace _BOA_
 {
     partial class Harbinger
     {
-        internal bool TryParseFactorAttribute(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression)
+        internal bool TryParseFactor_with_attribute(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor expression)
         {
-            if (!TryParseFactor(reader, scope, out expression, null))
+            if (!TryParseFactor(reader, scope, out expression, null, no_type_check: true))
                 return false;
-            return TryParseAttribute(reader, scope, ref expression);
+            return TryParseFactorAttribute(reader, scope, ref expression);
         }
 
-        internal bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor, in Type output_constraint = null, in bool type_check = false)
+        public bool TryParseFactor(in BoaReader reader, in ScopeNode scope, out ExpressionExecutor factor, in Type output_constraint, in bool no_type_check = false)
         {
             factor = null;
 
@@ -92,7 +92,7 @@ namespace _BOA_
             return false;
 
         success:
-            if (type_check)
+            if (!no_type_check)
                 if (factor == null)
                 {
                     reader.Stderr($"can not check type on null factor.");
@@ -112,7 +112,7 @@ namespace _BOA_
             return true;
         }
 
-        internal bool TryParseAttribute(in BoaReader reader, in ScopeNode scope, ref ExpressionExecutor expression)
+        internal bool TryParseFactorAttribute(in BoaReader reader, in ScopeNode scope, ref ExpressionExecutor expression)
         {
             if (!reader.TryReadChar_match('.', lint: reader.lint_theme.point))
                 return true;

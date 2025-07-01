@@ -14,7 +14,7 @@ namespace _BOA_
 
             assignation = var_exe;
 
-            if (!TryParseAttribute(reader, scope, ref assignation))
+            if (!TryParseFactorAttribute(reader, scope, ref assignation))
                 goto failure;
 
             List<string> matches = new() { "=", "+=", "-=", "*=", "/=", "&=", "|=", "^=", };

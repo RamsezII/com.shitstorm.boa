@@ -4,12 +4,19 @@ path_gits = "{path_gits}/all-gits.txt"
 var gits = (run path_gits).to_list 
 
 var res = list()
+var cmd = "git status --porcelain"
 
 foreach x in gits 
 {
-    var output = os_cmdline -w str(x) "git status --porcelain"
+    echo "{x}$ {cmd}"
+    var output = os_cmdline -w str(x) cmd
+    echo output
+
     if (str(output) != "")
+    {
+        echo "following clone has changed: {x}"
         res.add(x)
+    }
 }
 
 res

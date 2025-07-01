@@ -1,9 +1,22 @@
 
+var cmd = str(_args_[1])
+
+echo "fetching changed gits..."
+
 var script_path = parent_dir(str(_args_[0])) 
 script_path = "{script_path}/all-changed-gits.txt"
 
 var gits = (run script_path)
 gits = gits.to_list
 
+echo "_"
+echo "_"
+echo "will now apply following command: '{cmd}'"
+echo "_"
+echo "_"
+
 foreach x in gits 
-    os_cmdline -w str(x) str(_args_[1])
+{
+    echo "{x}$ {cmd}"
+    echo os_cmdline -w str(x) cmd
+}

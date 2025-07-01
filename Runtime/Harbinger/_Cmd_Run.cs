@@ -60,8 +60,6 @@ namespace _BOA_
                         harbinger.args.Add(routines[arg_i].Current.output);
 
                     ScopeNode scope = new ScopeNode(null, false);
-                    if (false)
-                        scope = scope.Dedoublate();
 
                     if (!harbinger.TryParseProgram(reader, scope, out _, out var program))
                     {
