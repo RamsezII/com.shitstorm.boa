@@ -11,11 +11,9 @@ foreach x in gits
     var output = os_cmdline -w str(x) cmd
     if (str(output) != "")
     {
-        echo "changed: {x}"
+        echo x
         res.add(x)
     }
-    else
-        echo "unchanged: {x}"
 }
 
 res
