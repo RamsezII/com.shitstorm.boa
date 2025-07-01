@@ -47,7 +47,7 @@ namespace _BOA_
                 string long_path = executor.harbinger.PathCheck(path, PathModes.ForceFull, false, false, out _, out _);
 
                 if (!File.Exists(long_path))
-                    executor.reader.Stderr($"can not find file at path: {long_path}.");
+                    executor.harbinger.Stderr($"can not find file at path: {long_path}.");
                 else
                 {
                     string text = File.ReadAllText(long_path);
