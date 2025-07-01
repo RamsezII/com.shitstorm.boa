@@ -36,7 +36,7 @@ namespace _BOA_
         public BoaSignal signal;
         public readonly List<object> args = new();
         public string _stderr;
-        public Action<object> stdout;
+        public Action<object, string> stdout;
 
         //----------------------------------------------------------------------------------------------------------
 
@@ -81,12 +81,12 @@ namespace _BOA_
 
         //----------------------------------------------------------------------------------------------------------
 
-        public Harbinger(in Shell shell, in Harbinger father, in string workdir, in Action<object> stdout)
+        public Harbinger(in Shell shell, in Harbinger father, in string workdir, in Action<object, string> stdout)
         {
             this.shell = shell;
             this.father = father;
             if (shell != null)
-                this.stdout += data => this.shell.AddLine(data);
+                this.stdout += this.shell.AddLine;
             this.stdout += stdout;
             this.workdir = PathCheck(workdir, PathModes.ForceFull, false, false, out _, out _);
         }

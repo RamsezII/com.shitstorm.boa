@@ -93,11 +93,17 @@ namespace _BOA_
                 string output = string.Empty;
                 object _lock = new();
 
-                using var task = Task.Run(() => Util.RunExternalCommand_streaming(wdir, cmdline, log: false, on_stdout: stdout =>
-                {
-                    lock (_lock)
-                        output += stdout + "\n";
-                }));
+                using var task = Task.Run(() => Util.RunExternalCommand_streaming(
+                    wdir,
+                    cmdline,
+                    log: false,
+                    on_stdout: stdout =>
+                    {
+                        lock (_lock)
+                            output += stdout + "\n";
+                    },
+                    on_err: stderr => executor.harbinger.stdout(stderr, stderr.ToString().SetColor(Color.yellow))
+                ));
 
                 while (!task.IsCompleted)
                 {

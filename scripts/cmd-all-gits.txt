@@ -1,0 +1,13 @@
+
+var script_path = parent_dir(str(_args_[0])) 
+script_path = "{script_path}/all-gits.txt"
+
+var gits = (run script_path)
+gits = gits.to_list
+
+foreach x in gits 
+{
+    echo "{x}$ {_args_[1]}"
+    var output = os_cmdline -w str(x) str(_args_[1])
+    echo output
+}

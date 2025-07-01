@@ -25,8 +25,8 @@ namespace _BOA_
                     int read_old = cobra_exe.line.read_i;
                     if (cobra_exe.line.TryReadAll(out string input_line, lint: false))
                     {
-                        var harbinger = new Harbinger(null, null, cobra_exe.shell.working_dir, data => cobra_exe.Stdout(data));
-                        var reader =new BoaReader(LintTheme.theme_dark, false, input_line, null, cobra_exe.line.cursor_i);
+                        var harbinger = new Harbinger(null, null, cobra_exe.shell.working_dir, (data, lint) => cobra_exe.Stdout(data, lint));
+                        var reader = new BoaReader(LintTheme.theme_dark, false, input_line, null, cobra_exe.line.cursor_i);
 
                         ScopeNode scope1 = scope;
                         if (!cobra_exe.line.flags.HasFlag(SIG_FLAGS.SUBMIT))
