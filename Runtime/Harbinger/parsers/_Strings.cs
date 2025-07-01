@@ -26,17 +26,18 @@ namespace _BOA_
             List<Executor> stack = new();
             string value = string.Empty;
             int start_i = reader.read_i;
+            bool flag_escape = false;
 
             while (reader.TryReadChar_out(out char c, skippables: null))
                 switch (c)
                 {
                     case '\\':
                         reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
-                        ++reader.read_i;
+                        flag_escape = true;
                         reader.LintToThisPosition(reader.lint_theme.quotes, false);
                         break;
 
-                    case '\'' or '"' when c == sep:
+                    case '\'' or '"' when !flag_escape && c == sep:
                         {
                             reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
                             reader.LintToThisPosition(reader.lint_theme.quotes, false);
@@ -51,7 +52,7 @@ namespace _BOA_
                         }
                         return true;
 
-                    case '{':
+                    case '{' when !flag_escape:
                         {
                             reader.LintToThisPosition(reader.lint_theme.strings, false, reader.read_i - 1);
                             reader.LintToThisPosition(reader.lint_theme.quotes, false);
@@ -82,6 +83,7 @@ namespace _BOA_
                         break;
 
                     default:
+                        flag_escape = false;
                         value += c;
                         break;
                 }

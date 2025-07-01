@@ -22,13 +22,13 @@ namespace _BOA_
 
                 if (sep != default)
                 {
+                    bool flag_escape = false;
                     value = string.Empty;
                     int start_i = read_i;
                     LintToThisPosition(lint_theme.quotes, false);
 
                     while (TryReadChar_out(out char c, skippables: null))
                     {
-                        bool flag_escape = false;
                         switch (c)
                         {
                             case '\\':
@@ -54,6 +54,7 @@ namespace _BOA_
                                 return true;
 
                             default:
+                                flag_escape = false;
                                 value += c;
                                 break;
                         }
