@@ -8,15 +8,14 @@ var cmd = "git status --porcelain"
 
 foreach x in gits 
 {
-    echo "{x}$ {cmd}"
     var output = os_cmdline -w str(x) cmd
-    echo output
-
     if (str(output) != "")
     {
-        echo "following clone has changed: {x}"
+        echo "changed: {x}"
         res.add(x)
     }
+    else
+        echo "unchanged: {x}"
 }
 
 res
