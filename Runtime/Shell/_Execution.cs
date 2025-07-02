@@ -18,6 +18,8 @@ namespace _BOA_
 
         const byte maximum_instant_ticks = 100;
 
+        public bool IsBusy => execution != null;
+
         //----------------------------------------------------------------------------------------------------------
 
         void Tick() => PropagateSignal(sig_tick);
@@ -76,7 +78,30 @@ namespace _BOA_
                     if (!submit)
                         scope = scope.Dedoublate();
 
-                    if (!harbinger.TryParseProgram(signal.reader, scope, out bool daemonize, out program))
+                    if (harbinger.TryParseProgram(signal.reader, scope, out bool daemonize, out program))
+                        if (submit)
+                        {
+                            AddToHistory(signal.reader.text);
+
+                            if (daemonize)
+                            {
+                                Daemonize(program);
+
+                                execution = null;
+                                program = null;
+                                harbinger = null;
+
+                                RefreshShellPrefixe();
+                            }
+                            else
+                            {
+                                execution = program.EExecute();
+                                goto before_execution;
+                            }
+                        }
+                        else
+                            harbinger = null;
+                    else
                     {
                         if (submit)
                         {
@@ -91,24 +116,6 @@ namespace _BOA_
                         }
                         harbinger = null;
                     }
-                    else if (submit)
-                        if (daemonize)
-                        {
-                            Daemonize(program);
-
-                            execution = null;
-                            program = null;
-                            harbinger = null;
-
-                            RefreshShellPrefixe();
-                        }
-                        else
-                        {
-                            execution = program.EExecute();
-                            goto before_execution;
-                        }
-                    else
-                        harbinger = null;
                 }
             }
         }
