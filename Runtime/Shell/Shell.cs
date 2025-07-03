@@ -14,6 +14,7 @@ namespace _BOA_
         string ToLog => ToString();
 #endif
         public Action<string, string> stdout;
+        public Action<string> change_stdin;
 
         //----------------------------------------------------------------------------------------------------------
 
