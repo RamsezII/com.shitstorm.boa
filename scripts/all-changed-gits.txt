@@ -2,6 +2,7 @@
 var path_gits = parent_dir(str(_args_[0]))
 path_gits = "{path_gits}/all-gits.txt"
 var gits = (run path_gits).to_list 
+gits.add(_app_dir_)
 
 var res = list()
 var cmd = "git status --porcelain"
