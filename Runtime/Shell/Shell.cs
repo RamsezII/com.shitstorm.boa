@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using _ARK_;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ namespace _BOA_
 {
     public sealed partial class Shell : MonoBehaviour
     {
+        static readonly HashSet<Shell> instances = new();
+
         static byte _id;
         public byte id;
         public override string ToString() => $"{GetType()}[{id}]";
@@ -22,6 +25,7 @@ namespace _BOA_
         static void OnAfterSceneLoad()
         {
             _id = 0;
+            InitShellHistory();
         }
 
         //----------------------------------------------------------------------------------------------------------
@@ -29,6 +33,7 @@ namespace _BOA_
         private void Awake()
         {
             id = ++_id;
+            instances.Add(this);
             AwakeWorkDir();
         }
 
@@ -38,26 +43,14 @@ namespace _BOA_
         {
             NUCLEOR.delegates.shell_tick += Tick;
             RefreshShellPrefixe();
-            ArkMachine.UserListener(() =>
-            {
-                ReadHistory(true);
-                NUCLEOR.delegates.onApplicationFocus += OnFocus;
-                NUCLEOR.delegates.onApplicationUnfocus += OnUnfocus;
-            });
         }
-
-        //----------------------------------------------------------------------------------------------------------
-
-        void OnFocus() => ReadHistory(false);
-        void OnUnfocus() => WriteHistory(false);
 
         //----------------------------------------------------------------------------------------------------------
 
         private void OnDestroy()
         {
             NUCLEOR.delegates.shell_tick -= Tick;
-            NUCLEOR.delegates.onApplicationFocus -= OnFocus;
-            NUCLEOR.delegates.onApplicationUnfocus -= OnUnfocus;
+            instances.Remove(this);
             execution?.Dispose();
         }
     }

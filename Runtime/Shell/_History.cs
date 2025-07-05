@@ -13,29 +13,36 @@ namespace _BOA_
             public string[] lines;
         }
 
-        readonly List<string> history = new(history_max);
+        static readonly List<string> history = new(history_max);
 
         const byte history_max = 50;
         [SerializeField] int history_index = -1;
 
         //--------------------------------------------------------------------------------------------------------------
 
-        void WriteHistory(in bool log)
+        static void InitShellHistory() => ArkMachine.UserListener(() =>
         {
-            var saved_history = new History
+            static void WriteHistory(in bool log)
             {
-                lines = history.ToArray()
-            };
-            saved_history.SaveStaticJSon(log);
-        }
+                var saved_history = new History
+                {
+                    lines = history.ToArray()
+                };
+                saved_history.SaveStaticJSon(log);
+            }
 
-        void ReadHistory(in bool log)
-        {
-            history.Clear();
-            History saved_history = null;
-            if (StaticJSon.ReadStaticJSon(ref saved_history, true, log))
-                history.AddRange(saved_history.lines[..Mathf.Min(history_max, saved_history.lines.Length)]);
-        }
+            static void ReadHistory(in bool log)
+            {
+                history.Clear();
+                History saved_history = null;
+                if (StaticJSon.ReadStaticJSon(ref saved_history, true, log))
+                    history.AddRange(saved_history.lines[..Mathf.Min(history_max, saved_history.lines.Length)]);
+            }
+
+            ReadHistory(true);
+            NUCLEOR.delegates.onApplicationFocus += () => ReadHistory(false);
+            NUCLEOR.delegates.onApplicationUnfocus += () => WriteHistory(false);
+        });
 
         void AddToHistory(in string line)
         {
@@ -46,7 +53,8 @@ namespace _BOA_
 
             history.Add(line);
 
-            ResetHistoryNav();
+            foreach (Shell instance in instances)
+                instance.ResetHistoryNav();
         }
 
         public void ResetHistoryNav() => history_index = history.Count;
