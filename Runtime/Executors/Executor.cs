@@ -7,7 +7,6 @@ namespace _BOA_
     public abstract class Executor : IDisposable
     {
         public readonly Harbinger harbinger;
-        public Janitor janitor;
         public bool _disposed;
 
         static ushort _id;
