@@ -20,7 +20,7 @@ namespace _BOA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        static void InitShellHistory() => ArkMachine.UserListener(() =>
+        static void InitShellHistory() => ArkMachine.AddListener(() =>
         {
             static void WriteHistory(in bool log)
             {
