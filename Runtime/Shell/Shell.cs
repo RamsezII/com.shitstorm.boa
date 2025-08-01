@@ -41,7 +41,7 @@ namespace _BOA_
 
         private void Start()
         {
-            NUCLEOR.delegates.shell_tick += Tick;
+            NUCLEOR.delegates.Update_OnShellTick += Tick;
             RefreshShellPrefixe();
         }
 
@@ -49,7 +49,7 @@ namespace _BOA_
 
         private void OnDestroy()
         {
-            NUCLEOR.delegates.shell_tick -= Tick;
+            NUCLEOR.delegates.Update_OnShellTick -= Tick;
             instances.Remove(this);
             execution?.Dispose();
         }

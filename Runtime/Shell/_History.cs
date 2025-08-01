@@ -40,8 +40,8 @@ namespace _BOA_
             }
 
             ReadHistory(true);
-            NUCLEOR.delegates.onApplicationFocus += () => ReadHistory(false);
-            NUCLEOR.delegates.onApplicationUnfocus += () => WriteHistory(false);
+            NUCLEOR.delegates.OnApplicationFocus += () => ReadHistory(false);
+            NUCLEOR.delegates.OnApplicationUnfocus += () => WriteHistory(false);
         });
 
         void AddToHistory(in string line)
