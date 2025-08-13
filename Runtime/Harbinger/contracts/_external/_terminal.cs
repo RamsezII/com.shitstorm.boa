@@ -14,38 +14,50 @@ namespace _BOA_
             Harbinger.AddContract(new("open_terminal", null,
                 opts: static exe =>
                 {
-                    if (exe.reader.TryReadString_match("d", false, exe.reader.lint_theme.options, add_to_completions: false))
-                        if (!exe.harbinger.TryParsePath(exe.reader, FS_TYPES.DIRECTORY, false, out string wdir))
+                    string[] options = new string[] { "-w", "--working-dir" };
+
+                    if (exe.reader.TryReadString_matches_out(out _, false, exe.reader.lint_theme.flags, matches: options, stoppers: BoaReader._stoppers_options_))
+                        if (!exe.harbinger.TryParseExpression(exe.reader, exe.scope, false, typeof(string), out var expr_wdir))
                             exe.reader.Stderr($"please specify workdir.");
                         else
-                            exe.opts.Add("d", wdir);
+                            exe.opts["workdir"] = expr_wdir;
                 },
-                action: static exe =>
+                routine: static executor =>
                 {
-                    if (exe.TryGetOptionValue("d", out string wdir))
-                        wdir = exe.harbinger.PathCheck(wdir, PathModes.ForceFull, false, false, out _, out _);
-                    else
-                        wdir = exe.harbinger.workdir;
+                    bool wdir_b = executor.TryGetOptionValue("workdir", out ExpressionExecutor expr_wdir);
+                    using var rout_wdir = expr_wdir?.EExecute();
 
-                    ProcessStartInfo psi = new()
-                    {
-                        FileName = GetTerminalCommand(),
-                        WorkingDirectory = wdir,
-                        UseShellExecute = true,
-                    };
-                    Process.Start(psi);
+                    return Executor.EExecute(
+                        after_execution: data =>
+                        {
+                            string wdir = wdir_b
+                                ? executor.harbinger.PathCheck((string)rout_wdir.Current.output, PathModes.ForceFull, false, false, out _, out _)
+                                : executor.harbinger.workdir;
 
-                    static string GetTerminalCommand()
-                    {
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            return "powershell.exe";
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                            return "gnome-terminal";
-                        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-                            return "open -a Terminal";
+                            string terminal_name = null;
 
-                        throw new PlatformNotSupportedException($"Unsupported OS platform.");
-                    }
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                                terminal_name = "powershell.exe";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                                terminal_name = "gnome-terminal";
+                            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                                terminal_name = "open -a Terminal";
+
+                            if (terminal_name == null)
+                                throw new PlatformNotSupportedException($"Unsupported OS platform.");
+
+                            ProcessStartInfo psi = new()
+                            {
+                                FileName = terminal_name,
+                                WorkingDirectory = wdir,
+                                UseShellExecute = true,
+                            };
+
+                            Process.Start(psi);
+                        },
+                        modify_output: null,
+                        rout_wdir
+                    );
                 }));
         }
     }
