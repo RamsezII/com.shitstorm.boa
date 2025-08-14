@@ -5,7 +5,7 @@ namespace _BOA_
 {
     partial class Shell
     {
-        public static void Daemonize(in Executor executor) => NUCLEOR.instance.subScheduler.AddRoutine(EDaemonize(executor));
+        public static void Daemonize(in Executor executor) => NUCLEOR.instance.subSequencer.AddRoutine(EDaemonize(executor));
         public static IEnumerator<float> EDaemonize(Executor executor)
         {
             BoaSignal signal = new(SIG_FLAGS_new.TICK, null);
