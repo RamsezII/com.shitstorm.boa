@@ -4,4 +4,7 @@ path_gits = "{path_gits}/all-gits.txt"
 var gits = (run path_gits).to_list 
 
 foreach x in gits 
+{
+    echo x
     os_cmdline -w str(x) str(_args_[1])
+}
