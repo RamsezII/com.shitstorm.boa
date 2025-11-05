@@ -15,7 +15,7 @@ namespace _BOA_
             if (Application.isEditor)
                 workdir = Directory.GetParent(Application.dataPath).FullName;
             else
-                workdir = NUCLEOR.home_path;
+                workdir = ArkPaths.instance.Value.dpath_home;
             workdir = Harbinger.PathCheck(Harbinger.app_dir, workdir, PathModes.ForceFull, false, false, out _, out _);
         }
 

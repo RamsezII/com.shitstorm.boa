@@ -11,10 +11,10 @@ namespace _BOA_
 
             BlockExecutor program = new(this, scope ?? new ScopeNode(null, true));
             program.scope.SetVariable("_args_", new BoaVariable(args));
-            program.scope.SetVariable("_app_dir_", new BoaVariable(NUCLEOR.game_path.DOS2UNIX_full()));
+            program.scope.SetVariable("_home_dir_", new BoaVariable(ArkPaths.instance.Value.dpath_home));
 
 #if UNITY_EDITOR
-            program.scope.SetVariable("_assets_dir_", new BoaVariable(NUCLEOR.assets_path));
+            program.scope.SetVariable("_assets_dir_", new BoaVariable(ArkPaths.instance.Value.dpath_assets));
 #endif
 
             while (TryParseBlock(reader, program.scope, out var sub_block))
