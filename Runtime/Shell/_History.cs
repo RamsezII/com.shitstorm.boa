@@ -34,8 +34,7 @@ namespace _BOA_
             static void ReadHistory(in bool log)
             {
                 history.Clear();
-                History saved_history = null;
-                if (StaticJSon.ReadStaticJSon(ref saved_history, true, log))
+                if (StaticJSon.ReadStaticJSon(out History saved_history, true, log))
                     history.AddRange(saved_history.lines[..Mathf.Min(history_max, saved_history.lines.Length)]);
             }
 
