@@ -5,7 +5,7 @@ namespace _BOA_
 {
     partial class Shell
     {
-        static readonly BoaSignal sig_tick = new(SIG_FLAGS_new.TICK, null);
+        static readonly BoaSignal sig_tick = new(SIG_FLAGS_old.TICK, null);
 
         readonly ScopeNode scope = new(null, false);
 
@@ -69,7 +69,7 @@ namespace _BOA_
                 current_status = shell_status;
                 if (signal != null && signal.reader != null)
                 {
-                    bool submit = signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT);
+                    bool submit = signal.flags.HasFlag(SIG_FLAGS_old.SUBMIT);
 
                     harbinger = new Harbinger(this, null, workdir, null);
                     harbinger.signal = signal;

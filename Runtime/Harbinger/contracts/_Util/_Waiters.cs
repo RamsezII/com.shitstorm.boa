@@ -15,7 +15,7 @@ namespace _BOA_
 
             static IEnumerator<Contract.Status> EWaitOneFrame(ContractExecutor executor)
             {
-                while (!executor.harbinger.signal.flags.HasFlag(SIG_FLAGS_new.TICK))
+                while (!executor.harbinger.signal.flags.HasFlag(SIG_FLAGS_old.TICK))
                     yield return default;
                 yield return default;
             }

@@ -6,7 +6,7 @@ namespace _BOA_
     {
         static byte _id;
         public readonly byte id;
-        public readonly SIG_FLAGS_new flags;
+        public readonly SIG_FLAGS_old flags;
         public readonly BoaReader reader;
         public override string ToString() => $"sig[{id}]{{{flags}}}";
 
@@ -24,7 +24,7 @@ namespace _BOA_
 
         //--------------------------------------------------------------------------------------------------------------
 
-        public BoaSignal(in SIG_FLAGS_new flags, in BoaReader reader)
+        public BoaSignal(in SIG_FLAGS_old flags, in BoaReader reader)
         {
             id = _id++;
             this.flags = flags;

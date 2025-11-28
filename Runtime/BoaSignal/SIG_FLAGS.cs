@@ -24,7 +24,7 @@ namespace _BOA_
     }
 
     [Flags]
-    public enum SIG_FLAGS_new : ushort
+    public enum SIG_FLAGS_old : ushort
     {
         _none_,
         KILL = 1 << SIG_ENUM._kill,

@@ -36,7 +36,7 @@ namespace _BOA_
 
                 do
                     yield return status_last;
-                while (!exe.harbinger.signal.flags.HasFlag(SIG_FLAGS_new.SUBMIT));
+                while (!exe.harbinger.signal.flags.HasFlag(SIG_FLAGS_old.SUBMIT));
 
                 string stdin = exe.harbinger.signal.reader.ReadAll();
                 yield return new(Contract.Status.States.ACTION_skip, output: stdin);

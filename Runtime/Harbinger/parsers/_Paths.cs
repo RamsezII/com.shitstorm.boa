@@ -63,7 +63,7 @@ namespace _BOA_
                                 }
                             }
 
-                            if (signal.flags.HasFlag(SIG_FLAGS_new.CHANGE))
+                            if (signal.flags.HasFlag(SIG_FLAGS_old.CHANGE))
                             {
                                 var paths = type switch
                                 {

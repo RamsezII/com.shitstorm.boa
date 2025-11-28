@@ -8,7 +8,7 @@ namespace _BOA_
         public static void Daemonize(in Executor executor) => NUCLEOR.instance.sequencer_parallel.AddRoutine(EDaemonize(executor));
         public static IEnumerator<float> EDaemonize(Executor executor)
         {
-            BoaSignal signal = new(SIG_FLAGS_new.TICK, null);
+            BoaSignal signal = new(SIG_FLAGS_old.TICK, null);
             using var routine = executor.EExecute();
             do
             {
